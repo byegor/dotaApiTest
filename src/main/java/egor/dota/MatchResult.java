@@ -12,11 +12,13 @@ public class MatchResult {
     int radiantId;
     int direId;
     boolean radiantWin;
+    long matchId;
 
-    public MatchResult(List<Hero> radiant, List<Hero> dire, boolean radiantWin) {
+    public MatchResult(List<Hero> radiant, List<Hero> dire, boolean radiantWin, long matchId) {
         radiantId = getOrCreateIdForEachTeam(radiant);
         direId = getOrCreateIdForEachTeam(dire);
         this.radiantWin = radiantWin;
+        this.matchId = matchId;
     }
 
     private int getOrCreateIdForEachTeam(List<Hero> team){

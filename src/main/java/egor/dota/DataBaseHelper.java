@@ -26,9 +26,10 @@ public enum DataBaseHelper {
     static final String TEAM_GET_BY_CODE = "SELECT * FROM TEAM WHERE CODE='%s';";
     static final String TEAM_INSERT = "INSERT TEAM (code) values('%s');";
 
-    static final String TEAM_FIGHTS_INSERT = "INSERT team_fights (winner, looser) values(%s, %s);";
+    static final String TEAM_FIGHTS_INSERT = "INSERT team_fights (winner, looser, match_id) values(%s, %s, %s);";
 
     static final String PROGRESS_INSERT = "INSERT PROGRESS (value) values(%s);";
+    static final String PROGRESS_GET_LAST = "SELECT * FROM PROGRESS ORDER BY id DESC LIMIT 1";
 
     DataBaseHelper() {
         try {
@@ -76,7 +77,7 @@ public enum DataBaseHelper {
             for (MatchResult matchResult : results) {
                 int winner = matchResult.radiantWin ? matchResult.radiantId : matchResult.direId;
                 int looser = matchResult.radiantWin ? matchResult.direId : matchResult.radiantId;
-                statement.addBatch(String.format(TEAM_FIGHTS_INSERT, winner, looser));
+                statement.addBatch(String.format(TEAM_FIGHTS_INSERT, winner, looser, matchResult.matchId));
             }
             statement.addBatch(String.format(PROGRESS_INSERT, lastMatchId));
             statement.executeBatch();
@@ -111,6 +112,7 @@ public enum DataBaseHelper {
             return heroes;
         } catch (SQLException e) {
             e.printStackTrace();
+            throw new RuntimeException(e);
         } finally {
             try {
                 if (connection != null) {
@@ -122,7 +124,6 @@ public enum DataBaseHelper {
             } catch (SQLException ignore) {
             }
         }
-        return Collections.emptyList();
     }
 
     public int getTeamIdByCode(String code) {
@@ -140,6 +141,7 @@ public enum DataBaseHelper {
 
         } catch (SQLException e) {
             e.printStackTrace();
+            throw new RuntimeException(e);
         } finally {
             try {
                 if (connection != null) {
@@ -151,7 +153,6 @@ public enum DataBaseHelper {
             } catch (SQLException ignore) {
             }
         }
-        return -2;
     }
 
     public int createTeam(String code) {
@@ -180,4 +181,32 @@ public enum DataBaseHelper {
             }
         }
     }
+    public long getLatRecordedMatchId() {
+        Connection connection = null;
+        Statement statement = null;
+        try {
+            connection = getConnection();
+            statement = connection.createStatement();
+            ResultSet resultSet = statement.executeQuery(PROGRESS_GET_LAST);
+            if (!resultSet.next()) {
+                return -1;
+            } else {
+                return resultSet.getLong("value");
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+            throw  new RuntimeException(e);
+        } finally {
+            try {
+                if (connection != null) {
+                    connection.close();
+                }
+                if (statement != null) {
+                    statement.close();
+                }
+            } catch (SQLException ignore) {
+            }
+        }
+    }
+
 }
