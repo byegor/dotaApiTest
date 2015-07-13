@@ -21,7 +21,7 @@ public class RetrieveStatisticsBasedOnSequenceJob implements Runnable {
         }
         for (int i = 0; i < 90000; i++) {
             long latRecordedSequenceNum = DataBaseHelper.INSTANCE.getLatRecordedMatchId();
-            JSONObject matchHistoryJson = HttpUtils.getMatchDetailsResultsBySequence(latRecordedSequenceNum);
+            JSONObject matchHistoryJson = HttpUtilsJava.getMatchDetailsResultsBySequence(latRecordedSequenceNum);
             List<MatchSequence> matches = parseMatchHistory(matchHistoryJson, heroMap);
             MatchSequence lastMatch = matches.remove(matches.size() - 1);
             long lastSequenceNum = lastMatch.getSequence();

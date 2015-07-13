@@ -5,7 +5,7 @@ import java.util.List;
 import java.util.concurrent.TimeUnit;
 
 /**
- * Created by Егор on 10.07.2015.
+ * Created by Egor on 10.07.2015.
  */
 public class MatchSequence {
     public static final long TWENTY_MINUTES = TimeUnit.MINUTES.toSeconds(20);

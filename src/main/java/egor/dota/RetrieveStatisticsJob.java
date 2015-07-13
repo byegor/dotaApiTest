@@ -22,7 +22,7 @@ public class RetrieveStatisticsJob implements Runnable {
         boolean reachEnd = false;
         while (!reachEnd) {
             long latRecordedMatchId = DataBaseHelper.INSTANCE.getLatRecordedMatchId();
-            JSONObject matchHistoryJson = HttpUtils.getMatchHistoryResults(latRecordedMatchId);
+            JSONObject matchHistoryJson = HttpUtilsJava.getMatchHistoryResults(latRecordedMatchId);
             List<Match> matches = parseMatchHistory(matchHistoryJson, heroMap);
             Match lastMatch = matches.remove(matches.size() - 1);
             long last = lastMatch.getId();
@@ -48,7 +48,7 @@ public class RetrieveStatisticsJob implements Runnable {
 
     public static MatchResult getMatchResult(Match match) {
         if (match.isNormalMatch()) {
-            JSONObject matchDetailResponse = HttpUtils.getMatchDetailsResults(match.getId());
+            JSONObject matchDetailResponse = HttpUtilsJava.getMatchDetailsResults(match.getId());
             JSONObject result = matchDetailResponse.optJSONObject("result");
             if (result != null) {
                 boolean radiantWin = result.getBoolean("radiant_win");

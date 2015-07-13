@@ -11,9 +11,9 @@ import org.json.JSONObject;
 import java.io.IOException;
 
 /**
- * Created by ���� on 11.07.2015.
+ * Created by Egor on 11.07.2015.
  */
-public class HttpUtils {
+public class HttpUtilsJava {
 
     private static final String HEROES = "https://api.steampowered.com/IEconDOTA2_570/GetHeroes/v0001/?key=9EBD51CD27F27324F1554C53BEDA17C3";
     public static final String GET_BATCH_OF_MATCHES = "https://api.steampowered.com/IDOTA2Match_570/GetMatchHistory/V001/?min_players=10&game_mode=1&key=9EBD51CD27F27324F1554C53BEDA17C3";

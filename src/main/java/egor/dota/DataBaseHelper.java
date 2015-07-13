@@ -7,7 +7,7 @@ import java.util.Collections;
 import java.util.List;
 
 /**
- * Created by Егор on 10.07.2015.
+ * Created by Egor on 10.07.2015.
  */
 public enum DataBaseHelper {
     INSTANCE;

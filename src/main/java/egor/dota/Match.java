@@ -6,7 +6,7 @@ import java.util.Iterator;
 import java.util.List;
 
 /**
- * Created by Егор on 10.07.2015.
+ * Created by Egor on 10.07.2015.
  */
 public class Match {
     private long id;

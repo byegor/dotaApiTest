@@ -1,7 +1,7 @@
 package egor.dota;
 
 /**
- * Created by Егор on 10.07.2015.
+ * Created by Egor on 10.07.2015.
  */
 public class Hero implements Comparable<Hero>{
     private int id;
