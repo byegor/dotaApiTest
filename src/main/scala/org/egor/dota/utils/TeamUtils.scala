@@ -1,5 +1,7 @@
 package org.egor.dota.utils
 
+import java.util.concurrent.atomic.AtomicLong
+
 import egor.dota.DataBaseHelper
 import org.egor.dota.entity.{Team, Hero}
 

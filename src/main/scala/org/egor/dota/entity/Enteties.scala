@@ -12,4 +12,5 @@ case class MatchBasicInfo(id: Long, sequence: Long, radiantWin: Boolean, duratio
 
 case class MatchResult(id: Long, radiantWin: Boolean, radiant:Team, dire:Team)
 
+case class MatchDetails(id: Long, radiantWin: Boolean, duration:Int, radiant:Team, dire:Team, accounts:List[Int])
 

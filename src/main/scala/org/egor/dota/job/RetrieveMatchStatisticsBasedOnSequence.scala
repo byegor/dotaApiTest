@@ -8,7 +8,7 @@ import org.json.{JSONArray, JSONObject}
 /**
  * Created by Egor on 12.07.2015.
  */
-class RetrieveMatchStatisticsBasedOnSequenceJob(jobId: Int, seqBound: Long) extends Runnable {
+class RetrieveMatchStatisticsBasedOnSequence(jobId: Int) extends Runnable {
 
 
   def isNormalMatch(matchResult: MatchBasicInfo): Boolean = {
@@ -19,20 +19,15 @@ class RetrieveMatchStatisticsBasedOnSequenceJob(jobId: Int, seqBound: Long) exte
     val heroes: List[Hero] = DBUtils.getHeroes
     val heroById: Map[Int, Hero] = heroes.map(h => h.id -> h).toMap
 
-
     while (true) {
       val latRecordedSequenceNum: Long = DBUtils.getLatRecordedMatchId(jobId)
       val matchHistoryJson: JSONObject = HttpUtils.getMatchDetailsResultsBySequence(latRecordedSequenceNum)
       val matchesInfo: List[MatchBasicInfo] = parseMatchHistory(matchHistoryJson, heroById)
       val lastMatch: MatchBasicInfo = matchesInfo.head
-      if (lastMatch.sequence > seqBound) {
-        println(jobId + " finished work")
-        return
-      }
       val matchResults: List[MatchResult] = matchesInfo.tail
         .filter(m => isNormalMatch(m))
         .map(m => new MatchResult(m.id, m.radiantWin, TeamUtils.getOrCreateIdForEachTeam(m.radiant), TeamUtils.getOrCreateIdForEachTeam(m.dire)))
-      DBUtils.insertMatchResults(matchResults, lastMatch.sequence, jobId)
+      DBUtils.insertMatchResults(matchResults, lastMatch.sequence)
     }
 
   }
