@@ -1,4 +1,4 @@
-package org.egor.dota.entity
+package egor.dota.model.entity
 
 /**
  * Created by Egor on 12.07.2015.

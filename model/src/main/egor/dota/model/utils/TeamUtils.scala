@@ -1,9 +1,10 @@
-package org.egor.dota.utils
+package egor.dota.model.utils
 
 import java.util.concurrent.atomic.AtomicLong
 
 import egor.dota.DataBaseHelper
-import org.egor.dota.entity.{Team, Hero}
+import egor.dota.model.entity.{Team, Hero}
+import org.egor.dota.entity.Team
 
 /**
  * Created by Егор on 13.07.2015.
