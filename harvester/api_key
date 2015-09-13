@@ -6,3 +6,6 @@ http://dev.dota2.com/showthread.php?t=58317
 https://api.steampowered.com/IDOTA2Match_570/GetMatchDetails/V001/?key=9EBD51CD27F27324F1554C53BEDA17C3&match_id=1043654411
 
 https://api.steampowered.com/IDOTA2Match_570/GetMatchHistoryBySequenceNum/v0001/?key=9EBD51CD27F27324F1554C53BEDA17C3&start_at_match_seq_num=1046875935
+
+
+http://kevintechnology.com/post/71621133663/using-machine-learning-to-recommend-heroes-for

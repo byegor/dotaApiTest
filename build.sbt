@@ -1,11 +1,5 @@
 
-scalaVersion in ThisBuild := "2.11.5"
-
-javaOptions in(ThisBuild, run) ++= List(
-  "-Xmx1G",
-  "-Xdebug",
-  "-agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=9999"
-)
+scalaVersion in ThisBuild := "2.11.6"
 
 crossScalaVersions in ThisBuild := Seq("2.10.4", "2.11.5")
 
@@ -23,8 +17,10 @@ libraryDependencies in ThisBuild ++= Seq(
 
 )
 
-lazy val root = project.in(file(".")) aggregate(model, harvester)
+lazy val root = project.in(file(".")) aggregate(model, ui, harvester)
 
 lazy val model = project.in(file("model"))
 
 lazy val harvester = project.in(file("harvester")) dependsOn model
+
+lazy val ui = project.in(file("ui"))
