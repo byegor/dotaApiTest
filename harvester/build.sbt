@@ -3,13 +3,13 @@ name := "harvester"
 version := "0.1"
 
 
-libraryDependencies ++= {
-  import Deps._
-  Seq(
-    json,
-    httpClient,
-    unirest,
-    mysql
+libraryDependencies ++= Seq(
+  "org.json" % "json" % "20140107",
+  "org.apache.httpcomponents" % "httpclient" % "4.5",
+  "com.mashape.unirest" % "unirest-java" % "1.4.6"
+)
 
-  )
-}
+
+assemblyJarName in assembly := "harvester.jar"
+
+mainClass in assembly := Some("egor.dota.harvester.HarvesterStarter")

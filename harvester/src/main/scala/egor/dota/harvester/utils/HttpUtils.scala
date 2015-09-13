@@ -1,4 +1,4 @@
-package egor.dota.model.utils
+package egor.dota.harvester.utils
 
 import com.mashape.unirest.http.{HttpResponse, JsonNode, Unirest}
 import org.json.JSONObject

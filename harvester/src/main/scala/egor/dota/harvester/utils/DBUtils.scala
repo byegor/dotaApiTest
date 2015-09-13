@@ -1,9 +1,8 @@
-package egor.dota.model.utils
+package egor.dota.harvester.utils
 
 import java.sql._
 
 import egor.dota.model.entity.{MatchResult, Hero}
-import org.egor.dota.entity._
 
 import scala.StringBuilder
 

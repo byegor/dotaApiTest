@@ -3,7 +3,7 @@ package egor.dota.harvester
 import egor.dota.harvester.job.{RetrieveMatchStatisticsBasedOnMatchId, RetrieveUserAndMatchBasedOnUser}
 
 /**
- * Created by Åãîð on 13.07.2015.
+ * Created by Ð•Ð³Ð¾Ñ€ on 13.07.2015.
  */
 object HarvesterStarter extends App {
   new Thread(new RetrieveUserAndMatchBasedOnUser).start()

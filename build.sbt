@@ -1,7 +1,7 @@
 
-scalaVersion := "2.11.5"
+scalaVersion in ThisBuild := "2.11.5"
 
-javaOptions in run ++= List(
+javaOptions in(ThisBuild, run) ++= List(
   "-Xmx1G",
   "-Xdebug",
   "-agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=9999"
@@ -16,8 +16,15 @@ scalacOptions in ThisBuild ++= Seq(
   "-optimize"
 )
 
-lazy val root = Project("dota-stats", file(".")) aggregate(model, harvester)
+libraryDependencies in ThisBuild ++= Seq(
+  "org.scalatest" %% "scalatest" % "2.2.4" % "test",
+  "org.scalacheck" %% "scalacheck" % "1.12.2" % "test",
+  "mysql" % "mysql-connector-java" % "5.1.36"
+
+)
+
+lazy val root = project.in(file(".")) aggregate(model, harvester)
 
 lazy val model = project.in(file("model"))
 
-lazy val harvester = Project("harvester", file("harvester")) dependsOn (model)
+lazy val harvester = project.in(file("harvester")) dependsOn model
