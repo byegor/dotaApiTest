@@ -6,7 +6,7 @@ import org.eclipse.jetty.webapp.WebAppContext
 import org.scalatra.servlet.ScalatraListener
 
 /**
- * Created by Егор on 13.09.2015.
+ * Created by Egor on 13.09.2015.
  */
 class JettyRunner {
 
