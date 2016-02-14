@@ -1,11 +1,15 @@
 package com.eb.schedule.crawler
 
+import com.eb.schedule.model.dao.{UpdateTaskDao, TeamDao}
+import com.eb.schedule.model.slick.{UpdateTask, Team}
 import com.eb.schedule.model.{Failed, Finished}
-import com.eb.schedule.utils.{DBUtils, HttpUtils}
-import egor.dota.model.entity.TeamInfo
+import com.eb.schedule.utils.HttpUtils
 import org.json.{JSONArray, JSONObject}
 import CrawlerUrls._
 import org.slf4j.LoggerFactory
+
+import scala.concurrent.duration.Duration
+import scala.concurrent.{Await, Future}
 
 
 class TeamCrawler extends Runnable {
@@ -13,21 +17,21 @@ class TeamCrawler extends Runnable {
   private val log = LoggerFactory.getLogger(this.getClass)
 
   def run() {
-    val tasks: List[(Int, String)] = DBUtils.getPendingUpdateTasks(TeamInfo.getClass.getName)
-    tasks.foreach(par => storeTeam(par._1))
+    val tasks: Future[Seq[UpdateTask]] = UpdateTaskDao.getPendingTasks(Team.getClass.getSimpleName)
+    val result: Seq[UpdateTask] = Await.result(tasks, Duration.Inf)
+    result.foreach(task => storeTeam(task.id.toInt))
   }
 
   private def storeTeam(teamId: Int): Unit = {
-    val info: Option[TeamInfo] = getTeamInfo(teamId)
+    val info: Option[Team] = getTeamInfo(teamId)
     if (info.isDefined) {
-      DBUtils.updateOrCreateTeamInfo(info.get)
-      DBUtils.updateResultInTask(teamId, TeamInfo.getClass.getName, Finished)
+      TeamDao.saveOrUpdateTeamAndTask(info.get)
     } else {
-      DBUtils.updateResultInTask(teamId, TeamInfo.getClass.getName, Failed)
+      UpdateTaskDao.update(new UpdateTask(teamId, Team.getClass.getSimpleName, Failed.status.toByte))
     }
   }
 
-  private def getTeamInfo(teamId: Int): Option[TeamInfo] = {
+  private def getTeamInfo(teamId: Int): Option[Team] = {
     try {
       val team: JSONObject = getTeamInfoFromSteam(teamId)
       val id: Int = team.getInt("team_id")
@@ -36,7 +40,7 @@ class TeamCrawler extends Runnable {
         val name: String = team.getString("name")
         val tag: String = team.getString("tag")
         downloadTeamLogo(logoUid, tag)
-        Some(new TeamInfo(teamId, name, tag))
+        Some(new Team(teamId, name, tag))
       } else {
         log.error("Couldn't find such team on steam: " + teamId)
         None

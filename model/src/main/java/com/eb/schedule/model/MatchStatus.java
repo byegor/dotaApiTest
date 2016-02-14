@@ -1,4 +1,4 @@
-package egor.dota.model.entity;
+package com.eb.schedule.model;
 
 /**
  * Created by Egor on 12.02.2016.

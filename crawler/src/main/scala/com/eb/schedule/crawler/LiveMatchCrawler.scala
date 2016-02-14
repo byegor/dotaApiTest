@@ -1,9 +1,17 @@
 package com.eb.schedule.crawler
 
-import com.eb.schedule.utils.{DBUtils, HttpUtils}
-import egor.dota.model.entity._
+import java.sql.Timestamp
+import java.util.Date
+
+import com.eb.schedule.model.MatchStatus
+import com.eb.schedule.model.dao.{MatchDao, GameDao, TeamDao, LeagueDao}
+import com.eb.schedule.model.slick.{Game, MatchDetails}
+import com.eb.schedule.utils.{HttpUtils}
 import org.json.{JSONArray, JSONObject}
 import org.slf4j.LoggerFactory
+
+import scala.concurrent.duration.Duration
+import scala.concurrent.{Await, Future}
 
 /**
   * Created by Egor on 10.02.2016.
@@ -16,7 +24,7 @@ class LiveMatchCrawler extends Runnable{
   def run(): Unit ={
     try{
       val liveGamesJson: List[JSONObject] = getLiveMatchesJson
-      val parsedMatch: List[Match] = liveGamesJson.map(json => parseMatch(json))
+      val parsedMatch: List[MatchDetails] = liveGamesJson.map(json => parseMatch(json))
       parsedMatch.foreach(saveOrUpdateLiveMatch)
     }catch {
       case e:Exception => log.error("exception when running live match crawler ", e)
@@ -37,7 +45,7 @@ class LiveMatchCrawler extends Runnable{
     gamesJson
   }
 
-  def parseMatch(game: JSONObject): Match = {
+  def parseMatch(game: JSONObject): MatchDetails = {
     val radiantTeam: JSONObject = game.getJSONObject("radiant_team")
     val direTeam: JSONObject = game.getJSONObject("dire_team")
     val radiantTeamId: Int = radiantTeam.getInt("team_id")
@@ -47,28 +55,26 @@ class LiveMatchCrawler extends Runnable{
     val seriesType: Byte = game.getInt("series_type").toByte
     val radiantSeriesWins: Byte = game.getInt("radiant_series_wins").toByte
     val direSeriesWins: Byte = game.getInt("dire_series_wins").toByte
-    new Match(matchId, radiantTeamId, direTeamId, leagueId, seriesType, radiantSeriesWins, (radiantSeriesWins + direSeriesWins + 1).toByte)
+    new MatchDetails(matchId, radiantTeamId, direTeamId, leagueId, seriesType, radiantSeriesWins, (radiantSeriesWins + direSeriesWins + 1).toByte)
   }
 
-  def saveOrUpdateLiveMatch(matchDetails: Match): Unit = {
-    val gameOpt: Option[Game] = DBUtils.getNotFinishedMatchByCriteria(matchDetails.matchId, matchDetails.radiantId, matchDetails.direId)
+  //todo
+  def saveOrUpdateLiveMatch(matchDetails: MatchDetails): Unit = {
+    val games: Future[Seq[Game]] = GameDao.getUnfinishedGames(matchDetails)
+    val result: Seq[Game] = Await.result(games, Duration.Inf)
     if (gameOpt.isDefined) {
       val game: Game = gameOpt.get
       if (MatchStatus.SCHEDULED == game.status) {
         DBUtils.updateGameStatus(game)
       }
     }else{
-      if(!DBUtils.getTeamById(matchDetails.radiantId).isDefined){
-        DBUtils.updateOrCreateTeamInfo(new TeamInfo(matchDetails.radiantId, "", ""))
-      }
-      if(!DBUtils.getTeamById(matchDetails.direId).isDefined){
-        DBUtils.updateOrCreateTeamInfo(new TeamInfo(matchDetails.direId, "", ""))
-      }
-      if(!DBUtils.getLeagueById(matchDetails.leagueid).isDefined){
-        DBUtils.saveLeague(new League(matchDetails.leagueid, "", "", ""))
-      }
-      DBUtils.saveMatchDetails(matchDetails)
-      DBUtils.saveLiveGame(matchDetails)
+      TeamDao.insertTeamTask(matchDetails.radiant)
+      TeamDao.insertTeamTask(matchDetails.dire)
+      LeagueDao.insertLeagueTask(matchDetails.leagueId)
+
+      MatchDao.insert(matchDetails)
+      GameDao.insert(new Game(-1, matchDetails.radiant, matchDetails.dire, matchDetails.leagueId, Some(matchDetails.matchId), Some(new Timestamp(System.currentTimeMillis())), MatchStatus.LIVE))
+
     }
   }
 

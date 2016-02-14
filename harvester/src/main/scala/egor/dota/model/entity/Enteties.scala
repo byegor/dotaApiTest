@@ -2,6 +2,8 @@ package egor.dota.model.entity
 
 import java.util.Date
 
+import com.eb.schedule.model.MatchStatus
+
 
 case class Hero(id: Int, name: String)
 
