@@ -1,6 +1,6 @@
 package com.eb.schedule.model.dao
 
-import com.eb.schedule.model.slick.{MatchDetails, MatchDetailsTable, MatchDetails, MatchDetailss}
+import com.eb.schedule.model.slick.{LiveGame, LiveGames}
 import slick.driver.MySQLDriver.api._
 import slick.lifted.TableQuery
 
@@ -9,15 +9,15 @@ import scala.concurrent.Future
 /**
   * Created by Egor on 13.02.2016.
   */
-object MatchDao extends DBConf {
+object LiveGameDao extends DBConf {
 
 
-  lazy val matches = new TableQuery(tag => new MatchDetailsTable(tag))
+  lazy val liveGames = new TableQuery(tag => new LiveGames(tag))
 
 
-  def filterQuery(id: Long): Query[MatchDetailsTable, MatchDetails, Seq] = matches.filter(_.matchId === id)
+  def filterQuery(id: Long): Query[LiveGames, LiveGame, Seq] = liveGames.filter(_.matchId === id)
 
-  def findById(id: Int): Future[MatchDetails] =
+  def findById(id: Int): Future[LiveGame] =
     try db.run(filterQuery(id).result.head)
     finally db.close
 
@@ -25,12 +25,12 @@ object MatchDao extends DBConf {
     try db.run(filterQuery(id).exists.result)
     finally db.close
 
-  def insert(matchDetails: MatchDetails): Future[Int] = {
-    try db.run(matches += matchDetails)
+  def insert(matchDetails: LiveGame): Future[Int] = {
+    try db.run(liveGames += matchDetails)
     finally db.close
   }
 
-  def update(id: Long, matchDetails: MatchDetails): Future[Int] = {
+  def update(id: Long, matchDetails: LiveGame): Future[Int] = {
     try db.run(filterQuery(id).update(matchDetails))
     finally db.close
   }

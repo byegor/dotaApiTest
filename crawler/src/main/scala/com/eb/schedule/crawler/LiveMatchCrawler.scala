@@ -1,17 +1,18 @@
 package com.eb.schedule.crawler
 
 import java.sql.Timestamp
-import java.util.Date
+
 
 import com.eb.schedule.model.MatchStatus
-import com.eb.schedule.model.dao.{MatchDao, GameDao, TeamDao, LeagueDao}
-import com.eb.schedule.model.slick.{Game, MatchDetails}
-import com.eb.schedule.utils.{HttpUtils}
+import com.eb.schedule.model.dao.{LiveGameDao, ScheduledGamesDao, TeamDao, LeagueDao}
+import com.eb.schedule.model.slick.{ScheduledGame, Pick, LiveGame}
+import com.eb.schedule.utils.HttpUtils
 import org.json.{JSONArray, JSONObject}
 import org.slf4j.LoggerFactory
 
 import scala.concurrent.duration.Duration
-import scala.concurrent.{Await, Future}
+import scala.concurrent.{ExecutionContext, Await, Future}
+import ExecutionContext.Implicits.global
 
 /**
   * Created by Egor on 10.02.2016.
@@ -23,15 +24,17 @@ class LiveMatchCrawler extends Runnable{
 
   def run(): Unit ={
     try{
-      val liveGamesJson: List[JSONObject] = getLiveMatchesJson
-      val parsedMatch: List[MatchDetails] = liveGamesJson.map(json => parseMatch(json))
-      parsedMatch.foreach(saveOrUpdateLiveMatch)
+      val liveGamesJson: List[JSONObject] = getLiveGamesJson
+      val parsedLiveGames: List[LiveGame] = liveGamesJson.map(json => parseLiveGame(json))
+      //todo
+      val parsedScoreBoards: List[(List[Pick], (Int, Int))] = liveGamesJson.map(extractScoreBoardDetails(_))
+      parsedLiveGames.foreach(saveLiveGame)
     }catch {
       case e:Exception => log.error("exception when running live match crawler ", e)
     }
   }
 
-  def getLiveMatchesJson = {
+  def getLiveGamesJson = {
     var gamesJson: List[JSONObject] = Nil
     val response: JSONObject = HttpUtils.getResponseAsJson(CrawlerUrls.GET_LIVE_LEAGUE_MATCHES)
     val gamesList: JSONArray = response.getJSONObject("result").getJSONArray("games")
@@ -45,7 +48,7 @@ class LiveMatchCrawler extends Runnable{
     gamesJson
   }
 
-  def parseMatch(game: JSONObject): MatchDetails = {
+  def parseLiveGame(game: JSONObject): LiveGame = {
     val radiantTeam: JSONObject = game.getJSONObject("radiant_team")
     val direTeam: JSONObject = game.getJSONObject("dire_team")
     val radiantTeamId: Int = radiantTeam.getInt("team_id")
@@ -55,26 +58,59 @@ class LiveMatchCrawler extends Runnable{
     val seriesType: Byte = game.getInt("series_type").toByte
     val radiantSeriesWins: Byte = game.getInt("radiant_series_wins").toByte
     val direSeriesWins: Byte = game.getInt("dire_series_wins").toByte
-    new MatchDetails(matchId, radiantTeamId, direTeamId, leagueId, seriesType, radiantSeriesWins, (radiantSeriesWins + direSeriesWins + 1).toByte)
+    new LiveGame(matchId, radiantTeamId, direTeamId, leagueId, seriesType, new Timestamp(System.currentTimeMillis()), radiantSeriesWins, (radiantSeriesWins + direSeriesWins + 1).toByte)
   }
 
-  //todo
-  def saveOrUpdateLiveMatch(matchDetails: MatchDetails): Unit = {
-    val games: Future[Seq[Game]] = GameDao.getUnfinishedGames(matchDetails)
-    val result: Seq[Game] = Await.result(games, Duration.Inf)
-    if (gameOpt.isDefined) {
-      val game: Game = gameOpt.get
-      if (MatchStatus.SCHEDULED == game.status) {
-        DBUtils.updateGameStatus(game)
+  def extractScoreBoardDetails(game:JSONObject) = {
+    val matchId: Long = game.getLong("match_id")
+    val scoreBoard: JSONObject = game.getJSONObject("scoreboard")
+    val radiantScoreBoard: JSONObject = scoreBoard.getJSONObject("radiant")
+    val direScoreBoard: JSONObject = scoreBoard.getJSONObject("dire")
+    val radiantScore: Int = radiantScoreBoard.getInt("score")
+    val direScore: Int = direScoreBoard.getInt("score")
+    val scoreTuple = (radiantScore, direScore)
+    val picks: List[Pick] = getPicks(matchId, direScoreBoard, radiantScoreBoard)
+    (picks, scoreTuple)
+  }
+
+  def getPicks(matchId: Long, direScoreBoard: JSONObject, radiantScoreBoard: JSONObject): List[Pick] ={
+    getTeamPickBan(direScoreBoard.getJSONArray("picks"), matchId, isPick = true, isRadiant = false) :::
+      getTeamPickBan(direScoreBoard.getJSONArray("bans"), matchId, isPick = false, isRadiant = false) :::
+      getTeamPickBan(direScoreBoard.getJSONArray("picks"), matchId, isPick = true, isRadiant = true) :::
+      getTeamPickBan(direScoreBoard.getJSONArray("bans"), matchId, isPick = false, isRadiant = false)
+  }
+
+  def getTeamPickBan(picks: JSONArray, matchId: Long, isPick:Boolean, isRadiant:Boolean): List[Pick] = {
+    var picksResult: List[Pick] = Nil
+    for (i <- 0 until picks.length()) {
+      val pick: JSONObject = picks.getJSONObject(i)
+      val hero: Int = pick.getInt("hero_id")
+      picksResult ::= new Pick(matchId, hero, isRadiant, isPick)
+    }
+    picksResult
+  }
+
+
+  def saveLiveGame(liveGame: LiveGame): Unit = {
+    val isNewGame: Boolean = Await.result(LiveGameDao.exists(liveGame.matchId), Duration.fromNanos(5000))
+    if(isNewGame){
+      TeamDao.insertTeamTask(liveGame.radiant)
+      TeamDao.insertTeamTask(liveGame.dire)
+      LeagueDao.insertLeagueTask(liveGame.leagueId)
+      LiveGameDao.insert(liveGame)
+      if( liveGame.game == 0){
+        val game: Future[ScheduledGame] = ScheduledGamesDao.getScheduledGames(liveGame)
+        //todo what if we don't find a game
+        game onFailure {
+          case t => println("An error has occured: " + t.getMessage)
+        }
+        game onSuccess {
+          case g =>{
+            ScheduledGamesDao.update(new ScheduledGame(g.id, Some(liveGame.matchId), g.radiant, g.dire, g.leagueId, g.startDate, MatchStatus.LIVE.status))
+          }
+        }
+
       }
-    }else{
-      TeamDao.insertTeamTask(matchDetails.radiant)
-      TeamDao.insertTeamTask(matchDetails.dire)
-      LeagueDao.insertLeagueTask(matchDetails.leagueId)
-
-      MatchDao.insert(matchDetails)
-      GameDao.insert(new Game(-1, matchDetails.radiant, matchDetails.dire, matchDetails.leagueId, Some(matchDetails.matchId), Some(new Timestamp(System.currentTimeMillis())), MatchStatus.LIVE))
-
     }
   }
 

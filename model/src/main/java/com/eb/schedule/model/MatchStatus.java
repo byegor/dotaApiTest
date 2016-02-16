@@ -9,10 +9,10 @@ public enum MatchStatus {
     FINISHED(2);
 
 
-    public final int status;
+    public final byte status;
 
     MatchStatus(int status) {
-        this.status = status;
+        this.status = (byte) status;
     }
 
 

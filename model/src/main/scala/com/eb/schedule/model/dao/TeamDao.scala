@@ -1,10 +1,11 @@
 package com.eb.schedule.model.dao
 
-import com.eb.schedule.model.dao.LeagueDao._
+
 import com.eb.schedule.model.slick._
 import slick.lifted.TableQuery
-import scala.concurrent.Future
+import scala.concurrent.{ExecutionContext, Future}
 import slick.driver.MySQLDriver.api._
+import ExecutionContext.Implicits.global
 
 /**
   * Created by Egor on 13.02.2016.
@@ -29,12 +30,6 @@ object TeamDao extends DBConf {
   def insert(team: Team): Future[Int] = {
     try db.run(teams += team)
     finally db.close
-  }
-
-  def insertIfNotExists(id: Int) = teams.forceInsertQuery {
-    val exists = filterQuery(id).exists
-    val insert = (id.bind, "") <>(Team.apply _ tupled, Team.unapply)
-    for (team <- Query(insert) if !exists) yield team
   }
 
   def insertTeamTask(id: Int) = {

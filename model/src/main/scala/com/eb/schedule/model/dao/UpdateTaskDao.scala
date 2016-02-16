@@ -1,6 +1,6 @@
 package com.eb.schedule.model.dao
 
-import com.eb.schedule.model.slick.{UpdateTask, UpdateTasks, UpdateTask, UpdateTasks}
+import com.eb.schedule.model.slick.{UpdateTask, UpdateTasks}
 import slick.driver.MySQLDriver.api._
 import slick.lifted.TableQuery
 
@@ -40,7 +40,7 @@ object UpdateTaskDao extends DBConf {
     finally db.close
 
   def getPendingTasks(classname: String) = {
-    try db.run(tasks.filter(t => t.classname === classname && t.result === 0).result)
+    try db.run(tasks.filter(t => t.classname === classname && t.result === 0.toByte).result)
     finally db.close
   }
 }
