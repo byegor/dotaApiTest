@@ -8,6 +8,7 @@ import slick.driver.JdbcProfile
   */
 
 trait DBConf {
+
   val dbConfig = DatabaseConfig.forConfig[JdbcProfile]("hikari")
   val db = dbConfig.db
   import dbConfig.driver.api._

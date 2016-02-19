@@ -40,6 +40,22 @@ object ScheduledGamesDao extends DBConf {
     finally db.close
   }
 
+  def updateStatus(id:Int, status:Byte): Future[Int] = {
+    try db.run(games
+      .filter(_.id === id)
+      .map(x => x.status)
+      .update(status))
+    finally db.close
+  }
+
+  def updateScore(matchId:Long, radiantScore:Byte, direScore:Byte): Future[Int] = {
+    try db.run(games
+      .filter(_.matchId === matchId)
+      .map(x => (x.radiantScore, x.direScore))
+      .update((radiantScore, direScore)))
+    finally db.close
+  }
+
   def delete(id: Int): Future[Int] =
     try db.run(filterQuery(id).delete)
     finally db.close
