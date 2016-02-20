@@ -1,7 +1,7 @@
 package com.eb.schedule.model.services
 
-import com.eb.schedule.model.dao.{LeagueRepComp, LeagueRepositoryComponent}
-import com.eb.schedule.model.slick.{League, League}
+import com.eb.schedule.model.dao.LeagueRepComp
+import com.eb.schedule.model.slick.League
 
 import scala.concurrent.Future
 

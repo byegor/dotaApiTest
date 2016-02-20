@@ -1,7 +1,7 @@
 package com.eb.schedule.model.services
 
-import com.eb.schedule.model.dao.{PickRepComp, PickRepositoryComponent}
-import com.eb.schedule.model.slick.{Pick, Pick}
+import com.eb.schedule.model.dao.PickRepComp
+import com.eb.schedule.model.slick.Pick
 
 import scala.concurrent.Future
 

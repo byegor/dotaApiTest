@@ -1,6 +1,7 @@
 package com.eb.schedule
 
-import java.util.concurrent.{TimeUnit, Executors, ScheduledExecutorService}
+import java.util.concurrent.{Executors, ScheduledExecutorService, TimeUnit}
+
 import com.eb.schedule.crawler.{LiveMatchCrawler, TeamCrawler}
 
 

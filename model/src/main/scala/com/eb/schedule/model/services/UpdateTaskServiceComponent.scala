@@ -23,7 +23,7 @@ trait UpdateTaskServiceComponent {
 
     def delete(id: Long, classname: String): Future[Int]
 
-    def getPendingTasks(classname: String)
+    def getPendingTasks(classname: String): Future[Seq[UpdateTask]]
   }
 }
 
@@ -53,7 +53,7 @@ trait UpdateTaskServiceImplComponent extends UpdateTaskServiceComponent{
       taskRepository.delete(id, classname)
     }
 
-    def getPendingTasks(classname: String) = {
+    def getPendingTasks(classname: String): Future[Seq[UpdateTask]] = {
       taskRepository.getPendingTasks(classname)
     }
   }

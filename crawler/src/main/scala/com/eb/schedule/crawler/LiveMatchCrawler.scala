@@ -2,17 +2,15 @@ package com.eb.schedule.crawler
 
 import java.sql.Timestamp
 
-
-import com.eb.schedule.model.MatchStatus
-import com.eb.schedule.model.dao._
-import com.eb.schedule.model.slick.{ScheduledGame, Pick, LiveGame}
+import com.eb.schedule.model.slick.{LiveGame, Pick, ScheduledGame}
+import com.eb.schedule.model.{AppConfig, MatchStatus}
 import com.eb.schedule.utils.HttpUtils
 import org.json.{JSONArray, JSONObject}
 import org.slf4j.LoggerFactory
 
+import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.duration.Duration
-import scala.concurrent.{ExecutionContext, Await, Future}
-import ExecutionContext.Implicits.global
+import scala.concurrent.{Await, ExecutionContext, Future}
 
 /**
   * Created by Egor on 10.02.2016.
@@ -20,6 +18,12 @@ import ExecutionContext.Implicits.global
 class LiveMatchCrawler extends Runnable {
 
   private val log = LoggerFactory.getLogger(this.getClass)
+
+  val teamService = AppConfig.teamService
+  val leagueService = AppConfig.leagueService
+  val scheduledGameService = AppConfig.scheduledGameService
+  val pickService = AppConfig.pickService
+  val liveGameService = AppConfig.liveGameService
 
   def run(): Unit = {
     try {
@@ -88,29 +92,29 @@ class LiveMatchCrawler extends Runnable {
 
   def saveGameInfo(gameInfo: (LiveGame, List[Pick], Int, Int)): Unit = {
     val liveGame :LiveGame = gameInfo._1
-    val isNewGame: Boolean = Await.result(LiveGameDao.exists(liveGame.matchId), Duration.Inf)
+    val isNewGame: Boolean = Await.result(liveGameService.exists(liveGame.matchId), Duration.Inf)
     if (isNewGame) {
-      TeamDao.insertTeamTask(liveGame.radiant)
-      TeamDao.insertTeamTask(liveGame.dire)
-      LeagueDao.insertLeagueTask(liveGame.leagueId)
-      LiveGameDao.insert(liveGame)
+      teamService.insertTeamTask(liveGame.radiant)
+      teamService.insertTeamTask(liveGame.dire)
+      leagueService.insertLeagueTask(liveGame.leagueId)
+      liveGameService.insert(liveGame)
       if (liveGame.game == 0) {
-        val game: Future[ScheduledGame] = ScheduledGamesDao.getScheduledGames(liveGame)
+        val game: Future[ScheduledGame] = scheduledGameService.getScheduledGames(liveGame)
         //todo what if we don't find a game
         game onFailure {
           case t => println("An error has occured: " + t.getMessage)
         }
         game onSuccess {
           case g => {
-            ScheduledGamesDao.updateStatus(g.id, MatchStatus.LIVE.status)
+            scheduledGameService.updateStatus(g.id, MatchStatus.LIVE.status)
           }
         }
       }
     }else{
-      ScheduledGamesDao.updateScore(liveGame.matchId, gameInfo._3.toByte, gameInfo._4.toByte)
+      scheduledGameService.updateScore(liveGame.matchId, gameInfo._3.toByte, gameInfo._4.toByte)
     }
     if(gameInfo._2 != Nil){
-      gameInfo._2.foreach(PickDao.updateOrCreate)
+      gameInfo._2.foreach(pickService.updateOrCreate)
     }
   }
 

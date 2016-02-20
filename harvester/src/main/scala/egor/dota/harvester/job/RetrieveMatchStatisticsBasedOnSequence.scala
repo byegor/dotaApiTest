@@ -1,7 +1,7 @@
 package egor.dota.harvester.job
 
-import egor.dota.model.entity.{MatchResult, MatchBasicInfo, Hero}
-import egor.dota.harvester.utils.{HttpUtils, DBUtils, TeamUtils}
+import egor.dota.harvester.utils.{DBUtils, HttpUtils, TeamUtils}
+import egor.dota.model.entity.{Hero, MatchBasicInfo, MatchResult}
 import org.json.{JSONArray, JSONObject}
 
 /**

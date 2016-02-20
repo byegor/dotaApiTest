@@ -26,9 +26,8 @@ trait UpdateTaskRepositoryComponent {
 
     def delete(id: Long, classname: String): Future[Int]
 
-    def getPendingTasks(classname: String)
+    def getPendingTasks(classname: String): Future[Seq[UpdateTask]]
   }
-
 }
 
 trait UpdateTaskRepositoryImplComponent extends UpdateTaskRepositoryComponent {
@@ -64,7 +63,7 @@ trait UpdateTaskRepositoryImplComponent extends UpdateTaskRepositoryComponent {
       try db.run(filterQuery(id, classname).delete)
       finally db.close
 
-    def getPendingTasks(classname: String) = {
+    def getPendingTasks(classname: String): Future[Seq[UpdateTask]] = {
       try db.run(tasks.filter(t => t.classname === classname && t.result === 0.toByte).result)
       finally db.close
     }

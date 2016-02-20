@@ -1,7 +1,7 @@
 package egor.dota.harvester.job
 
 import egor.dota.harvester.utils.{DBUtils, HttpUtils}
-import org.json.{JSONException, JSONArray, JSONObject}
+import org.json.{JSONArray, JSONException, JSONObject}
 
 /**
  * Created by Egor on 12.07.2015.

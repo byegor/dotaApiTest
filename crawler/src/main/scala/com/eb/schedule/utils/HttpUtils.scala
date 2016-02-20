@@ -2,15 +2,11 @@ package com.eb.schedule.utils
 
 import java.io._
 import java.net.URL
-import java.nio.file.{Paths, Files}
+
 import com.fasterxml.jackson.databind
 import com.fasterxml.jackson.databind.{DeserializationFeature, ObjectMapper}
-import com.mashape.unirest.http.{HttpResponse, JsonNode, Unirest}
+import com.mashape.unirest.http.{HttpResponse, Unirest}
 import org.json.JSONObject
-
-import scala.Predef
-import scala.io.Source
-import collection.JavaConversions._
 
 
 object HttpUtils {

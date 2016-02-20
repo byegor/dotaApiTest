@@ -1,7 +1,7 @@
 package com.eb.schedule.model.services
 
-import com.eb.schedule.model.dao.{ScheduledGameRepComp, ScheduledGameRepositoryComponent}
-import com.eb.schedule.model.slick.{LiveGame, ScheduledGame, ScheduledGame}
+import com.eb.schedule.model.dao.ScheduledGameRepComp
+import com.eb.schedule.model.slick.{LiveGame, ScheduledGame}
 
 import scala.concurrent.Future
 

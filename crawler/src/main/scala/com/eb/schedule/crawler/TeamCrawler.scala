@@ -1,11 +1,10 @@
 package com.eb.schedule.crawler
 
-import com.eb.schedule.model.dao.{UpdateTaskDao, TeamDao}
-import com.eb.schedule.model.slick.{UpdateTask, Team}
-import com.eb.schedule.model.{Failed, Finished}
+import com.eb.schedule.crawler.CrawlerUrls._
+import com.eb.schedule.model.slick.{Team, UpdateTask}
+import com.eb.schedule.model.{AppConfig, Failed}
 import com.eb.schedule.utils.HttpUtils
 import org.json.{JSONArray, JSONObject}
-import CrawlerUrls._
 import org.slf4j.LoggerFactory
 
 import scala.concurrent.duration.Duration
@@ -15,9 +14,12 @@ import scala.concurrent.{Await, Future}
 class TeamCrawler extends Runnable {
 
   private val log = LoggerFactory.getLogger(this.getClass)
+  
+  val teamService = AppConfig.teamService
+  val taskService = AppConfig.taskService
 
   def run() {
-    val tasks: Future[Seq[UpdateTask]] = UpdateTaskDao.getPendingTasks(Team.getClass.getSimpleName)
+    val tasks: Future[Seq[UpdateTask]] = taskService.getPendingTasks(Team.getClass.getSimpleName)
     val result: Seq[UpdateTask] = Await.result(tasks, Duration.Inf)
     result.foreach(task => storeTeam(task.id.toInt))
   }
@@ -25,9 +27,9 @@ class TeamCrawler extends Runnable {
   private def storeTeam(teamId: Int): Unit = {
     val info: Option[Team] = getTeamInfo(teamId)
     if (info.isDefined) {
-      TeamDao.saveOrUpdateTeamAndTask(info.get)
+      teamService.saveOrUpdateTeamAndTask(info.get)
     } else {
-      UpdateTaskDao.update(new UpdateTask(teamId, Team.getClass.getSimpleName, Failed.status.toByte))
+      taskService.update(new UpdateTask(teamId, Team.getClass.getSimpleName, Failed.status.toByte))
     }
   }
 

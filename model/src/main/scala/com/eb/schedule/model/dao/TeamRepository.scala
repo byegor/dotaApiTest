@@ -2,11 +2,12 @@ package com.eb.schedule.model.dao
 
 
 import com.eb.schedule.model.slick._
+import slick.driver.MySQLDriver.api._
 import slick.jdbc.JdbcBackend
 import slick.lifted.TableQuery
-import scala.concurrent.{ExecutionContext, Future}
-import slick.driver.MySQLDriver.api._
-import ExecutionContext.Implicits.global
+
+import scala.concurrent.ExecutionContext.Implicits.global
+import scala.concurrent.Future
 
 /**
   * Created by Egor on 13.02.2016.
@@ -66,14 +67,14 @@ trait TeamRepositoryImplComponent extends TeamRepositoryComponent{
       }
     }
 
-    def saveOrUpdateTeamAndTask(team: Team) = {
-      exists(team.id).onSuccess { case present =>
-        if (present) try db.run(DBIO.seq(
-          filterQuery(team.id).update(team),
-          UpdateTaskDao.filterQuery(team.id, Team.getClass.getSimpleName).update(new UpdateTask(team.id, Team.getClass.getSimpleName, 1))
-        ).transactionally) finally db.close
-      }
-    }
+//    def saveOrUpdateTeamAndTask(team: Team) = {
+//      exists(team.id).onSuccess { case present =>
+//        if (present) try db.run(DBIO.seq(
+//          filterQuery(team.id).update(team),
+//          UpdateTaskDao.filterQuery(team.id, Team.getClass.getSimpleName).update(new UpdateTask(team.id, Team.getClass.getSimpleName, 1))
+//        ).transactionally) finally db.close
+//      }
+//    }
 
     def update(team: Team): Future[Int] = {
       try db.run(filterQuery(team.id).update(team))
