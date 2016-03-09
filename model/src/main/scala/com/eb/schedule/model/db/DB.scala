@@ -8,6 +8,6 @@ import slick.jdbc.JdbcBackend
 
 trait DB {
 
-  val db:JdbcBackend#DatabaseDef
+  def db:JdbcBackend#DatabaseDef
 
 }

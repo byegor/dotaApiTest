@@ -1,7 +1,9 @@
 package com.eb.schedule.model.dao
 
 import com.eb.schedule.model.MatchStatus
+import com.eb.schedule.model.db.DB
 import com.eb.schedule.model.slick._
+import com.google.inject.Inject
 import slick.driver.MySQLDriver.api._
 import slick.jdbc.JdbcBackend
 import slick.lifted.TableQuery
@@ -11,96 +13,74 @@ import scala.concurrent.Future
 /**
   * Created by Egor on 13.02.2016.
   */
-trait ScheduledGameRepComp {
+trait ScheduledGameRepository {
+  def findById(id: Int): Future[ScheduledGame]
 
-  def repository: ScheduledGameRep
+  def findByMatchId(matchId: Long): Future[ScheduledGame]
 
-  trait ScheduledGameRep {
-    def findById(id: Int): Future[ScheduledGame]
+  def exists(id: Int): Future[Boolean]
 
-    def findByMatchId(matchId: Long): Future[ScheduledGame]
+  def insert(game: ScheduledGame): Future[Int]
 
-    def exists(id: Int): Future[Boolean]
+  def update(game: ScheduledGame): Future[Int]
 
-    def insert(game: ScheduledGame): Future[Int]
+  def updateStatus(id: Int, status: Byte): Future[Int]
 
-    def update(game: ScheduledGame): Future[Int]
+  def updateScore(matchId: Long, radiantScore: Byte, direScore: Byte): Future[Int]
 
-    def updateStatus(id: Int, status: Byte): Future[Int]
+  def delete(id: Int): Future[Int]
 
-    def updateScore(matchId: Long, radiantScore: Byte, direScore: Byte): Future[Int]
-
-    def delete(id: Int): Future[Int]
-
-    def getScheduledGames(matchDetails: LiveGame): Future[ScheduledGame]
-  }
-
+  def getScheduledGames(matchDetails: LiveGame): Future[ScheduledGame]
 }
 
-trait ScheduledGameRepImplComp extends ScheduledGameRepComp {
-  val db: JdbcBackend#DatabaseDef
+class ScheduledGameRepositoryImpl @Inject()(val database: DB) extends ScheduledGameRepository {
+  val db = database.db
+  lazy val games = new TableQuery(tag => new ScheduledGames(tag))
 
-  def repository = new ScheduledGameRepImpl(db)
+  def filterQuery(id: Int): Query[ScheduledGames, ScheduledGame, Seq] = games.filter(_.id === id)
 
-  class ScheduledGameRepImpl(val db: JdbcBackend#DatabaseDef) extends ScheduledGameRep {
+  def findById(id: Int): Future[ScheduledGame] =
+    db.run(filterQuery(id).result.head)
 
-    lazy val games = new TableQuery(tag => new ScheduledGames(tag))
+  def findByMatchId(matchId: Long): Future[ScheduledGame] =
+    db.run(games.filter(_.matchId === matchId).result.head)
 
-    def filterQuery(id: Int): Query[ScheduledGames, ScheduledGame, Seq] = games.filter(_.id === id)
+  def exists(id: Int): Future[Boolean] =
+    db.run(filterQuery(id).exists.result)
 
-    def findById(id: Int): Future[ScheduledGame] =
-      try db.run(filterQuery(id).result.head)
-      finally db.close
-
-    def findByMatchId(matchId: Long): Future[ScheduledGame] =
-      try db.run(games.filter(_.matchId === matchId).result.head)
-      finally db.close
-
-    def exists(id: Int): Future[Boolean] =
-      try db.run(filterQuery(id).exists.result)
-      finally db.close
-
-    def insert(game: ScheduledGame): Future[Int] = {
-      try db.run(games += game)
-      finally db.close
-    }
-
-    def update(game: ScheduledGame): Future[Int] = {
-      try db.run(filterQuery(game.id).update(game))
-      finally db.close
-    }
-
-    def updateStatus(id: Int, status: Byte): Future[Int] = {
-      try db.run(games
-        .filter(_.id === id)
-        .map(x => x.status)
-        .update(status))
-      finally db.close
-    }
-
-    def updateScore(matchId: Long, radiantScore: Byte, direScore: Byte): Future[Int] = {
-      try db.run(games
-        .filter(_.matchId === matchId)
-        .map(x => (x.radiantScore, x.direScore))
-        .update((radiantScore, direScore)))
-      finally db.close
-    }
-
-    def delete(id: Int): Future[Int] =
-      try db.run(filterQuery(id).delete)
-      finally db.close
-
-
-    private def getScheduledGameQuery(liveGame: LiveGame) = {
-      games.filter(g => g.status === MatchStatus.SCHEDULED.status && g.leagueId === liveGame.leagueId && ((g.radiant === liveGame.radiant && g.dire === liveGame.dire) || (g.radiant === liveGame.dire && g.dire === liveGame.radiant)))
-        .sortBy(_.startDate)
-    }
-
-    def getScheduledGames(matchDetails: LiveGame): Future[ScheduledGame] = {
-      try db.run(getScheduledGameQuery(matchDetails).result.head)
-      finally db.close
-    }
+  def insert(game: ScheduledGame): Future[Int] = {
+    db.run(games += game)
   }
 
+  def update(game: ScheduledGame): Future[Int] = {
+    db.run(filterQuery(game.id).update(game))
+  }
+
+  def updateStatus(id: Int, status: Byte): Future[Int] = {
+    db.run(games
+      .filter(_.id === id)
+      .map(x => x.status)
+      .update(status))
+  }
+
+  def updateScore(matchId: Long, radiantScore: Byte, direScore: Byte): Future[Int] = {
+    db.run(games
+      .filter(_.matchId === matchId)
+      .map(x => (x.radiantScore, x.direScore))
+      .update((radiantScore, direScore)))
+  }
+
+  def delete(id: Int): Future[Int] =
+    db.run(filterQuery(id).delete)
+
+
+  private def getScheduledGameQuery(liveGame: LiveGame) = {
+    games.filter(g => g.status === MatchStatus.SCHEDULED.status && g.leagueId === liveGame.leagueId && ((g.radiant === liveGame.radiant && g.dire === liveGame.dire) || (g.radiant === liveGame.dire && g.dire === liveGame.radiant)))
+      .sortBy(_.startDate)
+  }
+
+  def getScheduledGames(matchDetails: LiveGame): Future[ScheduledGame] = {
+    db.run(getScheduledGameQuery(matchDetails).result.head)
+  }
 }
 

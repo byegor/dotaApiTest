@@ -1,6 +1,8 @@
 package com.eb.schedule.model.dao
 
+import com.eb.schedule.model.db.DB
 import com.eb.schedule.model.slick._
+import com.google.inject.Inject
 import slick.driver.MySQLDriver.api._
 import slick.jdbc.JdbcBackend
 import slick.lifted.TableQuery
@@ -12,70 +14,51 @@ import scala.concurrent.{ExecutionContext, Future}
   * Created by Egor on 13.02.2016.
   */
 
-trait PickRepComp {
+trait PickRepository {
+  def findById(p: Pick): Future[Pick]
 
-  def pickRep: PickRep
+  def exists(p: Pick): Future[Boolean]
 
-  trait PickRep {
-    def findById(p: Pick): Future[Pick]
+  def insert(pick: Pick): Future[Int]
 
-    def exists(p: Pick): Future[Boolean]
+  def update(p: Pick): Future[Int]
 
-    def insert(pick: Pick): Future[Int]
+  def updateOrCreate(p: Pick): Unit
 
-    def update(p: Pick): Future[Int]
-
-    def updateOrCreate(p: Pick): Unit
-
-    def delete(p: Pick): Future[Int]
-  }
-
+  def delete(p: Pick): Future[Int]
 }
 
-trait PickRepImplComp extends PickRepComp {
-  val db: JdbcBackend#DatabaseDef
+class PickRepositoryImpl @Inject()(database: DB) extends PickRepository {
+  val db: JdbcBackend#DatabaseDef = database.db
 
-  def pickRep = new PickRepImpl(db)
+  private lazy val picks = new TableQuery(tag => new Picks(tag))
 
-  class PickRepImpl(val db: JdbcBackend#DatabaseDef) extends PickRep {
+  def filterQuery(p: Pick): Query[Picks, Pick, Seq] = picks.filter(e => e.matchId === p.matchId && e.pick === p.pick && e.radiant === p.radiant)
 
-    private lazy val picks = new TableQuery(tag => new Picks(tag))
+  def findById(p: Pick): Future[Pick] =
+    db.run(filterQuery(p).result.head)
 
-    def filterQuery(p: Pick): Query[Picks, Pick, Seq] = picks.filter(e => e.matchId === p.matchId && e.pick === p.pick && e.radiant === p.radiant)
+  def exists(p: Pick): Future[Boolean] =
+    db.run(filterQuery(p).exists.result)
 
-    def findById(p: Pick): Future[Pick] =
-      try db.run(filterQuery(p).result.head)
-      finally db.close
+  def insert(pick: Pick): Future[Int] = {
+    db.run(picks += pick)
+  }
 
-    def exists(p: Pick): Future[Boolean] =
-      try db.run(filterQuery(p).exists.result)
-      finally db.close
+  def update(p: Pick): Future[Int] = {
+    db.run(picks.filter(e => e.matchId === p.matchId && e.pick === p.pick && e.radiant === p.radiant).update(p))
+  }
 
-    def insert(pick: Pick): Future[Int] = {
-      try db.run(picks += pick)
-      finally db.close
-    }
-
-    def update(p: Pick): Future[Int] = {
-      try db.run(picks.filter(e => e.matchId === p.matchId && e.pick === p.pick && e.radiant === p.radiant).update(p))
-      finally db.close
-    }
-
-    def updateOrCreate(p: Pick): Unit = {
-      exists(p).onSuccess { case present =>
-        if (!present) {
-          update(p)
-        } else {
-          insert(p)
-        }
+  def updateOrCreate(p: Pick): Unit = {
+    exists(p).onSuccess { case present =>
+      if (!present) {
+        update(p)
+      } else {
+        insert(p)
       }
     }
-
-    def delete(p: Pick): Future[Int] =
-      try db.run(filterQuery(p).delete)
-      finally db.close
   }
 
+  def delete(p: Pick): Future[Int] =
+    db.run(filterQuery(p).delete)
 }
-
-

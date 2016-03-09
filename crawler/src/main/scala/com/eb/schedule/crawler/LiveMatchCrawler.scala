@@ -2,28 +2,30 @@ package com.eb.schedule.crawler
 
 import java.sql.Timestamp
 
+import com.eb.schedule.model.MatchStatus
+import com.eb.schedule.model.services._
 import com.eb.schedule.model.slick.{LiveGame, Pick, ScheduledGame}
-import com.eb.schedule.model.{AppConfig, MatchStatus}
 import com.eb.schedule.utils.HttpUtils
+import com.google.inject.Inject
 import org.json.{JSONArray, JSONObject}
 import org.slf4j.LoggerFactory
 
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.duration.Duration
-import scala.concurrent.{Await, ExecutionContext, Future}
+import scala.concurrent.{Await, Future}
 
 /**
   * Created by Egor on 10.02.2016.
   */
-class LiveMatchCrawler extends Runnable {
+class LiveMatchCrawler @Inject()(
+                      teamService: TeamService,
+                      leagueService: LeagueService,
+                      liveGameService: LiveGameService,
+                      pickService: PickService,
+                      scheduledGameService: ScheduledGameService
+                      ) extends Runnable {
 
   private val log = LoggerFactory.getLogger(this.getClass)
-
-  val teamService = AppConfig.teamService
-  val leagueService = AppConfig.leagueService
-  val scheduledGameService = AppConfig.scheduledGameService
-  val pickService = AppConfig.pickService
-  val liveGameService = AppConfig.liveGameService
 
   def run(): Unit = {
     try {

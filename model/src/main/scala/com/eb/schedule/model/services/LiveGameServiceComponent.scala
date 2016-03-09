@@ -1,54 +1,44 @@
 package com.eb.schedule.model.services
 
-import com.eb.schedule.model.dao.LiveGameRepComp
+import com.eb.schedule.model.dao.LiveGameRepository
 import com.eb.schedule.model.slick.LiveGame
+import com.google.inject.Inject
 
 import scala.concurrent.Future
 
 /**
   * Created by Egor on 20.02.2016.
   */
-trait LiveGameServiceComponent {
+trait LiveGameService {
+  def findById(id: Int): Future[LiveGame]
 
-  def liveGameService: LiveGameService
+  def exists(id: Long): Future[Boolean]
 
-  trait LiveGameService {
-    def findById(id: Int): Future[LiveGame]
+  def insert(matchDetails: LiveGame): Future[Int]
 
-    def exists(id: Long): Future[Boolean]
+  def update(id: Long, matchDetails: LiveGame): Future[Int]
 
-    def insert(matchDetails: LiveGame): Future[Int]
-
-    def update(id: Long, matchDetails: LiveGame): Future[Int]
-
-    def delete(id: Long): Future[Int]
-  }
+  def delete(id: Long): Future[Int]
 }
 
-trait LiveGameServiceImplComponent extends LiveGameServiceComponent {
-  this: LiveGameRepComp =>
+class LiveGameServiceImpl @Inject()(repository: LiveGameRepository) extends LiveGameService {
+  def findById(id: Int): Future[LiveGame] = {
+    repository.findById(id)
+  }
 
-  def liveGameService = new LiveGameServiceImpl
+  def exists(id: Long): Future[Boolean] = {
+    repository.exists(id)
+  }
 
-  class LiveGameServiceImpl extends LiveGameService {
-    def findById(id: Int): Future[LiveGame] = {
-      repository.findById(id)
-    }
+  def insert(liveGame: LiveGame): Future[Int] = {
+    repository.insert(liveGame)
+  }
 
-    def exists(id: Long): Future[Boolean] = {
-      repository.exists(id)
-    }
+  def update(id: Long, matchDetails: LiveGame): Future[Int] = {
+    repository.update(id, matchDetails)
+  }
 
-    def insert(liveGame: LiveGame): Future[Int] = {
-      repository.insert(liveGame)
-    }
-
-    def update(id: Long, matchDetails: LiveGame): Future[Int] = {
-      repository.update(id, matchDetails)
-    }
-
-    def delete(id: Long): Future[Int] = {
-      repository.delete(id)
-    }
+  def delete(id: Long): Future[Int] = {
+    repository.delete(id)
   }
 }

@@ -1,9 +1,11 @@
 package com.eb.schedule.crawler
 
 import com.eb.schedule.crawler.CrawlerUrls._
+import com.eb.schedule.model.Failed
+import com.eb.schedule.model.services.{TeamService, UpdateTaskService}
 import com.eb.schedule.model.slick.{Team, UpdateTask}
-import com.eb.schedule.model.{AppConfig, Failed}
 import com.eb.schedule.utils.HttpUtils
+import com.google.inject.Inject
 import org.json.{JSONArray, JSONObject}
 import org.slf4j.LoggerFactory
 
@@ -11,12 +13,9 @@ import scala.concurrent.duration.Duration
 import scala.concurrent.{Await, Future}
 
 
-class TeamCrawler extends Runnable {
+class TeamCrawler @Inject() (teamService: TeamService, taskService: UpdateTaskService) extends Runnable {
 
   private val log = LoggerFactory.getLogger(this.getClass)
-  
-  val teamService = AppConfig.teamService
-  val taskService = AppConfig.taskService
 
   def run() {
     val tasks: Future[Seq[UpdateTask]] = taskService.getPendingTasks(Team.getClass.getSimpleName)
@@ -55,7 +54,7 @@ class TeamCrawler extends Runnable {
     }
   }
 
-  private def getTeamInfoFromSteam(teamId: Int): JSONObject = {
+  def getTeamInfoFromSteam(teamId: Int): JSONObject = {
     val teamInfo: JSONObject = HttpUtils.getResponseAsJson(GET_TEAM_BY_ID + teamId)
     val result: JSONObject = teamInfo.getJSONObject("result")
     val teams: JSONArray = result.getJSONArray("teams")

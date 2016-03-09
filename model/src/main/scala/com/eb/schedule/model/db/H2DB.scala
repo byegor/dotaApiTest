@@ -6,7 +6,7 @@ import slick.driver.JdbcProfile
 /**
   * Created by Egor on 20.02.2016.
   */
-trait H2DB extends DB{
+object H2DB extends DB{
   val dbConfig = DatabaseConfig.forConfig[JdbcProfile]("h2")
-  val db = dbConfig.db
+  def db = dbConfig.db
 }
