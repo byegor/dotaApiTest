@@ -10,7 +10,7 @@ import scala.concurrent.Future
   * Created by Egor on 20.02.2016.
   */
 trait TeamService {
-  def findById(id: Int): Future[Team]
+  def findById(id: Int): Future[Option[Team]]
 
   def exists(id: Int): Future[Boolean]
 
@@ -27,7 +27,7 @@ trait TeamService {
 
 
 class TeamServiceImpl @Inject()(teamRepository: TeamRepository) extends TeamService {
-  def findById(id: Int): Future[Team] = {
+  def findById(id: Int): Future[Option[Team]] = {
     teamRepository.findById(id)
   }
 

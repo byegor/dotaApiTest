@@ -17,7 +17,7 @@ import scala.concurrent.Future
 
 
 trait TeamRepository {
-  def findById(id: Int): Future[Team]
+  def findById(id: Int): Future[Option[Team]]
 
   def exists(id: Int): Future[Boolean]
 
@@ -43,8 +43,8 @@ class TeamRepositoryImpl @Inject()(database: DB) extends TeamRepository {
 
   def filterQuery(id: Int): Query[Teams, Team, Seq] = teams.filter(_.id === id)
 
-  def findById(id: Int): Future[Team] =
-    db.run(filterQuery(id).result.head)
+  def findById(id: Int): Future[Option[Team]] =
+    db.run(filterQuery(id).result.headOption)
 
 
   def exists(id: Int): Future[Boolean] =
@@ -66,10 +66,17 @@ class TeamRepositoryImpl @Inject()(database: DB) extends TeamRepository {
 
   def saveOrUpdateTeamAndTask(team: Team) = {
     exists(team.id).onSuccess { case present =>
-      if (present) db.run(DBIO.seq(
-        filterQuery(team.id).update(team),
-        tasks.filter(t => t.id === team.id.toLong && t.classname === Team.getClass.getSimpleName).update(new UpdateTask(team.id.toLong, Team.getClass.getSimpleName, 1))
-      ).transactionally)
+      if (present){
+        db.run(DBIO.seq(
+          filterQuery(team.id).update(team),
+          tasks.filter(t => t.id === team.id.toLong && t.classname === Team.getClass.getSimpleName).update(new UpdateTask(team.id.toLong, Team.getClass.getSimpleName, 1))
+        ).transactionally)
+      } else{
+        db.run(DBIO.seq(
+          teams +=team,
+          tasks.filter(t => t.id === team.id.toLong && t.classname === Team.getClass.getSimpleName).update(new UpdateTask(team.id.toLong, Team.getClass.getSimpleName, 1))
+        ).transactionally)
+      }
     }
   }
 

@@ -6,8 +6,9 @@ import org.json.{JSONArray, JSONObject}
 import org.mockito.Matchers._
 import org.mockito.Mockito._
 
-import scala.concurrent.Await
+import scala.concurrent.{Future, Await}
 import scala.concurrent.duration.Duration
+import scala.concurrent.ExecutionContext.Implicits.global
 
 /**
   * Created by Egor on 20.02.2016.
@@ -21,15 +22,40 @@ class TeamCrawlerTest extends BasicTest {
     when(crawler.getTeamInfoFromSteam(36)).thenReturn(getJsonTeam)
     doNothing().when(crawler).downloadTeamLogo(anyObject(), anyObject())
     crawler.run()
-
-
-    val team: Team = Await.result(teamService.findById(36), Duration.Inf)
+    Thread.sleep(1000)
+    val taks: UpdateTask = Await.result(taskService.findByIdAndName(36l, Team.getClass.getSimpleName), Duration.Inf)
+    assert(1.toByte == taks.result)
+    val teamOpt: Option[Team] = Await.result(teamService.findById(36), Duration.Inf)
+    assert(teamOpt.isDefined)
+    val team = teamOpt.get
     val jsonTeam: JSONObject = getJsonTeam
     assert(jsonTeam.getString("name") == team.name)
     assert(jsonTeam.getString("tag") == team.tag)
-    assert(jsonTeam.getInt("id") == team.id)
+    assert(jsonTeam.getInt("team_id") == team.id)
   }
 
+  test("crawle and update team") {
+    taskService.insert(new UpdateTask(36l, Team.getClass.getSimpleName, 0.toByte))
+    teamService.insert(new Team(36, "name", "tag"))
+
+    val crawler = org.mockito.Mockito.spy(new TeamCrawler(teamService, taskService))
+    when(crawler.getTeamInfoFromSteam(36)).thenReturn(getJsonTeam)
+    doNothing().when(crawler).downloadTeamLogo(anyObject(), anyObject())
+    crawler.run()
+    Thread.sleep(1000)
+    taskService.findByIdAndName(36l, Team.getClass.getSimpleName).onSuccess {
+      case taks => {
+        assert(1.toByte == taks.result)
+        val teamOpt: Option[Team] = Await.result(teamService.findById(36), Duration.Inf)
+        assert(teamOpt.isDefined)
+        val team = teamOpt.get
+        val jsonTeam: JSONObject = getJsonTeam
+        assert(jsonTeam.getString("name") == team.name)
+        assert(jsonTeam.getString("tag") == team.tag)
+        assert(jsonTeam.getInt("team_id") == team.id)
+      }
+    }
+  }
 
   def getJsonTeam: JSONObject = {
     val result: JSONObject = teamJsonResponse.getJSONObject("result")
