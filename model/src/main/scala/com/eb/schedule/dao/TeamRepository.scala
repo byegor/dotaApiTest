@@ -23,7 +23,7 @@ trait TeamRepository {
 
   def insert(team: Team): Future[Int]
 
-  def insertTeamTask(id: Int)
+  def insertTeamTask(team: Team)
 
   def saveOrUpdateTeamAndTask(team: Team)
 
@@ -55,11 +55,11 @@ class TeamRepositoryImpl @Inject()(database: DB) extends TeamRepository {
     db.run(teams += team)
   }
 
-  def insertTeamTask(id: Int) = {
-    exists(id).onSuccess { case present =>
+  def insertTeamTask(team: Team) = {
+    exists(team.id).onSuccess { case present =>
       if (!present) db.run(DBIO.seq(
-        teams += new Team(id, "", ""),
-        tasks += new UpdateTask(id.toLong, Team.getClass.getSimpleName, 0.toByte)
+        teams += team,
+        tasks += new UpdateTask(team.id.toLong, Team.getClass.getSimpleName, 0.toByte)
       ).transactionally)
     }
   }

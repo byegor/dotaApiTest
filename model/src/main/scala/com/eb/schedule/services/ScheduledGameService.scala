@@ -1,5 +1,6 @@
 package com.eb.schedule.model.services
 
+import com.eb.schedule.dto.{DTOUtils, LiveGameDTO}
 import com.eb.schedule.model.dao.ScheduledGameRepository
 import com.eb.schedule.model.slick.{LiveGame, ScheduledGame}
 import com.google.inject.Inject
@@ -26,7 +27,7 @@ trait ScheduledGameService {
 
   def delete(id: Int): Future[Int]
 
-  def getScheduledGames(matchDetails: LiveGame): Future[Option[ScheduledGame]]
+  def getScheduledGames(matchDetails: LiveGameDTO): Future[Option[ScheduledGame]]
 }
 
 
@@ -63,7 +64,7 @@ class ScheduledGameServiceImpl @Inject()(repository: ScheduledGameRepository) ex
     repository.delete(id)
   }
 
-  def getScheduledGames(liveGame: LiveGame): Future[Option[ScheduledGame]] = {
-    repository.getScheduledGames(liveGame)
+  def getScheduledGames(liveGameDTO: LiveGameDTO): Future[Option[ScheduledGame]] = {
+    repository.getScheduledGames(DTOUtils.transformLiveGameFromDTO(liveGameDTO))
   }
 }

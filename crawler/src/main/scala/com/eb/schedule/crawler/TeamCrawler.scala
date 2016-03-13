@@ -1,6 +1,7 @@
 package com.eb.schedule.crawler
 
 import com.eb.schedule.crawler.CrawlerUrls._
+import com.eb.schedule.dto.TaskDTO
 import com.eb.schedule.model.Failed
 import com.eb.schedule.model.services.{TeamService, UpdateTaskService}
 import com.eb.schedule.model.slick.{Team, UpdateTask}
@@ -18,8 +19,8 @@ class TeamCrawler @Inject() (teamService: TeamService, taskService: UpdateTaskSe
   private val log = LoggerFactory.getLogger(this.getClass)
 
   def run() {
-    val tasks: Future[Seq[UpdateTask]] = taskService.getPendingTasks(Team.getClass.getSimpleName)
-    val result: Seq[UpdateTask] = Await.result(tasks, Duration.Inf)
+    val tasks: Future[Seq[TaskDTO]] = taskService.getPendingTeamTasks()
+    val result: Seq[TaskDTO] = Await.result(tasks, Duration.Inf)
     result.foreach(task => storeTeam(task.id.toInt))
   }
 

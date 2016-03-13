@@ -19,7 +19,7 @@ trait LiveGameRepository {
 
   def insert(matchDetails: LiveGame): Future[Int]
 
-  def update(id: Long, matchDetails: LiveGame): Future[Int]
+  def update(liveGame: LiveGame): Future[Int]
 
   def delete(id: Long): Future[Int]
 }
@@ -41,8 +41,8 @@ class LiveGameRepositoryImpl @Inject()(database: DB) extends LiveGameRepository 
     db.run(liveGames += matchDetails)
   }
 
-  def update(id: Long, matchDetails: LiveGame): Future[Int] = {
-    db.run(filterQuery(id).update(matchDetails))
+  def update(liveGame: LiveGame): Future[Int] = {
+    db.run(filterQuery(liveGame.matchId).update(liveGame))
   }
 
   def delete(id: Long): Future[Int] =

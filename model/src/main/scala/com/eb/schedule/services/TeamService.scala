@@ -1,5 +1,6 @@
 package com.eb.schedule.model.services
 
+import com.eb.schedule.dto.{DTOUtils, TeamDTO}
 import com.eb.schedule.model.dao.TeamRepository
 import com.eb.schedule.model.slick.Team
 import com.google.inject.Inject
@@ -16,7 +17,7 @@ trait TeamService {
 
   def insert(team: Team): Future[Int]
 
-  def insertTeamTask(id: Int)
+  def insertTeamTask(t:TeamDTO)
 
   def saveOrUpdateTeamAndTask(team: Team)
 
@@ -39,8 +40,8 @@ class TeamServiceImpl @Inject()(teamRepository: TeamRepository) extends TeamServ
     teamRepository.insert(team)
   }
 
-  def insertTeamTask(id: Int) = {
-    teamRepository.insertTeamTask(id)
+  def insertTeamTask(t:TeamDTO) = {
+    teamRepository.insertTeamTask(DTOUtils.transformTeamFromDTO(t))
   }
 
   def saveOrUpdateTeamAndTask(team: Team) = {

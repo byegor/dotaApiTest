@@ -1,31 +1,32 @@
 package com.eb.schedule.model.services
 
+import com.eb.schedule.dto.{DTOUtils, LeagueDTO}
 import com.eb.schedule.model.dao.LeagueRepository
 import com.eb.schedule.model.slick.League
 import com.google.inject.Inject
 
 import scala.concurrent.Future
-
+import scala.concurrent.ExecutionContext.Implicits.global
 /**
   * Created by Egor on 20.02.2016.
   */
 trait LeagueService {
-  def findById(id: Int): Future[League]
+  def findById(id: Int): Future[LeagueDTO]
 
   def exists(id: Int): Future[Boolean]
 
   def insert(league: League): Future[Int]
 
-  def insertLeagueTask(id: Int)
+  def insertLeagueTask(leagueDTO: LeagueDTO)
 
-  def update(id: Int, league: League): Future[Int]
+  def update(league: LeagueDTO): Future[Int]
 
   def delete(id: Int): Future[Int]
 }
 
 class LeagueServiceImpl @Inject()(leagueRep: LeagueRepository) extends LeagueService {
-  def findById(id: Int): Future[League] = {
-    leagueRep.findById(id)
+  def findById(id: Int): Future[LeagueDTO] = {
+    leagueRep.findById(id).map(DTOUtils.crateDTO)
   }
 
   def exists(id: Int): Future[Boolean] = {
@@ -36,12 +37,12 @@ class LeagueServiceImpl @Inject()(leagueRep: LeagueRepository) extends LeagueSer
     leagueRep.insert(league)
   }
 
-  def insertLeagueTask(id: Int) = {
-    leagueRep.insertLeagueTask(id)
+  def insertLeagueTask(leagueDTO: LeagueDTO) = {
+    leagueRep.insertLeagueTask(DTOUtils.transformLeagueFromDTO(leagueDTO))
   }
 
-  def update(id: Int, league: League): Future[Int] = {
-    leagueRep.update(id, league)
+  def update(league: LeagueDTO): Future[Int] = {
+    leagueRep.update(DTOUtils.transformLeagueFromDTO(league))
   }
 
   def delete(id: Int): Future[Int] = {

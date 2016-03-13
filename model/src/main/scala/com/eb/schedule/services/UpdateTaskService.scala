@@ -1,10 +1,12 @@
 package com.eb.schedule.model.services
 
+import com.eb.schedule.dto.{DTOUtils, TaskDTO}
 import com.eb.schedule.model.dao.UpdateTaskRepository
-import com.eb.schedule.model.slick.UpdateTask
+import com.eb.schedule.model.slick.{Team, UpdateTask}
 import com.google.inject.Inject
 
 import scala.concurrent.Future
+import scala.concurrent.ExecutionContext.Implicits.global
 
 /**
   * Created by Egor on 20.02.2016.
@@ -20,7 +22,7 @@ trait UpdateTaskService {
 
   def delete(id: Long, classname: String): Future[Int]
 
-  def getPendingTasks(classname: String): Future[Seq[UpdateTask]]
+  def getPendingTeamTasks(): Future[Seq[TaskDTO]]
 }
 
 class UpdateTaskServiceImpl @Inject()(taskRepository: UpdateTaskRepository) extends UpdateTaskService {
@@ -44,7 +46,12 @@ class UpdateTaskServiceImpl @Inject()(taskRepository: UpdateTaskRepository) exte
     taskRepository.delete(id, classname)
   }
 
-  def getPendingTasks(classname: String): Future[Seq[UpdateTask]] = {
-    taskRepository.getPendingTasks(classname)
+  def getPendingTeamTasks(): Future[Seq[TaskDTO]] = {
+    getPendingTasks(Team.getClass.getSimpleName)
+  }
+
+
+  private def getPendingTasks(classname: String): Future[Seq[TaskDTO]] = {
+    taskRepository.getPendingTasks(classname).map(f => f.map(t => DTOUtils.createUpdateTaskDTO(t)))
   }
 }
