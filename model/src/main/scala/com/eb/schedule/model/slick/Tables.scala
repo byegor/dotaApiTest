@@ -50,7 +50,7 @@ class UpdateTasks(_tableTag: Tag) extends Table[UpdateTask](_tableTag, "update_t
 }
 
 
-case class LiveGame(matchId: Long, radiant: Int, dire: Int, leagueId: Int, seriesType: Byte, startDate: java.sql.Timestamp, radiantWin: Byte, game: Byte)
+case class LiveGame(matchId: Long, radiant: Int, dire: Int, leagueId: Int, seriesType: Byte, var startDate: java.sql.Timestamp, radiantWin: Byte, game: Byte)
 
 class LiveGames(_tableTag: Tag) extends Table[LiveGame](_tableTag, "live_games") {
   def * = (matchId, radiant, dire, leagueId, seriesType, startDate, radiantWin, game) <> (LiveGame.tupled, LiveGame.unapply)

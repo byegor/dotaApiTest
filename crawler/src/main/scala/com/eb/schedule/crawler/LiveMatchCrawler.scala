@@ -18,12 +18,12 @@ import scala.concurrent.{Await, Future}
   * Created by Egor on 10.02.2016.
   */
 class LiveMatchCrawler @Inject()(
-                      teamService: TeamService,
-                      leagueService: LeagueService,
-                      liveGameService: LiveGameService,
-                      pickService: PickService,
-                      scheduledGameService: ScheduledGameService
-                      ) extends Runnable {
+                                  teamService: TeamService,
+                                  leagueService: LeagueService,
+                                  liveGameService: LiveGameService,
+                                  pickService: PickService,
+                                  scheduledGameService: ScheduledGameService
+                                ) extends Runnable {
 
   private val log = LoggerFactory.getLogger(this.getClass)
 
@@ -63,13 +63,12 @@ class LiveMatchCrawler @Inject()(
     val radiantSeriesWins: Byte = game.getInt("radiant_series_wins").toByte
     val direSeriesWins: Byte = game.getInt("dire_series_wins").toByte
     val scoreBoard: JSONObject = game.getJSONObject("scoreboard")
-    val duration:Double = scoreBoard.getDouble("duration")
+    val duration: Double = scoreBoard.getDouble("duration")
     val radiantScoreBoard: JSONObject = scoreBoard.getJSONObject("radiant")
     val direScoreBoard: JSONObject = scoreBoard.getJSONObject("dire")
     val radiantScore: Int = radiantScoreBoard.getInt("score")
     val direScore: Int = direScoreBoard.getInt("score")
-    var picks: List[Pick] = Nil
-    if(duration < 200) picks = getPicks(matchId, direScoreBoard, radiantScoreBoard)
+    val picks: List[Pick] = getPicks(matchId, direScoreBoard, radiantScoreBoard)
     val liveGame: LiveGame = new LiveGame(matchId, radiantTeamId, direTeamId, leagueId, seriesType, new Timestamp(System.currentTimeMillis()), radiantSeriesWins, (radiantSeriesWins + direSeriesWins + 1).toByte)
     (liveGame, picks, radiantScore, direScore)
   }
@@ -93,29 +92,22 @@ class LiveMatchCrawler @Inject()(
 
 
   def saveGameInfo(gameInfo: (LiveGame, List[Pick], Int, Int)): Unit = {
-    val liveGame :LiveGame = gameInfo._1
-    val isNewGame: Boolean = Await.result(liveGameService.exists(liveGame.matchId), Duration.Inf)
-    if (isNewGame) {
+    val liveGame: LiveGame = gameInfo._1
+    val isGameExists: Boolean = Await.result(liveGameService.exists(liveGame.matchId), Duration.Inf)
+    if (!isGameExists) {
       teamService.insertTeamTask(liveGame.radiant)
       teamService.insertTeamTask(liveGame.dire)
       leagueService.insertLeagueTask(liveGame.leagueId)
       liveGameService.insert(liveGame)
-      if (liveGame.game == 0) {
-        val game: Future[ScheduledGame] = scheduledGameService.getScheduledGames(liveGame)
-        //todo what if we don't find a game
-        game onFailure {
-          case t => println("An error has occured: " + t.getMessage)
-        }
-        game onSuccess {
-          case g => {
-            scheduledGameService.updateStatus(g.id, MatchStatus.LIVE.status)
-          }
-        }
+      val game: Future[Option[ScheduledGame]] = scheduledGameService.getScheduledGames(liveGame)
+      game onSuccess {
+        case Some(g) => scheduledGameService.updateStatus(g.id, MatchStatus.LIVE.status)
+        case None => scheduledGameService.insert(new ScheduledGame(-1, Some(liveGame.matchId), liveGame.radiant, liveGame.dire, liveGame.leagueId, liveGame.startDate, MatchStatus.LIVE.status, gameInfo._3.toByte, gameInfo._4.toByte))
       }
-    }else{
+    } else {
       scheduledGameService.updateScore(liveGame.matchId, gameInfo._3.toByte, gameInfo._4.toByte)
     }
-    if(gameInfo._2 != Nil){
+    if (gameInfo._2 != Nil) {
       gameInfo._2.foreach(pickService.updateOrCreate)
     }
   }

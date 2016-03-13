@@ -26,7 +26,7 @@ trait ScheduledGameService {
 
   def delete(id: Int): Future[Int]
 
-  def getScheduledGames(matchDetails: LiveGame): Future[ScheduledGame]
+  def getScheduledGames(matchDetails: LiveGame): Future[Option[ScheduledGame]]
 }
 
 
@@ -63,7 +63,7 @@ class ScheduledGameServiceImpl @Inject()(repository: ScheduledGameRepository) ex
     repository.delete(id)
   }
 
-  def getScheduledGames(liveGame: LiveGame): Future[ScheduledGame] = {
+  def getScheduledGames(liveGame: LiveGame): Future[Option[ScheduledGame]] = {
     repository.getScheduledGames(liveGame)
   }
 }

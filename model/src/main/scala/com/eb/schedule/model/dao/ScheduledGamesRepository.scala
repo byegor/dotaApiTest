@@ -30,7 +30,7 @@ trait ScheduledGameRepository {
 
   def delete(id: Int): Future[Int]
 
-  def getScheduledGames(matchDetails: LiveGame): Future[ScheduledGame]
+  def getScheduledGames(matchDetails: LiveGame): Future[Option[ScheduledGame]]
 }
 
 class ScheduledGameRepositoryImpl @Inject()(val database: DB) extends ScheduledGameRepository {
@@ -79,8 +79,8 @@ class ScheduledGameRepositoryImpl @Inject()(val database: DB) extends ScheduledG
       .sortBy(_.startDate)
   }
 
-  def getScheduledGames(matchDetails: LiveGame): Future[ScheduledGame] = {
-    db.run(getScheduledGameQuery(matchDetails).result.head)
+  def getScheduledGames(matchDetails: LiveGame): Future[Option[ScheduledGame]] = {
+    db.run(getScheduledGameQuery(matchDetails).result.headOption)
   }
 }
 

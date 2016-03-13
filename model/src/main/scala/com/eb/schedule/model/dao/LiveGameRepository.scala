@@ -13,7 +13,7 @@ import scala.concurrent.Future
   * Created by Egor on 13.02.2016.
   */
 trait LiveGameRepository {
-  def findById(id: Int): Future[LiveGame]
+  def findById(id: Long): Future[LiveGame]
 
   def exists(id: Long): Future[Boolean]
 
@@ -31,7 +31,7 @@ class LiveGameRepositoryImpl @Inject()(database: DB) extends LiveGameRepository 
 
   def filterQuery(id: Long): Query[LiveGames, LiveGame, Seq] = liveGames.filter(_.matchId === id)
 
-  def findById(id: Int): Future[LiveGame] =
+  def findById(id: Long): Future[LiveGame] =
     db.run(filterQuery(id).result.head)
 
   def exists(id: Long): Future[Boolean] =
