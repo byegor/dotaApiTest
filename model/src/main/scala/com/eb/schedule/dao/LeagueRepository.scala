@@ -22,7 +22,7 @@ trait LeagueRepository {
 
   def insert(league: League): Future[Int]
 
-  def insertLeagueTask(league: League)
+  def insertLeagueTask(league: League):Future[Unit]
 
   def update(league: League): Future[Int]
 
@@ -48,13 +48,13 @@ class LeagueRepositoryImpl @Inject()(database: DB) extends LeagueRepository {
     db.run(leagues += league)
   }
 
-  def insertLeagueTask(league: League) = {
-    exists(league.id).onSuccess { case present =>
+  def insertLeagueTask(league: League):Future[Unit] = {
+    exists(league.id).map( present =>
       if (!present) db.run(DBIO.seq(
         leagues += league,
         tasks += new UpdateTask(league.id.toLong, League.getClass.getSimpleName, 0.toByte)
       ).transactionally)
-    }
+    )
   }
 
   def update(league: League): Future[Int] = {

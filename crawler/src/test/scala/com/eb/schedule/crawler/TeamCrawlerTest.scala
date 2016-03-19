@@ -1,5 +1,6 @@
 package com.eb.schedule.crawler
 
+import com.eb.schedule.dto.TeamDTO
 import com.eb.schedule.model.BasicTest
 import com.eb.schedule.model.slick.{Team, UpdateTask}
 import org.json.{JSONArray, JSONObject}
@@ -36,7 +37,7 @@ class TeamCrawlerTest extends BasicTest {
 
   test("crawle and update team") {
     taskService.insert(new UpdateTask(36l, Team.getClass.getSimpleName, 0.toByte))
-    teamService.insert(new Team(36, "name", "tag"))
+    teamService.insert(new TeamDTO(36, "name", "tag"))
 
     val crawler = org.mockito.Mockito.spy(new TeamCrawler(teamService, taskService))
     when(crawler.getTeamInfoFromSteam(36)).thenReturn(getJsonTeam)

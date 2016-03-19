@@ -5,14 +5,16 @@ import com.eb.schedule.model.dao.{PickRepository, LeagueRepository, TeamReposito
 import com.eb.schedule.model.slick.{League, Team, Pick, LiveGame}
 import com.google.inject.Inject
 import scala.concurrent.ExecutionContext.Implicits.global
+import scala.concurrent.duration.Duration
 
-import scala.concurrent.Future
+import scala.concurrent.{Await, Future}
+import scala.util.{Failure, Success}
 
 /**
   * Created by Egor on 20.02.2016.
   */
 trait LiveGameService {
-  def findById(id: Long): Future[LiveGameDTO]
+  def findById(id: Long): LiveGameDTO
 
   def exists(id: Long): Future[Boolean]
 
@@ -24,8 +26,16 @@ trait LiveGameService {
 }
 
 class LiveGameServiceImpl @Inject()(liveGameRepository: LiveGameRepository, teamRepository: TeamRepository, leagueRepository: LeagueRepository, pickRepository: PickRepository) extends LiveGameService {
-  def findById(id: Long): Future[LiveGameDTO] = {
-    liveGameRepository.findById(id).map(DTOUtils.createLiveGameDTO)
+  def findById(id: Long): LiveGameDTO = {
+    val liveGame = for {
+      game <- liveGameRepository.findById(id)
+      radiant <- teamRepository.findById(game.radiant)
+      dire <- teamRepository.findById(game.dire)
+    } yield DTOUtils.createLiveGameWithTeamDTO(game, radiant.get, dire.get)
+    val picks: Seq[Pick] = Await.result(pickRepository.findByMatchId(id), Duration.Inf)
+    val liveGameDTO: LiveGameDTO = Await.result(liveGame, Duration.Inf)
+    DTOUtils.fillLiveGameWithPicks(liveGameDTO, picks)
+    liveGameDTO
   }
 
   def exists(id: Long): Future[Boolean] = {
@@ -39,15 +49,16 @@ class LiveGameServiceImpl @Inject()(liveGameRepository: LiveGameRepository, team
     val direTeam: Team = DTOUtils.transformTeamFromDTO(liveGameDTO.dire)
     val league: League = DTOUtils.transformLeagueFromDTO(liveGameDTO.leagueDTO)
     val liveGame: LiveGame = DTOUtils.transformLiveGameFromDTO(liveGameDTO)
-    teamRepository.insertTeamTask(radiantTeam)
-    teamRepository.insertTeamTask(direTeam)
+    val liveGameFuture = for {
+      r <- teamRepository.insertTeamTask(radiantTeam)
+      d <- teamRepository.insertTeamTask(direTeam)
+      l <- leagueRepository.insertLeagueTask(league)
+      rp <- pickRepository.insert(radiantPicks)
+      dp <- pickRepository.insert(direPicks)
+      g <- liveGameRepository.insert(liveGame)
+    } yield g
 
-    leagueRepository.insertLeagueTask(league)
-
-    radiantPicks.foreach(pickRepository.insert)
-    direPicks.foreach(pickRepository.insert)
-
-    liveGameRepository.insert(liveGame)
+    liveGameFuture
   }
 
   def update(liveGameDTO: LiveGameDTO): Future[Int] = {

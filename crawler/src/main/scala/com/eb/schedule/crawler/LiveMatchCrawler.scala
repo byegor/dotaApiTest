@@ -2,7 +2,7 @@ package com.eb.schedule.crawler
 
 import java.sql.Timestamp
 
-import com.eb.schedule.dto.{PickDTO, LeagueDTO, TeamDTO, LiveGameDTO}
+import com.eb.schedule.dto._
 import com.eb.schedule.model.MatchStatus
 import com.eb.schedule.model.services._
 import com.eb.schedule.model.slick.{LiveGame, Pick, ScheduledGame}
@@ -102,20 +102,20 @@ class LiveMatchCrawler @Inject()(
   def saveGameInfo(liveGameDTO: LiveGameDTO): Unit = {
     val isGameExists: Boolean = Await.result(liveGameService.exists(liveGameDTO.matchId), Duration.Inf)
     if (!isGameExists) {
-      liveGameService.insert(liveGameDTO)
-      //todo scheduled game to DTO
-      val game: Future[Option[ScheduledGame]] = scheduledGameService.getScheduledGames(liveGameDTO)
-      game onSuccess {
-        case Some(g) => scheduledGameService.updateStatus(g.id, MatchStatus.LIVE.status)
-          //todo
-        case None => print("")
-        //        case None => scheduledGameService.insert(new ScheduledGame(-1, Some(liveGame.matchId), liveGame.radiant, liveGame.dire, liveGame.leagueId, liveGame.startDate, MatchStatus.LIVE.status, gameInfo._3.toByte, gameInfo._4.toByte))
+      val insert: Future[Int] = liveGameService.insert(liveGameDTO)
+      val game: Option[ScheduledGameDTO] = scheduledGameService.getScheduledGames(liveGameDTO)
+      if (game.isDefined) {
+        scheduledGameService.updateStatus(game.get.id, MatchStatus.LIVE.status)
+      } else {
+        insert.andThen{
+          case s => scheduledGameService.insert(new ScheduledGameDTO(-1, Some(liveGameDTO.matchId), liveGameDTO.radiant, liveGameDTO.dire, liveGameDTO.leagueDTO, liveGameDTO.startDate, MatchStatus.LIVE.status, liveGameDTO.radiant.score.toByte, liveGameDTO.dire.score.toByte))
+        }
       }
     } else {
       scheduledGameService.updateScore(liveGameDTO.matchId, liveGameDTO.radiant.score.toByte, liveGameDTO.dire.score.toByte)
       if (liveGameDTO.duration < 200) {
-        pickService.updatePicks(liveGameDTO.matchId, liveGameDTO.radiant, true)
-        pickService.updatePicks(liveGameDTO.matchId, liveGameDTO.dire, false)
+        pickService.insertIfNotExists(liveGameDTO.matchId, liveGameDTO.radiant, true)
+        pickService.insertIfNotExists(liveGameDTO.matchId, liveGameDTO.dire, false)
       }
     }
   }

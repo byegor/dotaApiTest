@@ -4,6 +4,7 @@ package com.eb.schedule.model.dao
 import com.eb.schedule.model.db.DB
 import com.eb.schedule.model.slick._
 import com.google.inject.Inject
+import org.slf4j.LoggerFactory
 import slick.driver.MySQLDriver.api._
 import slick.jdbc.JdbcBackend
 import slick.lifted.TableQuery
@@ -23,7 +24,7 @@ trait TeamRepository {
 
   def insert(team: Team): Future[Int]
 
-  def insertTeamTask(team: Team)
+  def insertTeamTask(team: Team):Future[Unit]
 
   def saveOrUpdateTeamAndTask(team: Team)
 
@@ -35,6 +36,8 @@ trait TeamRepository {
 
 class TeamRepositoryImpl @Inject()(database: DB) extends TeamRepository {
 
+  private val log = LoggerFactory.getLogger(this.getClass)
+
   val db: JdbcBackend#DatabaseDef = database.db
 
   private lazy val teams = new TableQuery(tag => new Teams(tag))
@@ -43,8 +46,13 @@ class TeamRepositoryImpl @Inject()(database: DB) extends TeamRepository {
 
   def filterQuery(id: Int): Query[Teams, Team, Seq] = teams.filter(_.id === id)
 
-  def findById(id: Int): Future[Option[Team]] =
-    db.run(filterQuery(id).result.headOption)
+  def findById(id: Int): Future[Option[Team]] = {
+    val future: Future[Option[Team]] = db.run(filterQuery(id).result.headOption)
+    future.onFailure{
+      case e => log.error("Couldn't team by id", e)
+    }
+    future
+  }
 
 
   def exists(id: Int): Future[Boolean] =
@@ -55,13 +63,14 @@ class TeamRepositoryImpl @Inject()(database: DB) extends TeamRepository {
     db.run(teams += team)
   }
 
-  def insertTeamTask(team: Team) = {
-    exists(team.id).onSuccess { case present =>
-      if (!present) db.run(DBIO.seq(
+  def insertTeamTask(team: Team):Future[Unit] = {
+    exists(team.id).map(present => if(!present){
+      val run: Future[Unit] = db.run(DBIO.seq(
         teams += team,
         tasks += new UpdateTask(team.id.toLong, Team.getClass.getSimpleName, 0.toByte)
       ).transactionally)
-    }
+      run
+    })
   }
 
   def saveOrUpdateTeamAndTask(team: Team) = {

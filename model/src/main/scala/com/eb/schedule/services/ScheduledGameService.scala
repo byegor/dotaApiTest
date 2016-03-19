@@ -1,11 +1,13 @@
 package com.eb.schedule.model.services
 
-import com.eb.schedule.dto.{DTOUtils, LiveGameDTO}
+import com.eb.schedule.dto.{ScheduledGameDTO, DTOUtils, LiveGameDTO}
 import com.eb.schedule.model.dao.ScheduledGameRepository
 import com.eb.schedule.model.slick.{LiveGame, ScheduledGame}
 import com.google.inject.Inject
 
-import scala.concurrent.Future
+import scala.concurrent.{Await, Future}
+import scala.concurrent.ExecutionContext.Implicits.global
+import scala.concurrent.duration.Duration
 
 /**
   * Created by Egor on 20.02.2016.
@@ -13,11 +15,11 @@ import scala.concurrent.Future
 trait ScheduledGameService {
   def findById(id: Int): Future[ScheduledGame]
 
-  def findByMatchId(matchId: Long): Future[ScheduledGame]
+  def findByMatchId(matchId: Long): Future[Option[ScheduledGame]]
 
   def exists(id: Int): Future[Boolean]
 
-  def insert(game: ScheduledGame): Future[Int]
+  def insert(game: ScheduledGameDTO): Future[Int]
 
   def update(game: ScheduledGame): Future[Int]
 
@@ -27,7 +29,7 @@ trait ScheduledGameService {
 
   def delete(id: Int): Future[Int]
 
-  def getScheduledGames(matchDetails: LiveGameDTO): Future[Option[ScheduledGame]]
+  def getScheduledGames(matchDetails: LiveGameDTO): Option[ScheduledGameDTO]
 }
 
 
@@ -36,7 +38,7 @@ class ScheduledGameServiceImpl @Inject()(repository: ScheduledGameRepository) ex
     repository.findById(id)
   }
 
-  def findByMatchId(matchId: Long): Future[ScheduledGame] = {
+  def findByMatchId(matchId: Long): Future[Option[ScheduledGame]] = {
     repository.findByMatchId(matchId)
   }
 
@@ -44,8 +46,8 @@ class ScheduledGameServiceImpl @Inject()(repository: ScheduledGameRepository) ex
     repository.exists(id)
   }
 
-  def insert(game: ScheduledGame): Future[Int] = {
-    repository.insert(game)
+  def insert(game: ScheduledGameDTO): Future[Int] = {
+    repository.insert(DTOUtils.transformScheduledGameFromDTO(game))
   }
 
   def update(game: ScheduledGame): Future[Int] = {
@@ -64,7 +66,14 @@ class ScheduledGameServiceImpl @Inject()(repository: ScheduledGameRepository) ex
     repository.delete(id)
   }
 
-  def getScheduledGames(liveGameDTO: LiveGameDTO): Future[Option[ScheduledGame]] = {
-    repository.getScheduledGames(DTOUtils.transformLiveGameFromDTO(liveGameDTO))
+  def getScheduledGames(liveGameDTO: LiveGameDTO): Option[ScheduledGameDTO] = {
+    val future: Future[Option[ScheduledGame]] = repository.getScheduledGames(DTOUtils.transformLiveGameFromDTO(liveGameDTO))
+    val result: Option[ScheduledGame] = Await.result(future, Duration.Inf)
+    result match {
+      case Some(g) => Some(DTOUtils.crateDTO(g))
+      case None => None
+    }
   }
+
+
 }

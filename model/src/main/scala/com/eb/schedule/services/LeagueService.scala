@@ -15,7 +15,7 @@ trait LeagueService {
 
   def exists(id: Int): Future[Boolean]
 
-  def insert(league: League): Future[Int]
+  def insert(league: LeagueDTO): Future[Int]
 
   def insertLeagueTask(leagueDTO: LeagueDTO)
 
@@ -33,8 +33,8 @@ class LeagueServiceImpl @Inject()(leagueRep: LeagueRepository) extends LeagueSer
     leagueRep.exists(id)
   }
 
-  def insert(league: League): Future[Int] = {
-    leagueRep.insert(league)
+  def insert(league: LeagueDTO): Future[Int] = {
+    leagueRep.insert(DTOUtils.transformLeagueFromDTO(league))
   }
 
   def insertLeagueTask(leagueDTO: LeagueDTO) = {

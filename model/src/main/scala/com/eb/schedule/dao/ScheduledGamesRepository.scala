@@ -4,10 +4,12 @@ import com.eb.schedule.model.MatchStatus
 import com.eb.schedule.model.db.DB
 import com.eb.schedule.model.slick._
 import com.google.inject.Inject
+import org.slf4j.LoggerFactory
 import slick.driver.MySQLDriver.api._
 import slick.jdbc.JdbcBackend
 import slick.lifted.TableQuery
 
+import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 
 /**
@@ -16,7 +18,7 @@ import scala.concurrent.Future
 trait ScheduledGameRepository {
   def findById(id: Int): Future[ScheduledGame]
 
-  def findByMatchId(matchId: Long): Future[ScheduledGame]
+  def findByMatchId(matchId: Long): Future[Option[ScheduledGame]]
 
   def exists(id: Int): Future[Boolean]
 
@@ -34,6 +36,8 @@ trait ScheduledGameRepository {
 }
 
 class ScheduledGameRepositoryImpl @Inject()(val database: DB) extends ScheduledGameRepository {
+  private val log = LoggerFactory.getLogger(this.getClass)
+
   val db = database.db
   lazy val games = new TableQuery(tag => new ScheduledGames(tag))
 
@@ -42,14 +46,18 @@ class ScheduledGameRepositoryImpl @Inject()(val database: DB) extends ScheduledG
   def findById(id: Int): Future[ScheduledGame] =
     db.run(filterQuery(id).result.head)
 
-  def findByMatchId(matchId: Long): Future[ScheduledGame] =
-    db.run(games.filter(_.matchId === matchId).result.head)
+  def findByMatchId(matchId: Long): Future[Option[ScheduledGame]] =
+    db.run(games.filter(_.matchId === matchId).result.headOption)
 
   def exists(id: Int): Future[Boolean] =
     db.run(filterQuery(id).exists.result)
 
   def insert(game: ScheduledGame): Future[Int] = {
-    db.run(games += game)
+    val future: Future[Int] = db.run(games += game)
+    future.onFailure{
+      case e =>log.error("couldn't insert scheduled game", e)
+    }
+    future
   }
 
   def update(game: ScheduledGame): Future[Int] = {

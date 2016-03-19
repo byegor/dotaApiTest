@@ -13,13 +13,13 @@ import scala.concurrent.Future
 trait PickService {
   def findById(p: PickDTO): Future[PickDTO]
 
+  def findByMatchId(id: Long): Future[Seq[PickDTO]]
+
   def exists(p: PickDTO): Future[Boolean]
 
   def insert(pick: PickDTO): Future[Int]
 
-  def updatePicks(matchId:Long, t: TeamDTO, isRadiant: Boolean): Unit
-
-  def updateOrCreate(p: PickDTO): Unit
+  def insertIfNotExists(matchId:Long, t: TeamDTO, isRadiant: Boolean): Unit
 
   def delete(p: PickDTO): Future[Int]
 }
@@ -27,6 +27,10 @@ trait PickService {
 class PickServiceImpl @Inject()(pickRep: PickRepository) extends PickService {
   def findById(p: PickDTO): Future[PickDTO] = {
 //    pickRep.findById(p)
+    null
+  }
+
+  def findByMatchId(id: Long): Future[Seq[PickDTO]] = {
     null
   }
 
@@ -39,13 +43,9 @@ class PickServiceImpl @Inject()(pickRep: PickRepository) extends PickService {
     null
   }
 
-  def updatePicks(matchId:Long, t: TeamDTO, isRadiant: Boolean): Unit = {
+  def insertIfNotExists(matchId:Long, t: TeamDTO, isRadiant: Boolean): Unit = {
     val radiantPicks: List[Pick] = DTOUtils.transformPickFromDTO(matchId, t, isRadiant)
-    radiantPicks.foreach(pickRep.update)
-  }
-
-  def updateOrCreate(p: PickDTO): Unit = {
-
+    radiantPicks.foreach(pickRep.insertIfNotExists)
   }
 
   def delete(p: PickDTO): Future[Int] = {

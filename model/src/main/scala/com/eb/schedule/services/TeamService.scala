@@ -15,7 +15,7 @@ trait TeamService {
 
   def exists(id: Int): Future[Boolean]
 
-  def insert(team: Team): Future[Int]
+  def insert(team: TeamDTO): Future[Int]
 
   def insertTeamTask(t:TeamDTO)
 
@@ -36,8 +36,8 @@ class TeamServiceImpl @Inject()(teamRepository: TeamRepository) extends TeamServ
     teamRepository.exists(id)
   }
 
-  def insert(team: Team): Future[Int] = {
-    teamRepository.insert(team)
+  def insert(team: TeamDTO): Future[Int] = {
+    teamRepository.insert(DTOUtils.transformTeamFromDTO(team))
   }
 
   def insertTeamTask(t:TeamDTO) = {
