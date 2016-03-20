@@ -49,7 +49,7 @@ class TeamRepositoryImpl @Inject()(database: DB) extends TeamRepository {
   def findById(id: Int): Future[Option[Team]] = {
     val future: Future[Option[Team]] = db.run(filterQuery(id).result.headOption)
     future.onFailure{
-      case e => log.error("Couldn't team by id", e)
+      case e => log.error("Couldn't find team by id", e)
     }
     future
   }

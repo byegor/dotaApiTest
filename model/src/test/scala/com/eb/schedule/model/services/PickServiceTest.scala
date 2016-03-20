@@ -17,7 +17,7 @@ class PickServiceTest extends BasicTest {
   test("test picks") {
     val pickRepository: PickRepository = injector.getInstance(classOf[PickRepository])
     val pick: Pick = new Pick(1, 1, true, true)
-    pickRepository.insert(List(pick, new Pick(1, 2, true, true)))
+    Await.result(pickRepository.insert(List(pick, new Pick(1, 2, true, true))), Duration.Inf)
     assert(2 == Await.result(pickRepository.findByMatchId(1), Duration.Inf).size)
 
     assert(pick == Await.result(pickRepository.findById(pick), Duration.Inf))

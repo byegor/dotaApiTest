@@ -54,8 +54,10 @@ class ScheduledGameRepositoryImpl @Inject()(val database: DB) extends ScheduledG
 
   def insert(game: ScheduledGame): Future[Int] = {
     val future: Future[Int] = db.run(games += game)
-    future.onFailure{
-      case e =>log.error("couldn't insert scheduled game", e)
+    future.onFailure {
+      case e =>
+        log.error("couldn't insert scheduled game", e)
+        throw e
     }
     future
   }

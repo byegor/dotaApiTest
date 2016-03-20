@@ -12,6 +12,10 @@
             additivity="false">
         <appender-ref ref="STDOUT"/>
     </logger>
+    <logger name="com.mysql" level="debug"
+            additivity="false">
+        <appender-ref ref="STDOUT"/>
+    </logger>
 
     <root level="info">
         <appender-ref ref="STDOUT"/>

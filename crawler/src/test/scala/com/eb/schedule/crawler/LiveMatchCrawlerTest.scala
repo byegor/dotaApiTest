@@ -116,8 +116,8 @@ class LiveMatchCrawlerTest extends BasicTest {
     val live: LiveGameDTO = crawler.extractGameInfo(liveMatchJson)
     val scheduledGame: ScheduledGameDTO = new ScheduledGameDTO(1, Some(live.matchId), live.radiant, live.dire, live.leagueDTO, live.startDate, 0.toByte, 0, 0)
     val insert = for {
-      r <- teamService.insert(live.radiant)
-      d <- teamService.insert(live.dire)
+      r <- teamService.insertTeamTask(live.radiant)
+      d <- teamService.insertTeamTask(live.dire)
       l <- leagueService.insert(live.leagueDTO)
       g <- scheduledGameService.insert(scheduledGame)
     } yield g
