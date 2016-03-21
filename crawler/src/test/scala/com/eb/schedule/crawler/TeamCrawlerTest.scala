@@ -37,7 +37,7 @@ class TeamCrawlerTest extends BasicTest {
 
   test("crawle and update team") {
     taskService.insert(new UpdateTask(36l, Team.getClass.getSimpleName, 0.toByte))
-    teamService.insert(new TeamDTO(36, "name", "tag"))
+    teamService.insert(new TeamDTO(36, "name", -1))
 
     val crawler = org.mockito.Mockito.spy(new TeamCrawler(teamService, taskService))
     when(crawler.getTeamInfoFromSteam(36)).thenReturn(getJsonTeam)
@@ -54,6 +54,7 @@ class TeamCrawlerTest extends BasicTest {
         assert(jsonTeam.getString("name") == team.name)
         assert(jsonTeam.getString("tag") == team.tag)
         assert(jsonTeam.getInt("team_id") == team.id)
+        assert(jsonTeam.getLong("logo") == team.logo)
       }
     }
   }

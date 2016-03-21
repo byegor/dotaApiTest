@@ -7,12 +7,8 @@ import com.eb.schedule.model.slick._
   */
 object DTOUtils {
 
-
-  def createLiveGameDTO(g: LiveGame):LiveGameDTO={
-    new LiveGameDTO(g.matchId, new TeamDTO(g.radiant, ""), new TeamDTO(g.dire, ""), new LeagueDTO(g.leagueId, ""), g.seriesType, g.startDate, g.radiantWin, g.game)
-  }
   def createLiveGameWithTeamDTO(g: LiveGame, radiant: Team, dire:Team):LiveGameDTO={
-    new LiveGameDTO(g.matchId, new TeamDTO(radiant.id, radiant.name, radiant.tag), new TeamDTO(dire.id, dire.name, dire.tag), new LeagueDTO(g.leagueId, ""), g.seriesType, g.startDate, g.radiantWin, g.game)
+    new LiveGameDTO(g.matchId, new TeamDTO(radiant.id, radiant.name, radiant.logo, radiant.tag), new TeamDTO(dire.id, dire.name, dire.logo, dire.tag), new LeagueDTO(g.leagueId, ""), g.seriesType, g.startDate, g.radiantWin, g.game)
   }
 
   def fillLiveGameWithPicks(g:LiveGameDTO, picks: Seq[Pick]): LiveGameDTO ={
@@ -35,7 +31,7 @@ object DTOUtils {
   }
 
   def crateDTO(g:ScheduledGame):ScheduledGameDTO = {
-    new ScheduledGameDTO(g.id, g.matchId, new TeamDTO(g.radiant, ""), new TeamDTO(g.dire, ""), new LeagueDTO(g.leagueId), g.startDate, g.status, g.radiantScore, g.direScore)
+    new ScheduledGameDTO(g.id, g.matchId, new TeamDTO(g.radiant, "", -1), new TeamDTO(g.dire, "", -1), new LeagueDTO(g.leagueId), g.startDate, g.status, g.radiantScore, g.direScore)
   }
 
   def crateDTO(l:League):LeagueDTO = {
@@ -51,7 +47,7 @@ object DTOUtils {
   }
 
   def transformTeamFromDTO(t: TeamDTO): Team = {
-    new Team(t.id, t.name, t.tag)
+    new Team(t.id, t.name, t.tag, t.logo)
   }
 
   def transformLeagueFromDTO(l: LeagueDTO): League = {

@@ -24,16 +24,17 @@ class Leagues(tag: Tag) extends Table[League](tag, "league") {
 }
 
 
-case class Team(id: Int, name: String, tag: String)
+case class Team(id: Int, name: String, tag: String, logo:Long)
 
 class Teams(_tableTag: Tag) extends Table[Team](_tableTag, "team") {
-  def * = (id, name, tag) <>(Team.tupled, Team.unapply)
+  def * = (id, name, tag, logo) <>(Team.tupled, Team.unapply)
 
-  def ? = (Rep.Some(id), Rep.Some(name), Rep.Some(tag)).shaped.<>({ r => import r._; _1.map(_ => Team.tupled((_1.get, _2.get, _3.get))) }, (_: Any) => throw new Exception("Inserting into ? projection not supported."))
+  def ? = (Rep.Some(id), Rep.Some(name), Rep.Some(tag), Rep.Some(logo)).shaped.<>({ r => import r._; _1.map(_ => Team.tupled((_1.get, _2.get, _3.get, _4.get))) }, (_: Any) => throw new Exception("Inserting into ? projection not supported."))
 
   val id: Rep[Int] = column[Int]("id", O.PrimaryKey)
   val name: Rep[String] = column[String]("name", O.Length(50, varying = true))
   val tag: Rep[String] = column[String]("tag", O.Length(20, varying = true))
+  val logo: Rep[Long] = column[Long]("logo", O.Length(20))
 }
 
 

@@ -19,7 +19,7 @@ trait TeamService {
 
   def insertTeamTask(t:TeamDTO):Future[Unit]
 
-  def saveOrUpdateTeamAndTask(team: Team)
+  def saveOrUpdateTeamAndTask(team: TeamDTO)
 
   def update(team: Team): Future[Int]
 
@@ -44,8 +44,8 @@ class TeamServiceImpl @Inject()(teamRepository: TeamRepository) extends TeamServ
     teamRepository.insertTeamTask(DTOUtils.transformTeamFromDTO(t))
   }
 
-  def saveOrUpdateTeamAndTask(team: Team) = {
-    teamRepository.saveOrUpdateTeamAndTask(team)
+  def saveOrUpdateTeamAndTask(team: TeamDTO) = {
+    teamRepository.saveOrUpdateTeamAndTask(DTOUtils.transformTeamFromDTO(team))
   }
 
   def update(team: Team): Future[Int] = {

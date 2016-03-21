@@ -1,7 +1,7 @@
 package com.eb.schedule.crawler
 
 import com.eb.schedule.crawler.CrawlerUrls._
-import com.eb.schedule.dto.TaskDTO
+import com.eb.schedule.dto.{TeamDTO, TaskDTO}
 import com.eb.schedule.model.Failed
 import com.eb.schedule.model.services.{TeamService, UpdateTaskService}
 import com.eb.schedule.model.slick.{Team, UpdateTask}
@@ -25,7 +25,7 @@ class TeamCrawler @Inject() (teamService: TeamService, taskService: UpdateTaskSe
   }
 
   private def storeTeam(teamId: Int): Unit = {
-    val info: Option[Team] = getTeamInfo(teamId)
+    val info: Option[TeamDTO] = getTeamInfo(teamId)
     if (info.isDefined) {
       teamService.saveOrUpdateTeamAndTask(info.get)
     } else {
@@ -33,7 +33,7 @@ class TeamCrawler @Inject() (teamService: TeamService, taskService: UpdateTaskSe
     }
   }
 
-  private def getTeamInfo(teamId: Int): Option[Team] = {
+  private def getTeamInfo(teamId: Int): Option[TeamDTO] = {
     try {
       val team: JSONObject = getTeamInfoFromSteam(teamId)
       val id: Int = team.getInt("team_id")
@@ -41,8 +41,7 @@ class TeamCrawler @Inject() (teamService: TeamService, taskService: UpdateTaskSe
         val logoUid: Long = team.getLong("logo")
         val name: String = team.getString("name")
         val tag: String = team.getString("tag")
-        downloadTeamLogo(logoUid, tag)
-        Some(new Team(teamId, name, tag))
+        Some(new TeamDTO(teamId, name, logoUid, tag))
       } else {
         log.error("Couldn't find such team on steam: " + teamId)
         None

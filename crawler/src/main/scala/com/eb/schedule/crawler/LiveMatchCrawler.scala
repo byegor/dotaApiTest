@@ -80,7 +80,8 @@ class LiveMatchCrawler @Inject()(
   private def extractTeam(json: JSONObject): TeamDTO = {
     val teamId: Int = json.getInt("team_id")
     val name = json.getString("team_name")
-    new TeamDTO(teamId, name)
+    val logo = json.getLong("team_logo")
+    new TeamDTO(teamId, name, logo)
   }
 
   def fillTeamDTOWithPicks(teamDTO: TeamDTO, json: JSONObject): Unit = {

@@ -22,7 +22,7 @@ class PickServiceTest extends BasicTest {
 
     assert(pick == Await.result(pickRepository.findById(pick), Duration.Inf))
 
-    val t: TeamDTO = new TeamDTO(1, "")
+    val t: TeamDTO = new TeamDTO(1, "", -1)
     t.picks = List(new PickDTO(1), new PickDTO(2), new PickDTO(3))
     pickService.insertIfNotExists(1, t, true)
     Thread.sleep(1500)
