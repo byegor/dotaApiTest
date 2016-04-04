@@ -1,0 +1,145 @@
+package com.eb.schedule
+
+import com.eb.schedule.cache.{ItemCache, HeroCache}
+import com.eb.schedule.dto._
+import com.eb.schedule.model.SeriesType
+import com.eb.schedule.model.slick.{NetWorth, ScheduledGame}
+import com.eb.schedule.utils.HttpUtils
+import com.google.inject.Inject
+import org.json.{JSONArray, JSONObject}
+
+import scala.collection.mutable
+
+/**
+  * Created by Egor on 23.03.2016.
+  */
+class LiveGameProcessor @Inject()(val heroCache: HeroCache, val itemCache: ItemCache) {
+
+  val GET_LIVE_LEAGUE_MATCHES: String = "https://api.steampowered.com/IDOTA2Match_570/GetLiveLeagueGames/v0001/?key=9EBD51CD27F27324F1554C53BEDA17C3"
+
+  def getLiveLeagueGames(): List[JSONObject] = {
+    val response: JSONObject = executeGet()
+    var gamesJson: List[JSONObject] = Nil
+    val gamesList: JSONArray = response.getJSONObject("result").getJSONArray("games")
+    for (i <- 0 until gamesList.length()) {
+      val game: JSONObject = gamesList.getJSONObject(i)
+      val leagueTier: Int = game.getInt("league_tier")
+      if (leagueTier == 3) {
+        gamesJson ::= game
+      }
+    }
+    gamesJson
+  }
+
+  //todo
+  def executeGet(): JSONObject = {
+    HttpUtils.getResponseAsJson(GET_LIVE_LEAGUE_MATCHES)
+  }
+
+  def transformToDTO(game: JSONObject): CurrentGameDTO = {
+    val matchId: Long = game.getLong("match_id")
+    val currentGame: CurrentGameDTO = new CurrentGameDTO(matchId)
+    fillGameWithTeams(game, currentGame)
+
+
+    currentGame
+  }
+
+  def fillGameWithTeams(game: JSONObject, currentGame: CurrentGameDTO): Unit = {
+    //todo
+    val leagueId: Int = game.getInt("league_id")
+    currentGame.basicInfo.radiantWin = game.getInt("radiant_series_wins").toByte
+    currentGame.basicInfo.direWin = game.getInt("dire_series_wins").toByte
+    currentGame.basicInfo.radiantTeam = parseTeam(game.getJSONObject("radiant_team"))
+    currentGame.basicInfo.direTeam = parseTeam(game.getJSONObject("dire_team"))
+    currentGame.basicInfo.seriesType = SeriesType.fromCode(game.getInt("series_type").toByte)
+    currentGame.radiantTeam = currentGame.basicInfo.radiantTeam.copy()
+    currentGame.direTeam = currentGame.basicInfo.direTeam.copy()
+  }
+
+  def fillGameWithOther(game: JSONObject, currentGame: CurrentGameDTO): Unit = {
+    val basicPlayerInfo: JSONArray = game.getJSONArray("players")
+    val playerInfo: (mutable.Map[Int, PlayerDTO], mutable.Map[Int, PlayerDTO]) = parseBasicPlayerInfo(basicPlayerInfo)
+
+    val scoreBoard: JSONObject = game.getJSONObject("scoreboard")
+    currentGame.basicInfo.duration = scoreBoard.getDouble("duration")
+
+    val radiantScoreBoard: JSONObject = scoreBoard.getJSONObject("radiant")
+    currentGame.radiantTeam.players = parseDeepPlayerInfo(radiantScoreBoard.getJSONArray("players"), playerInfo._1)
+    val direScoreBoard: JSONObject = scoreBoard.getJSONObject("dire")
+    currentGame.direTeam.players = parseDeepPlayerInfo(direScoreBoard.getJSONArray("players"), playerInfo._2)
+    currentGame.radiantTeam.netWorth = currentGame.radiantTeam.players.foldLeft(0)((res, player) => res + player.netWorth)
+    currentGame.direTeam.netWorth = currentGame.direTeam.players.foldLeft(0)((res, player) => res + player.netWorth)
+
+  }
+
+  def parseDeepPlayerInfo(playerInfo: JSONArray, basicPlayerInfo: mutable.Map[Int, PlayerDTO]): List[PlayerDTO] = {
+    for (i <- 0 until playerInfo.length()) {
+      val player: JSONObject = playerInfo.getJSONObject(i)
+      val accId: Int = player.getInt("account_id")
+      val playerDTO: PlayerDTO = basicPlayerInfo.get(accId).get
+      playerDTO.kills = player.getInt("kills")
+      playerDTO.deaths = player.getInt("death")
+      playerDTO.assists = player.getInt("assists")
+      playerDTO.level = player.getInt("level")
+      playerDTO.netWorth = player.getInt("net_worth")
+
+      playerDTO.hero = heroCache.getHero(player.getInt("hero_id"))
+
+      fillPlayerDTOWithItem(playerDTO, player.getInt("item0"))
+      fillPlayerDTOWithItem(playerDTO, player.getInt("item1"))
+      fillPlayerDTOWithItem(playerDTO, player.getInt("item2"))
+      fillPlayerDTOWithItem(playerDTO, player.getInt("item3"))
+      fillPlayerDTOWithItem(playerDTO, player.getInt("item4"))
+      fillPlayerDTOWithItem(playerDTO, player.getInt("item5"))
+    }
+    basicPlayerInfo.values.toList
+  }
+
+  def fillPlayerDTOWithItem(playerDTO: PlayerDTO, itemId: Int): Unit = {
+    if (itemId != 0) {
+      playerDTO.items ::= itemCache.getItem(itemId)
+    }
+  }
+
+  def parseBasicPlayerInfo(basicPlayerInfo: JSONArray): (scala.collection.mutable.Map[Int, PlayerDTO], scala.collection.mutable.Map[Int, PlayerDTO]) = {
+    val radiantPlayers: scala.collection.mutable.Map[Int, PlayerDTO] = new scala.collection.mutable.HashMap[Int, PlayerDTO]
+    val direPlayers: scala.collection.mutable.Map[Int, PlayerDTO] = new scala.collection.mutable.HashMap[Int, PlayerDTO]
+    for (i <- 0 until basicPlayerInfo.length()) {
+      val player: JSONObject = basicPlayerInfo.getJSONObject(i)
+      val team: Int = player.getInt("team")
+      if (team < 2) {
+        val playerDTO: PlayerDTO = new PlayerDTO(player.getInt("account_id"))
+        playerDTO.name = player.getString("name")
+        if (team == 0) {
+          radiantPlayers.put(playerDTO.accountId, playerDTO)
+        } else {
+          direPlayers.put(playerDTO.accountId, playerDTO)
+        }
+      }
+    }
+
+    (radiantPlayers, direPlayers)
+  }
+
+  private def parseTeam(json: JSONObject): TeamDTO = {
+    val team: TeamDTO = new TeamDTO(json.getInt("team_id"))
+    team.name = json.getString("team_name")
+    team.logo = json.getLong("team_logo")
+    team
+  }
+
+  def insertTeam(team: TeamDTO) = ???
+
+  def insertLeague(league: LeagueDTO) = ???
+
+  def insertNetWorth(netWorth: NetWorth) = ???
+
+  def updateLiveGameContainer() = ???
+
+  def isGameFinished(liveGames: Seq[CurrentGameDTO]) = ???
+
+  def storeMatchSeries(scheduledGame: ScheduledGame, liveGameDTO: CurrentGameDTO) = ???
+
+  def clearLiveGameContainer() = ???
+}

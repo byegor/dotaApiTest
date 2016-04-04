@@ -1,11 +1,11 @@
 package com.eb.schedule.model.dao
 
 import com.eb.schedule.model.db.DB
-import com.eb.schedule.model.slick.{UpdateTask, UpdateTasks}
+import com.eb.schedule.model.slick.UpdateTask
+import com.eb.schedule.model.slick.UpdateTask.UpdateTaskTable
 import com.google.inject.Inject
 import slick.driver.MySQLDriver.api._
 import slick.jdbc.JdbcBackend
-import slick.lifted.TableQuery
 
 import scala.concurrent.Future
 
@@ -31,9 +31,9 @@ class UpdateTaskRepositoryImpl @Inject()(database: DB) extends UpdateTaskReposit
 
   val db: JdbcBackend#DatabaseDef = database.db
 
-  lazy val tasks = new TableQuery(tag => new UpdateTasks(tag))
+  lazy val tasks = UpdateTask.table
 
-  def filterQuery(id: Long, classname: String): Query[UpdateTasks, UpdateTask, Seq] = tasks.filter(t => t.id === id && t.classname === classname)
+  def filterQuery(id: Long, classname: String): Query[UpdateTaskTable, UpdateTask, Seq] = tasks.filter(t => t.id === id && t.classname === classname)
 
   def findByIdAndName(id: Long, classname: String): Future[UpdateTask] =
     db.run(filterQuery(id, classname).result.head)

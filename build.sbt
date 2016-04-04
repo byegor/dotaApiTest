@@ -13,20 +13,22 @@ scalacOptions in ThisBuild ++= Seq(
 libraryDependencies in ThisBuild ++= Seq(
   "org.scalatest" %% "scalatest" % "2.2.4" % "test",
   "org.scalacheck" %% "scalacheck" % "1.12.2" % "test",
-  "org.mockito" % "mockito-all" % "1.9.5"  % "test",
+  "org.mockito" % "mockito-all" % "1.9.5" % "test",
   "mysql" % "mysql-connector-java" % "5.1.36",
   "com.google.inject" % "guice" % "4.0",
 
- "ch.qos.logback" % "logback-core" % "1.1.3",
- "ch.qos.logback" % "logback-classic" % "1.1.3"
+  "ch.qos.logback" % "logback-core" % "1.1.3",
+  "ch.qos.logback" % "logback-classic" % "1.1.3",
+
+  "org.json" % "json" % "20140107"
 )
 
-lazy val root = project.in(file(".")) aggregate(model, ui, crawler)
+lazy val root = project.in(file(".")) aggregate(model, rest, crawler)
 
 lazy val model = project.in(file("model"))
 
-lazy val harvester = project.in(file("harvester")) dependsOn model
+//lazy val harvester = project.in(file("harvester")) dependsOn model
 
-lazy val ui = project.in(file("ui"))
+lazy val rest = project.in(file("rest")) dependsOn model
 
-lazy val crawler = project.in(file("crawler"))dependsOn(model)
+lazy val crawler = project.in(file("crawler")) dependsOn model

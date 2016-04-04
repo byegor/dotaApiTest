@@ -11,7 +11,7 @@ import scala.concurrent.ExecutionContext.Implicits.global
   * Created by Egor on 20.02.2016.
   */
 trait LeagueService {
-  def findById(id: Int): Future[LeagueDTO]
+  def findById(id: Int): Future[Option[LeagueDTO]]
 
   def exists(id: Int): Future[Boolean]
 
@@ -25,7 +25,7 @@ trait LeagueService {
 }
 
 class LeagueServiceImpl @Inject()(leagueRep: LeagueRepository) extends LeagueService {
-  def findById(id: Int): Future[LeagueDTO] = {
+  def findById(id: Int): Future[Option[LeagueDTO]] = {
     leagueRep.findById(id).map(DTOUtils.crateDTO)
   }
 

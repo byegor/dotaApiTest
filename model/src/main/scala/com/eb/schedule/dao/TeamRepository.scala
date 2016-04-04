@@ -2,6 +2,7 @@ package com.eb.schedule.model.dao
 
 
 import com.eb.schedule.model.db.DB
+import com.eb.schedule.model.slick.Team.TeamsTable
 import com.eb.schedule.model.slick._
 import com.google.inject.Inject
 import org.slf4j.LoggerFactory
@@ -40,11 +41,11 @@ class TeamRepositoryImpl @Inject()(database: DB) extends TeamRepository {
 
   val db: JdbcBackend#DatabaseDef = database.db
 
-  private lazy val teams = new TableQuery(tag => new Teams(tag))
-  private lazy val tasks = new TableQuery(tag => new UpdateTasks(tag))
+  private lazy val teams = Team.table
+  private lazy val tasks = UpdateTask.table
 
 
-  def filterQuery(id: Int): Query[Teams, Team, Seq] = teams.filter(_.id === id)
+  def filterQuery(id: Int): Query[TeamsTable, Team, Seq] = teams.filter(_.id === id)
 
   def findById(id: Int): Future[Option[Team]] = {
     val future: Future[Option[Team]] = db.run(filterQuery(id).result.headOption)
@@ -65,11 +66,10 @@ class TeamRepositoryImpl @Inject()(database: DB) extends TeamRepository {
 
   def insertTeamTask(team: Team):Future[Unit] = {
     exists(team.id).map(present => if(!present){
-      val run: Future[Unit] = db.run(DBIO.seq(
+       db.run(DBIO.seq(
         teams += team,
         tasks += new UpdateTask(team.id.toLong, Team.getClass.getSimpleName, 0.toByte)
       ).transactionally)
-      run
     })
   }
 

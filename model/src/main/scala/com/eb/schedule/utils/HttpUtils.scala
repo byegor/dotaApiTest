@@ -14,6 +14,7 @@ object HttpUtils {
   private val mapper: ObjectMapper = new ObjectMapper()
   private val lock: AnyRef = new Object()
 
+  //todo
   def getResponseAsJson(url: String): JSONObject = {
     lock.synchronized {
       for (i <- 0 to 10) {

@@ -7,19 +7,19 @@ import org.json.{JSONArray, JSONObject}
 import org.mockito.Matchers._
 import org.mockito.Mockito._
 
-import scala.concurrent.{Future, Await}
-import scala.concurrent.duration.Duration
+import scala.concurrent.Await
 import scala.concurrent.ExecutionContext.Implicits.global
+import scala.concurrent.duration.Duration
 
 /**
   * Created by Egor on 20.02.2016.
   */
-class TeamCrawlerTest extends BasicTest {
+class TeamCrawlerRunnerTest extends BasicTest {
 
   test("crawle and create team") {
     taskService.insert(new UpdateTask(36l, Team.getClass.getSimpleName, 0.toByte))
 
-    val crawler = org.mockito.Mockito.spy(new TeamCrawler(teamService, taskService))
+    val crawler = org.mockito.Mockito.spy(new TeamCrawlerRunner(teamService, taskService))
     when(crawler.getTeamInfoFromSteam(36)).thenReturn(getJsonTeam)
     doNothing().when(crawler).downloadTeamLogo(anyObject(), anyObject())
     crawler.run()
@@ -37,9 +37,10 @@ class TeamCrawlerTest extends BasicTest {
 
   test("crawle and update team") {
     taskService.insert(new UpdateTask(36l, Team.getClass.getSimpleName, 0.toByte))
-    teamService.insert(new TeamDTO(36, "name", -1))
+    val teamDTO: TeamDTO = new TeamDTO(36)
+    teamService.insert(teamDTO)
 
-    val crawler = org.mockito.Mockito.spy(new TeamCrawler(teamService, taskService))
+    val crawler = org.mockito.Mockito.spy(new TeamCrawlerRunner(teamService, taskService))
     when(crawler.getTeamInfoFromSteam(36)).thenReturn(getJsonTeam)
     doNothing().when(crawler).downloadTeamLogo(anyObject(), anyObject())
     crawler.run()

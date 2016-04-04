@@ -1,7 +1,9 @@
 package com.eb.schedule.model.dao
 
+import com.eb.schedule.dto.CurrentGameDTO
 import com.eb.schedule.model.MatchStatus
 import com.eb.schedule.model.db.DB
+import com.eb.schedule.model.slick.ScheduledGame.ScheduledGameTable
 import com.eb.schedule.model.slick._
 import com.google.inject.Inject
 import org.slf4j.LoggerFactory
@@ -28,20 +30,20 @@ trait ScheduledGameRepository {
 
   def updateStatus(id: Int, status: Byte): Future[Int]
 
-  def updateScore(matchId: Long, radiantScore: Byte, direScore: Byte): Future[Int]
+  def updateStatusByMatchId(id: Long, status: Byte): Future[Int]
 
   def delete(id: Int): Future[Int]
 
-  def getScheduledGames(matchDetails: LiveGame): Future[Option[ScheduledGame]]
+  def getScheduledGames(team1: Int, team2: Int, league: Int): Future[Option[ScheduledGame]]
 }
 
 class ScheduledGameRepositoryImpl @Inject()(val database: DB) extends ScheduledGameRepository {
   private val log = LoggerFactory.getLogger(this.getClass)
 
   val db = database.db
-  lazy val games = new TableQuery(tag => new ScheduledGames(tag))
+  lazy val games = ScheduledGame.table
 
-  def filterQuery(id: Int): Query[ScheduledGames, ScheduledGame, Seq] = games.filter(_.id === id)
+  def filterQuery(id: Int): Query[ScheduledGameTable, ScheduledGame, Seq] = games.filter(_.id === id)
 
   def findById(id: Int): Future[ScheduledGame] =
     db.run(filterQuery(id).result.head)
@@ -73,24 +75,24 @@ class ScheduledGameRepositoryImpl @Inject()(val database: DB) extends ScheduledG
       .update(status))
   }
 
-  def updateScore(matchId: Long, radiantScore: Byte, direScore: Byte): Future[Int] = {
+  def updateStatusByMatchId(id: Long, status: Byte): Future[Int] = {
     db.run(games
-      .filter(_.matchId === matchId)
-      .map(x => (x.radiantScore, x.direScore))
-      .update((radiantScore, direScore)))
+      .filter(g => g.matchId === id)
+      .map(x => x.status)
+      .update(status))
   }
 
   def delete(id: Int): Future[Int] =
     db.run(filterQuery(id).delete)
 
 
-  private def getScheduledGameQuery(liveGame: LiveGame) = {
-    games.filter(g => g.status === MatchStatus.SCHEDULED.status && g.leagueId === liveGame.leagueId && ((g.radiant === liveGame.radiant && g.dire === liveGame.dire) || (g.radiant === liveGame.dire && g.dire === liveGame.radiant)))
+  private def getScheduledGameQuery(team1: Int, team2: Int, league: Int) = {
+    games.filter(g => g.status === MatchStatus.SCHEDULED.status && g.leagueId === league && ((g.radiant === team1 && g.dire === team2) || (g.radiant === team2 && g.dire === team1)))
       .sortBy(_.startDate)
   }
 
-  def getScheduledGames(matchDetails: LiveGame): Future[Option[ScheduledGame]] = {
-    db.run(getScheduledGameQuery(matchDetails).result.headOption)
+  def getScheduledGames(team1: Int, team2: Int, league: Int): Future[Option[ScheduledGame]] = {
+    db.run(getScheduledGameQuery(team1, team2, league).result.headOption)
   }
 }
 

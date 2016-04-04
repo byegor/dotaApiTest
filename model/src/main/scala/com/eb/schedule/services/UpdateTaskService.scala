@@ -1,8 +1,8 @@
 package com.eb.schedule.model.services
 
-import com.eb.schedule.dto.{DTOUtils, TaskDTO}
+import com.eb.schedule.dto.{DTOUtils, LeagueDTO, TaskDTO}
 import com.eb.schedule.model.dao.UpdateTaskRepository
-import com.eb.schedule.model.slick.{Team, UpdateTask}
+import com.eb.schedule.model.slick.{League, Team, UpdateTask}
 import com.google.inject.Inject
 
 import scala.concurrent.Future
@@ -23,6 +23,9 @@ trait UpdateTaskService {
   def delete(id: Long, classname: String): Future[Int]
 
   def getPendingTeamTasks(): Future[Seq[TaskDTO]]
+
+  def getPendingLeagueTasks(): Future[Seq[TaskDTO]]
+
 }
 
 class UpdateTaskServiceImpl @Inject()(taskRepository: UpdateTaskRepository) extends UpdateTaskService {
@@ -48,6 +51,10 @@ class UpdateTaskServiceImpl @Inject()(taskRepository: UpdateTaskRepository) exte
 
   def getPendingTeamTasks(): Future[Seq[TaskDTO]] = {
     getPendingTasks(Team.getClass.getSimpleName)
+  }
+
+  def getPendingLeagueTasks(): Future[Seq[TaskDTO]] = {
+    getPendingTasks(League.getClass.getSimpleName)
   }
 
 

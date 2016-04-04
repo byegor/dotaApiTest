@@ -10,5 +10,11 @@ libraryDependencies ++= Seq(
 
   "com.typesafe" % "config" % "1.3.0",
 
+  "com.fasterxml.jackson.core" % "jackson-databind" % "2.7.1",
+  "com.fasterxml.jackson.module" % "jackson-module-scala_2.11" % "2.6.3",
+
+  "org.apache.httpcomponents" % "httpclient" % "4.5",
+  "com.mashape.unirest" % "unirest-java" % "1.4.6",
+
   "com.h2database" % "h2" % "1.4.191"
 )

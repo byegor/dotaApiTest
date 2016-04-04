@@ -14,7 +14,7 @@ import scala.concurrent.duration.Duration
 import scala.concurrent.{Await, Future}
 
 
-class TeamCrawler @Inject() (teamService: TeamService, taskService: UpdateTaskService) extends Runnable {
+class TeamCrawlerRunner @Inject()(teamService: TeamService, taskService: UpdateTaskService) extends Runnable {
 
   private val log = LoggerFactory.getLogger(this.getClass)
 
@@ -38,10 +38,11 @@ class TeamCrawler @Inject() (teamService: TeamService, taskService: UpdateTaskSe
       val team: JSONObject = getTeamInfoFromSteam(teamId)
       val id: Int = team.getInt("team_id")
       if (id == teamId) {
-        val logoUid: Long = team.getLong("logo")
-        val name: String = team.getString("name")
-        val tag: String = team.getString("tag")
-        Some(new TeamDTO(teamId, name, logoUid, tag))
+        val teamDto: TeamDTO = new TeamDTO(teamId)
+        teamDto.name = team.getString("name")
+        teamDto.tag = team.getString("tag")
+        teamDto.logo = team.getLong("logo")
+        Some(teamDto)
       } else {
         log.error("Couldn't find such team on steam: " + teamId)
         None
