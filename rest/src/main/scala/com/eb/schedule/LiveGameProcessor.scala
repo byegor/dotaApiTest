@@ -1,6 +1,6 @@
 package com.eb.schedule
 
-import com.eb.schedule.cache.{ItemCache, HeroCache}
+import com.eb.schedule.cache.{HeroCache, ItemCache, LeagueCache}
 import com.eb.schedule.dto._
 import com.eb.schedule.model.SeriesType
 import com.eb.schedule.model.slick.{NetWorth, ScheduledGame}
@@ -13,7 +13,7 @@ import scala.collection.mutable
 /**
   * Created by Egor on 23.03.2016.
   */
-class LiveGameProcessor @Inject()(val heroCache: HeroCache, val itemCache: ItemCache) {
+class LiveGameProcessor @Inject()(val heroCache: HeroCache, val itemCache: ItemCache, val leagueCache: LeagueCache) {
 
   val GET_LIVE_LEAGUE_MATCHES: String = "https://api.steampowered.com/IDOTA2Match_570/GetLiveLeagueGames/v0001/?key=9EBD51CD27F27324F1554C53BEDA17C3"
 
@@ -40,14 +40,14 @@ class LiveGameProcessor @Inject()(val heroCache: HeroCache, val itemCache: ItemC
     val matchId: Long = game.getLong("match_id")
     val currentGame: CurrentGameDTO = new CurrentGameDTO(matchId)
     fillGameWithTeams(game, currentGame)
-
+    fillGameWithOther(game, currentGame)
 
     currentGame
   }
 
   def fillGameWithTeams(game: JSONObject, currentGame: CurrentGameDTO): Unit = {
-    //todo
     val leagueId: Int = game.getInt("league_id")
+    currentGame.basicInfo.league = leagueCache.getLeague(leagueId)
     currentGame.basicInfo.radiantWin = game.getInt("radiant_series_wins").toByte
     currentGame.basicInfo.direWin = game.getInt("dire_series_wins").toByte
     currentGame.basicInfo.radiantTeam = parseTeam(game.getJSONObject("radiant_team"))
@@ -128,10 +128,6 @@ class LiveGameProcessor @Inject()(val heroCache: HeroCache, val itemCache: ItemC
     team.logo = json.getLong("team_logo")
     team
   }
-
-  def insertTeam(team: TeamDTO) = ???
-
-  def insertLeague(league: LeagueDTO) = ???
 
   def insertNetWorth(netWorth: NetWorth) = ???
 

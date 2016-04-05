@@ -7,6 +7,7 @@ class CurrentGameDTO(val matchId: Long) {
   var basicInfo: BasicGameInfoDTO = new BasicGameInfoDTO(matchId)
   var direTeam:TeamDTO = ???
   var radiantTeam:TeamDTO = ???
+  var netWorth:NetWorthDTO = ???
 
 }
 

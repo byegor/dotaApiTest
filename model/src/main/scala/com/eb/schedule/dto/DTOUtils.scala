@@ -20,6 +20,14 @@ object DTOUtils {
     new LeagueDTO(l.id, l.name)
   }
 
+  def crateNetWorthDTO(nw: Option[NetWorth]): Option[NetWorthDTO] = {
+    val res:Option[NetWorthDTO] = nw match {
+      case Some(n) => Some(new NetWorthDTO(n.matchId, n.netWorth.split(",").map(_.toInt)))
+      case None => None
+    }
+    res
+  }
+
   def crateDTO(l: Option[League]): Option[LeagueDTO] = {
     if (l.isDefined) {
       Some(crateDTO(l.get))
@@ -30,6 +38,10 @@ object DTOUtils {
 
   def transformTeamFromDTO(t: TeamDTO): Team = {
     new Team(t.id, t.name, t.tag, t.logo)
+  }
+
+  def transformNetWorthFromDTO(nw: NetWorthDTO): NetWorth = {
+    new NetWorth(nw.matchId, nw.netWorth.mkString(","))
   }
 
   def transformLeagueFromDTO(l: LeagueDTO): League = {

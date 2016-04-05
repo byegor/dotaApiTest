@@ -31,8 +31,7 @@ class LeagueCrawler @Inject()(leagueService: LeagueService, taskService: UpdateT
 
       val leagueId: Int = itemJson.getInt("leagueid")
       if (ids.contains(leagueId)) {
-        leagueService.insert(new LeagueDTO(leagueId, parseName(itemJson.getString("name")), itemJson.getString("tournament_url")))
-        taskService.update(new UpdateTask(leagueId, League.getClass.getSimpleName, Finished.status.toByte))
+        leagueService.insertLeagueTask(new LeagueDTO(leagueId, parseName(itemJson.getString("name")), itemJson.getString("tournament_url")))
       }
     }
   }

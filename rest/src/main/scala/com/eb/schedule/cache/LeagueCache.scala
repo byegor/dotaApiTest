@@ -25,6 +25,7 @@ class LeagueCache @Inject()(val leagueService: LeagueService, taskService: Updat
 
   private val leagueCache: scala.collection.concurrent.Map[Int, LeagueDTO] = new ConcurrentHashMap[Int, LeagueDTO]()
 
+  //todo what if unknown league to steam - it will always create task
   def getLeague(id: Int): LeagueDTO = {
     val maybeLeagueDTO: Option[LeagueDTO] = leagueCache.get(id)
     if(maybeLeagueDTO.isDefined){

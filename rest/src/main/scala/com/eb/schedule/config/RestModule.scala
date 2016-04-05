@@ -1,6 +1,6 @@
 package com.eb.schedule.config
 
-import com.eb.schedule.cache.HeroCache
+import com.eb.schedule.cache.{HeroCache, ItemCache, LeagueCache}
 import com.google.inject.AbstractModule
 
 /**
@@ -12,6 +12,8 @@ class RestModule extends AbstractModule {
 
     //cache
     bind(classOf[HeroCache]).in(classOf[com.google.inject.Singleton])
+    bind(classOf[ItemCache]).in(classOf[com.google.inject.Singleton])
+    bind(classOf[LeagueCache]).in(classOf[com.google.inject.Singleton])
   }
 
 }

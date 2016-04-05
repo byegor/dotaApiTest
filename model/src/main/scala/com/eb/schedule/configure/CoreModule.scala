@@ -1,10 +1,10 @@
 package com.eb.schedule.configure
 
-import com.eb.schedule.dao.{ItemRepositoryImpl, ItemRepository, HeroRepositoryImpl, HeroRepository}
+import com.eb.schedule.dao._
 import com.eb.schedule.model.dao._
 import com.eb.schedule.model.db.{DB, H2DB, MysqlDB}
 import com.eb.schedule.model.services._
-import com.eb.schedule.services.{ItemServiceImpl, ItemService, HeroServiceImpl, HeroService}
+import com.eb.schedule.services._
 import com.eb.schedule.utils.HttpUtils
 import com.google.inject.AbstractModule
 
@@ -20,6 +20,7 @@ class CoreModule extends AbstractModule{
     bind(classOf[UpdateTaskRepository]).to(classOf[UpdateTaskRepositoryImpl])
     bind(classOf[LeagueRepository]).to(classOf[LeagueRepositoryImpl])
     bind(classOf[ScheduledGameRepository]).to(classOf[ScheduledGameRepositoryImpl])
+    bind(classOf[NetWorthRepository]).to(classOf[NetWorthRepositoryImpl])
 
     //service
     bind(classOf[HeroService]).to(classOf[HeroServiceImpl]).in(classOf[com.google.inject.Singleton])
@@ -28,6 +29,7 @@ class CoreModule extends AbstractModule{
     bind(classOf[UpdateTaskService]).to(classOf[UpdateTaskServiceImpl]).in(classOf[com.google.inject.Singleton])
     bind(classOf[LeagueService]).to(classOf[LeagueServiceImpl]).in(classOf[com.google.inject.Singleton])
     bind(classOf[ScheduledGameService]).to(classOf[ScheduledGameServiceImpl]).in(classOf[com.google.inject.Singleton])
+    bind(classOf[NetWorthService]).to(classOf[NetWorthServiceImpl]).in(classOf[com.google.inject.Singleton])
   }
 }
 
