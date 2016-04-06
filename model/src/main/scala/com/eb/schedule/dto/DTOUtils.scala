@@ -22,7 +22,7 @@ object DTOUtils {
 
   def crateNetWorthDTO(nw: Option[NetWorth]): Option[NetWorthDTO] = {
     val res:Option[NetWorthDTO] = nw match {
-      case Some(n) => Some(new NetWorthDTO(n.matchId, n.netWorth.split(",").map(_.toInt)))
+      case Some(n) => Some(new NetWorthDTO(n.matchId, n.netWorth.split(",").map(_.toInt).toList))
       case None => None
     }
     res

@@ -18,7 +18,11 @@ trait NetWorthRepository {
 
   def findByMatchId(id: Long): Future[Option[NetWorth]]
 
-  def insertOrUpdate(nw: NetWorth)
+  def exists(mathcId: Long): Future[Boolean]
+
+  def update(nw: NetWorth): Future[Int]
+
+  def insert(nw: NetWorth): Future[Int]
 }
 
 class NetWorthRepositoryImpl @Inject()(database: DB) extends NetWorthRepository {
@@ -34,19 +38,16 @@ class NetWorthRepositoryImpl @Inject()(database: DB) extends NetWorthRepository 
   def findByMatchId(id: Long): Future[Option[NetWorth]] =
     db.run(filterQuery(id).result.headOption)
 
-
-  def insertOrUpdate(nw: NetWorth) {
-    val future: Future[Option[NetWorth]] = findByMatchId(nw.matchId)
-    future.onSuccess {
-      case res => res match {
-        case Some(x) => db.run(filterQuery(nw.matchId).update(nw))
-        case None => db.run(netWorth += nw)
-      }
-    }
-    future.onFailure {
-      case e => log.error("Couldn't update netWorth by id" + nw.matchId, e)
-    }
+  def exists(matchId: Long): Future[Boolean] = {
+    db.run(filterQuery(matchId).exists.result)
   }
 
+  def update(nw: NetWorth): Future[Int] = {
+    db.run(filterQuery(nw.matchId).update(nw))
+  }
+
+  def insert(nw: NetWorth): Future[Int] = {
+    db.run(netWorth += nw)
+  }
 
 }

@@ -4,16 +4,19 @@ import com.eb.schedule.cache.{HeroCache, ItemCache, LeagueCache}
 import com.eb.schedule.dto._
 import com.eb.schedule.model.SeriesType
 import com.eb.schedule.model.slick.{NetWorth, ScheduledGame}
+import com.eb.schedule.services.NetWorthService
 import com.eb.schedule.utils.HttpUtils
 import com.google.inject.Inject
 import org.json.{JSONArray, JSONObject}
 
 import scala.collection.mutable
+import scala.concurrent.duration.Duration
+import scala.concurrent.{Await, Future}
 
 /**
   * Created by Egor on 23.03.2016.
   */
-class LiveGameProcessor @Inject()(val heroCache: HeroCache, val itemCache: ItemCache, val leagueCache: LeagueCache) {
+class LiveGameProcessor @Inject()(val heroCache: HeroCache, val itemCache: ItemCache, val leagueCache: LeagueCache, val netWorthService: NetWorthService) {
 
   val GET_LIVE_LEAGUE_MATCHES: String = "https://api.steampowered.com/IDOTA2Match_570/GetLiveLeagueGames/v0001/?key=9EBD51CD27F27324F1554C53BEDA17C3"
 
@@ -68,9 +71,21 @@ class LiveGameProcessor @Inject()(val heroCache: HeroCache, val itemCache: ItemC
     currentGame.radiantTeam.players = parseDeepPlayerInfo(radiantScoreBoard.getJSONArray("players"), playerInfo._1)
     val direScoreBoard: JSONObject = scoreBoard.getJSONObject("dire")
     currentGame.direTeam.players = parseDeepPlayerInfo(direScoreBoard.getJSONArray("players"), playerInfo._2)
+
+
+  }
+
+  def fillGameWithNetWorth(currentGame: CurrentGameDTO): Unit = {
+    val storedNetWorth: Future[Option[NetWorthDTO]] = netWorthService.findByMatchId(currentGame.matchId)
     currentGame.radiantTeam.netWorth = currentGame.radiantTeam.players.foldLeft(0)((res, player) => res + player.netWorth)
     currentGame.direTeam.netWorth = currentGame.direTeam.players.foldLeft(0)((res, player) => res + player.netWorth)
-
+    val currentNetWorth = currentGame.radiantTeam.netWorth - currentGame.direTeam.netWorth
+    val netWorth: Option[NetWorthDTO] = Await.result(storedNetWorth, Duration.Inf)
+    val newNetWorth: NetWorthDTO = netWorth match {
+      case Some(nw) => nw.netWorth ::= currentNetWorth; nw
+      case None => new NetWorthDTO(currentGame.matchId, List(0, currentNetWorth))
+    }
+    currentGame.netWorth = newNetWorth
   }
 
   def parseDeepPlayerInfo(playerInfo: JSONArray, basicPlayerInfo: mutable.Map[Int, PlayerDTO]): List[PlayerDTO] = {
@@ -129,11 +144,19 @@ class LiveGameProcessor @Inject()(val heroCache: HeroCache, val itemCache: ItemC
     team
   }
 
-  def insertNetWorth(netWorth: NetWorth) = ???
+  def insertNetWorth(netWorth: NetWorthDTO) = {
+    netWorthService.insertOrUpdate(netWorth)
+  }
 
-  def updateLiveGameContainer() = ???
+  def updateLiveGameContainer(currentGameDTO: CurrentGameDTO) = {
+    LiveGameContainer.updateLiveGame(currentGameDTO)
+  }
 
-  def isGameFinished(liveGames: Seq[CurrentGameDTO]) = ???
+  def findFinishedMatches(liveGames: Seq[CurrentGameDTO]): Seq[Long] = {
+    val stillRunning: Seq[Long] = liveGames.map(_.matchId)
+    val id: Iterable[Long] = LiveGameContainer.getLiveMatchesId()
+    id.toSeq.diff(stillRunning)
+  }
 
   def storeMatchSeries(scheduledGame: ScheduledGame, liveGameDTO: CurrentGameDTO) = ???
 
