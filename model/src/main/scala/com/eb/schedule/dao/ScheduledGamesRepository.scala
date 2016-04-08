@@ -26,6 +26,8 @@ trait ScheduledGameRepository {
 
   def insert(game: ScheduledGame): Future[Int]
 
+  def insertAndGet(game: ScheduledGame): Future[Int]
+
   def update(game: ScheduledGame): Future[Int]
 
   def updateStatus(id: Int, status: Byte): Future[Int]
@@ -59,6 +61,18 @@ class ScheduledGameRepositoryImpl @Inject()(val database: DB) extends ScheduledG
     future.onFailure {
       case e =>
         log.error("couldn't insert scheduled game", e)
+        throw e
+    }
+    future
+  }
+//val userId =  (users returning users.map(_.id)) += User(None, "Stefan", "Zeiger")
+  def insertAndGet(game: ScheduledGame): Future[Int] = {
+    val insertQuery = games returning games.map(_.id)
+    val action = insertQuery += game
+    val future: Future[Int] = db.run(action)
+    future.onFailure {
+      case e =>
+        log.error("couldn't insertAndGet scheduled game", e)
         throw e
     }
     future

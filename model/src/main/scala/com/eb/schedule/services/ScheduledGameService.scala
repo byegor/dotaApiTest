@@ -20,6 +20,8 @@ trait ScheduledGameService {
 
   def insert(game: ScheduledGameDTO): Future[Int]
 
+  def insertAndGet(game: ScheduledGameDTO): Future[Int]
+
   def update(game: ScheduledGame): Future[Int]
 
   def updateStatus(id: Int, status: Byte): Future[Int]
@@ -47,6 +49,10 @@ class ScheduledGameServiceImpl @Inject()(repository: ScheduledGameRepository) ex
 
   def insert(game: ScheduledGameDTO): Future[Int] = {
     repository.insert(DTOUtils.transformScheduledGameFromDTO(game))
+  }
+
+  def insertAndGet(game: ScheduledGameDTO): Future[Int] ={
+    repository.insertAndGet(DTOUtils.transformScheduledGameFromDTO(game))
   }
 
   def update(game: ScheduledGame): Future[Int] = {

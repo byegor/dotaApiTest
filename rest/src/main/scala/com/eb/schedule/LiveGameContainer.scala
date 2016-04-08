@@ -14,15 +14,24 @@ object LiveGameContainer {
 
   private val currentLiveGames: scala.collection.concurrent.Map[Long, CurrentGameDTO] = new ConcurrentHashMap[Long, CurrentGameDTO]
 
-  private val scheduledGames: scala.collection.concurrent.Map[Long, BasicGameInfoDTO] = new ConcurrentHashMap[Long, BasicGameInfoDTO]
+  private val basicGamesInfo: scala.collection.concurrent.Map[Long, BasicGameInfoDTO] = new ConcurrentHashMap[Long, BasicGameInfoDTO]
 
   def updateLiveGame(currentGameDTO: CurrentGameDTO): Unit = {
     currentLiveGames.put(currentGameDTO.matchId, currentGameDTO)
-    scheduledGames.put(currentGameDTO.matchId, currentGameDTO.basicInfo)
+    basicGamesInfo.put(currentGameDTO.matchId, currentGameDTO.basicInfo)
   }
 
-  def getLiveMatchesId():Iterable[Long] = {
+  def getLiveGame(matchId: Long): Option[CurrentGameDTO] = {
+    currentLiveGames.get(matchId)
+  }
+
+  def getLiveMatchesId(): Iterable[Long] = {
     currentLiveGames.keys
+  }
+
+  def removeLiveGame(matchId: Long) = {
+    currentLiveGames.remove(matchId)
+    basicGamesInfo.remove(matchId)
   }
 
 }

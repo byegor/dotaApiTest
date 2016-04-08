@@ -21,6 +21,7 @@ class CoreModule extends AbstractModule{
     bind(classOf[LeagueRepository]).to(classOf[LeagueRepositoryImpl])
     bind(classOf[ScheduledGameRepository]).to(classOf[ScheduledGameRepositoryImpl])
     bind(classOf[NetWorthRepository]).to(classOf[NetWorthRepositoryImpl])
+    bind(classOf[SeriesRepository]).to(classOf[SeriesRepositoryImpl])
 
     //service
     bind(classOf[HeroService]).to(classOf[HeroServiceImpl]).in(classOf[com.google.inject.Singleton])
@@ -30,6 +31,7 @@ class CoreModule extends AbstractModule{
     bind(classOf[LeagueService]).to(classOf[LeagueServiceImpl]).in(classOf[com.google.inject.Singleton])
     bind(classOf[ScheduledGameService]).to(classOf[ScheduledGameServiceImpl]).in(classOf[com.google.inject.Singleton])
     bind(classOf[NetWorthService]).to(classOf[NetWorthServiceImpl]).in(classOf[com.google.inject.Singleton])
+    bind(classOf[SeriesService]).to(classOf[SeriesServiceImpl]).in(classOf[com.google.inject.Singleton])
   }
 }
 

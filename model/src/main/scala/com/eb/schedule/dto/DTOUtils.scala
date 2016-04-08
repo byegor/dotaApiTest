@@ -7,7 +7,6 @@ import com.eb.schedule.model.slick._
   */
 object DTOUtils {
 
-
   def createUpdateTaskDTO(updateTask: UpdateTask): TaskDTO = {
     new TaskDTO(updateTask.id, updateTask.classname, updateTask.result)
   }
@@ -18,6 +17,10 @@ object DTOUtils {
 
   def crateDTO(l: League): LeagueDTO = {
     new LeagueDTO(l.id, l.name)
+  }
+
+  def crateDTO(l: MatchSeries): SeriesDTO = {
+    new SeriesDTO(l.scheduledGameId, l.matchId, l.gameNumber)
   }
 
   def crateNetWorthDTO(nw: Option[NetWorth]): Option[NetWorthDTO] = {
@@ -34,6 +37,10 @@ object DTOUtils {
     } else {
       None
     }
+  }
+
+  def transformMatchSeriesFromDTO(s: SeriesDTO): MatchSeries = {
+    new MatchSeries(s.gameId, s.matchId, s.gameNumber)
   }
 
   def transformTeamFromDTO(t: TeamDTO): Team = {

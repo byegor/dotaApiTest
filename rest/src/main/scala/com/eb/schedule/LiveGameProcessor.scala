@@ -1,13 +1,16 @@
 package com.eb.schedule
 
+import java.sql.Timestamp
+
 import com.eb.schedule.cache.{HeroCache, ItemCache, LeagueCache}
 import com.eb.schedule.dto._
-import com.eb.schedule.model.SeriesType
-import com.eb.schedule.model.slick.{NetWorth, ScheduledGame}
-import com.eb.schedule.services.NetWorthService
+import com.eb.schedule.model.services.ScheduledGameService
+import com.eb.schedule.model.{MatchStatus, SeriesType}
+import com.eb.schedule.services.{NetWorthService, SeriesService}
 import com.eb.schedule.utils.HttpUtils
 import com.google.inject.Inject
 import org.json.{JSONArray, JSONObject}
+import org.slf4j.LoggerFactory
 
 import scala.collection.mutable
 import scala.concurrent.duration.Duration
@@ -16,7 +19,9 @@ import scala.concurrent.{Await, Future}
 /**
   * Created by Egor on 23.03.2016.
   */
-class LiveGameProcessor @Inject()(val heroCache: HeroCache, val itemCache: ItemCache, val leagueCache: LeagueCache, val netWorthService: NetWorthService) {
+class LiveGameProcessor @Inject()(val heroCache: HeroCache, val itemCache: ItemCache, val leagueCache: LeagueCache, val netWorthService: NetWorthService, val gameService: ScheduledGameService, val seriesService: SeriesService) {
+
+  private val log = LoggerFactory.getLogger(this.getClass)
 
   val GET_LIVE_LEAGUE_MATCHES: String = "https://api.steampowered.com/IDOTA2Match_570/GetLiveLeagueGames/v0001/?key=9EBD51CD27F27324F1554C53BEDA17C3"
 
@@ -158,7 +163,31 @@ class LiveGameProcessor @Inject()(val heroCache: HeroCache, val itemCache: ItemC
     id.toSeq.diff(stillRunning)
   }
 
-  def storeMatchSeries(scheduledGame: ScheduledGame, liveGameDTO: CurrentGameDTO) = ???
 
-  def clearLiveGameContainer() = ???
+  def storeMatchSeries(liveGame: CurrentGameDTO) = {
+    val game: Option[ScheduledGameDTO] = gameService.getScheduledGames(liveGame)
+    if (game.isEmpty) {
+      val insert: Future[Int] = gameService.insertAndGet(new ScheduledGameDTO(-1, Some(liveGame.matchId), liveGame.radiantTeam, liveGame.direTeam, liveGame.basicInfo.league, new Timestamp(1), MatchStatus.FINISHED.status))
+      if (liveGame.basicInfo.radiantWin != 0 || liveGame.basicInfo.direWin != 0) {
+        log.error("Couldn't find a scheduled game for matchId: " + liveGame.matchId)
+      }
+      for (g <- insert) {
+        storeMatchSeries(liveGame, g)
+      }
+    } else {
+      storeMatchSeries(liveGame, game.get.id)
+    }
+  }
+
+  def updateGameStatus(gameId: Int) = {
+    gameService.updateStatus(gameId, MatchStatus.FINISHED.status)
+  }
+
+  def storeMatchSeries(liveGame: CurrentGameDTO, gameId: Int) = {
+    seriesService.insert(new SeriesDTO(gameId, liveGame.matchId, (liveGame.basicInfo.radiantWin + liveGame.basicInfo.direWin + 1).toByte))
+  }
+
+  def clearLiveGameContainer(liveGame: CurrentGameDTO) = {
+    LiveGameContainer.removeLiveGame(liveGame.matchId)
+  }
 }
