@@ -1,8 +1,8 @@
-package com.eb.schedule
+package com.eb.schedule.live
 
 import java.util.concurrent.ConcurrentHashMap
 
-import com.eb.schedule.dto.{BasicGameInfoDTO, CurrentGameDTO, ScheduledGameDTO}
+import com.eb.schedule.dto.{BasicGameInfoDTO, CurrentGameDTO}
 
 import scala.collection.JavaConversions._
 
@@ -23,6 +23,10 @@ object LiveGameContainer {
 
   def getLiveGame(matchId: Long): Option[CurrentGameDTO] = {
     currentLiveGames.get(matchId)
+  }
+
+  def exists(matchId: Long): Boolean = {
+    currentLiveGames.canEqual(matchId)
   }
 
   def getLiveMatchesId(): Iterable[Long] = {

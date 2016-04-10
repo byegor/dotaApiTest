@@ -36,7 +36,7 @@ trait ScheduledGameRepository {
 
   def delete(id: Int): Future[Int]
 
-  def getScheduledGames(team1: Int, team2: Int, league: Int): Future[Option[ScheduledGame]]
+  def getScheduledGames(team1: Int, team2: Int, league: Int, matchId: Long): Future[Option[ScheduledGame]]
 }
 
 class ScheduledGameRepositoryImpl @Inject()(val database: DB) extends ScheduledGameRepository {
@@ -65,7 +65,8 @@ class ScheduledGameRepositoryImpl @Inject()(val database: DB) extends ScheduledG
     }
     future
   }
-//val userId =  (users returning users.map(_.id)) += User(None, "Stefan", "Zeiger")
+
+  //val userId =  (users returning users.map(_.id)) += User(None, "Stefan", "Zeiger")
   def insertAndGet(game: ScheduledGame): Future[Int] = {
     val insertQuery = games returning games.map(_.id)
     val action = insertQuery += game
@@ -100,13 +101,13 @@ class ScheduledGameRepositoryImpl @Inject()(val database: DB) extends ScheduledG
     db.run(filterQuery(id).delete)
 
 
-  private def getScheduledGameQuery(team1: Int, team2: Int, league: Int) = {
-    games.filter(g => g.status === MatchStatus.SCHEDULED.status && g.leagueId === league && ((g.radiant === team1 && g.dire === team2) || (g.radiant === team2 && g.dire === team1)))
+  private def getScheduledGameQuery(team1: Int, team2: Int, league: Int, matchId: Long): _root_.slick.driver.MySQLDriver.api.Query[ScheduledGameTable, ScheduledGame, Seq] = {
+    games.filter(g => (g.matchId === matchId) || (g.status === MatchStatus.SCHEDULED.status && g.leagueId === league && ((g.radiant === team1 && g.dire === team2) || (g.radiant === team2 && g.dire === team1))))
       .sortBy(_.startDate)
   }
 
-  def getScheduledGames(team1: Int, team2: Int, league: Int): Future[Option[ScheduledGame]] = {
-    db.run(getScheduledGameQuery(team1, team2, league).result.headOption)
+  def getScheduledGames(team1: Int, team2: Int, league: Int, matchId: Long): Future[Option[ScheduledGame]] = {
+    db.run(getScheduledGameQuery(team1, team2, league, matchId).result.headOption)
   }
 }
 

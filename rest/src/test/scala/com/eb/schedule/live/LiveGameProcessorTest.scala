@@ -1,4 +1,4 @@
-package com.eb.schedule
+package com.eb.schedule.live
 
 import com.eb.schedule.model.BasicTest
 import org.json.JSONObject

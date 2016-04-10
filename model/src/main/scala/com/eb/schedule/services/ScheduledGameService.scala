@@ -22,7 +22,7 @@ trait ScheduledGameService {
 
   def insertAndGet(game: ScheduledGameDTO): Future[Int]
 
-  def update(game: ScheduledGame): Future[Int]
+  def update(game: ScheduledGameDTO): Future[Int]
 
   def updateStatus(id: Int, status: Byte): Future[Int]
 
@@ -55,8 +55,8 @@ class ScheduledGameServiceImpl @Inject()(repository: ScheduledGameRepository) ex
     repository.insertAndGet(DTOUtils.transformScheduledGameFromDTO(game))
   }
 
-  def update(game: ScheduledGame): Future[Int] = {
-    repository.update(game)
+  def update(game: ScheduledGameDTO): Future[Int] = {
+    repository.update(DTOUtils.transformScheduledGameFromDTO(game))
   }
 
   def updateStatus(id: Int, status: Byte): Future[Int] = {
@@ -73,7 +73,7 @@ class ScheduledGameServiceImpl @Inject()(repository: ScheduledGameRepository) ex
   }
 
   def getScheduledGames(liveGameDTO: CurrentGameDTO): Option[ScheduledGameDTO] = {
-    val future: Future[Option[ScheduledGame]] = repository.getScheduledGames(liveGameDTO.radiantTeam.id, liveGameDTO.direTeam.id, liveGameDTO.basicInfo.league.leagueId)
+    val future: Future[Option[ScheduledGame]] = repository.getScheduledGames(liveGameDTO.radiantTeam.id, liveGameDTO.direTeam.id, liveGameDTO.basicInfo.league.leagueId, liveGameDTO.matchId)
     val result: Option[ScheduledGame] = Await.result(future, Duration.Inf)
     result match {
       case Some(g) => Some(DTOUtils.crateDTO(g))
