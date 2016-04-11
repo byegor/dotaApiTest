@@ -5,9 +5,9 @@ package com.eb.schedule.dto
   */
 class CurrentGameDTO(val matchId: Long) {
   var basicInfo: BasicGameInfoDTO = new BasicGameInfoDTO(matchId)
-  var direTeam:TeamDTO = ???
-  var radiantTeam:TeamDTO = ???
-  var netWorth:NetWorthDTO = ???
+  var direTeam:TeamDTO = _
+  var radiantTeam:TeamDTO = _
+  var netWorth:NetWorthDTO = _
 
 }
 

@@ -1,8 +1,8 @@
 package com.eb.schedule.services
 
-import com.eb.schedule.dao.{HeroRepository, ItemRepository, SeriesRepository}
-import com.eb.schedule.dto.{DTOUtils, HeroDTO, ItemDTO, SeriesDTO}
-import com.eb.schedule.model.slick.Item
+import com.eb.schedule.dao.SeriesRepository
+import com.eb.schedule.dto.SeriesDTO
+import com.eb.schedule.utils.DTOUtils
 import com.google.inject.Inject
 
 import scala.concurrent.ExecutionContext.Implicits.global

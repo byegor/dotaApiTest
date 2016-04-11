@@ -1,10 +1,11 @@
 package com.eb.schedule.model.services
 
-import com.eb.schedule.dto.{DTOUtils, CurrentGameDTO, ScheduledGameDTO}
+import com.eb.schedule.dto.{CurrentGameDTO, ScheduledGameDTO}
 import com.eb.schedule.model.dao.ScheduledGameRepository
 import com.eb.schedule.model.slick.ScheduledGame
+import com.eb.schedule.utils.DTOUtils
 import com.google.inject.Inject
-
+import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.duration.Duration
 import scala.concurrent.{Await, Future}
 
@@ -14,7 +15,7 @@ import scala.concurrent.{Await, Future}
 trait ScheduledGameService {
   def findById(id: Int): Future[ScheduledGame]
 
-  def findByMatchId(matchId: Long): Future[Option[ScheduledGame]]
+  def findByMatchId(matchId: Long): Future[Option[ScheduledGameDTO]]
 
   def exists(id: Int): Future[Boolean]
 
@@ -39,8 +40,11 @@ class ScheduledGameServiceImpl @Inject()(repository: ScheduledGameRepository) ex
     repository.findById(id)
   }
 
-  def findByMatchId(matchId: Long): Future[Option[ScheduledGame]] = {
-    repository.findByMatchId(matchId)
+  def findByMatchId(matchId: Long): Future[Option[ScheduledGameDTO]] = {
+    repository.findByMatchId(matchId).map {
+      case Some(game) => Some(DTOUtils.crateDTO(game))
+      case None => None
+    }
   }
 
   def exists(id: Int): Future[Boolean] = {
@@ -51,7 +55,7 @@ class ScheduledGameServiceImpl @Inject()(repository: ScheduledGameRepository) ex
     repository.insert(DTOUtils.transformScheduledGameFromDTO(game))
   }
 
-  def insertAndGet(game: ScheduledGameDTO): Future[Int] ={
+  def insertAndGet(game: ScheduledGameDTO): Future[Int] = {
     repository.insertAndGet(DTOUtils.transformScheduledGameFromDTO(game))
   }
 
@@ -63,7 +67,7 @@ class ScheduledGameServiceImpl @Inject()(repository: ScheduledGameRepository) ex
     repository.updateStatus(id, status)
   }
 
-  def updateStatusByMatchId(id: Long, status: Byte): Future[Int] ={
+  def updateStatusByMatchId(id: Long, status: Byte): Future[Int] = {
     repository.updateStatusByMatchId(id, status)
   }
 

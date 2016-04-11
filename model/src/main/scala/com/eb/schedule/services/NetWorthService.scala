@@ -1,8 +1,9 @@
 package com.eb.schedule.services
 
 import com.eb.schedule.dao.NetWorthRepository
-import com.eb.schedule.dto.{DTOUtils, NetWorthDTO}
+import com.eb.schedule.dto.NetWorthDTO
 import com.eb.schedule.model.slick.NetWorth
+import com.eb.schedule.utils.DTOUtils
 import com.google.inject.Inject
 import org.slf4j.LoggerFactory
 

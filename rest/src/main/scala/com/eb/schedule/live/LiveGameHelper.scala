@@ -1,6 +1,6 @@
 package com.eb.schedule.live
 
-import com.eb.schedule.cache.{HeroCache, ItemCache, LeagueCache}
+import com.eb.schedule.cache.{HeroCache, ItemCache, LeagueCache, TeamCache}
 import com.eb.schedule.dto.{CurrentGameDTO, NetWorthDTO, PlayerDTO, TeamDTO}
 import com.eb.schedule.model.SeriesType
 import com.eb.schedule.services.NetWorthService
@@ -14,14 +14,14 @@ import scala.concurrent.{Await, Future}
 /**
   * Created by Egor on 10.04.2016.
   */
-class LiveGameHelper @Inject()(val heroCache: HeroCache, val itemCache: ItemCache, val leagueCache: LeagueCache, val netWorthService: NetWorthService) {
+class LiveGameHelper @Inject()(val heroCache: HeroCache, val itemCache: ItemCache, val leagueCache: LeagueCache, val teamCache: TeamCache, val netWorthService: NetWorthService) {
 
   def transformToDTO(game: JSONObject): CurrentGameDTO = {
     val matchId: Long = game.getLong("match_id")
     val currentGame: CurrentGameDTO = new CurrentGameDTO(matchId)
     fillGameWithTeams(game, currentGame)
     fillGameWithOther(game, currentGame)
-
+    fillGameWithNetWorth(currentGame)
     currentGame
   }
 
@@ -48,8 +48,6 @@ class LiveGameHelper @Inject()(val heroCache: HeroCache, val itemCache: ItemCach
     currentGame.radiantTeam.players = parseDeepPlayerInfo(radiantScoreBoard.getJSONArray("players"), playerInfo._1)
     val direScoreBoard: JSONObject = scoreBoard.getJSONObject("dire")
     currentGame.direTeam.players = parseDeepPlayerInfo(direScoreBoard.getJSONArray("players"), playerInfo._2)
-
-
   }
 
   def fillGameWithNetWorth(currentGame: CurrentGameDTO): Unit = {
@@ -115,10 +113,16 @@ class LiveGameHelper @Inject()(val heroCache: HeroCache, val itemCache: ItemCach
   }
 
   private def parseTeam(json: JSONObject): TeamDTO = {
-    val team: TeamDTO = new TeamDTO(json.getInt("team_id"))
-    team.name = json.getString("team_name")
-    team.logo = json.getLong("team_logo")
-    team
+    val teamId: Int = json.getInt("team_id")
+    val teamDto: TeamDTO = teamCache.getTeam(teamId)
+    if (teamDto != teamCache.unknownTeam) {
+      teamDto
+    } else {
+      val team: TeamDTO = new TeamDTO(teamId)
+      team.name = json.getString("team_name")
+      team.logo = json.getLong("team_logo")
+      team
+    }
   }
 
 

@@ -32,6 +32,9 @@ class CoreModule extends AbstractModule{
     bind(classOf[ScheduledGameService]).to(classOf[ScheduledGameServiceImpl]).in(classOf[com.google.inject.Singleton])
     bind(classOf[NetWorthService]).to(classOf[NetWorthServiceImpl]).in(classOf[com.google.inject.Singleton])
     bind(classOf[SeriesService]).to(classOf[SeriesServiceImpl]).in(classOf[com.google.inject.Singleton])
+
+    //utils
+    bind(classOf[HttpUtils])
   }
 }
 

@@ -13,8 +13,8 @@ import com.google.inject.Guice
   * Created by Егор on 08.02.2016.
   */
 object CrawlerStarter extends App {
-//  private val teamCrawler: TeamCrawler = new TeamCrawler()
-//  private val liveMatchCrawler: LiveMatchCrawler = new LiveMatchCrawler()
+  //  private val teamCrawler: TeamCrawler = new TeamCrawler()
+  //  private val liveMatchCrawler: LiveMatchCrawler = new LiveMatchCrawler()
 
   private val executor: ScheduledExecutorService = Executors.newScheduledThreadPool(2);
   val injector = Guice.createInjector(new MysqlModule, new CoreModule)
@@ -24,14 +24,14 @@ object CrawlerStarter extends App {
   val scheduledGameService = injector.getInstance(classOf[ScheduledGameService])
   val itemService = injector.getInstance(classOf[ItemService])
 
-  private val teamCrawler: TeamCrawlerRunner = new TeamCrawlerRunner(teamService, taskService)
+//  private val teamCrawler: TeamCrawlerRunner = new TeamCrawlerRunner(teamService, taskService)
+//  private val leagueCrawler: LeagueCrawler = new LeagueCrawler(leagueService, taskService);
+//    private val itemsCrawler:ItemsCrawler = new ItemsCrawler(itemService);
 
-//  private val itemsCrawler:ItemsCrawler = new ItemsCrawler(itemService);
-  private val leagueCrawler:LeagueCrawler = new LeagueCrawler(leagueService);
-  leagueCrawler.run()
-//  itemsCrawler.run()
-  Thread.sleep(20000)
-//  executor.scheduleAtFixedRate(teamCrawler, 0, 10, TimeUnit.MINUTES)
+//  leagueCrawler.run()
+  //  itemsCrawler.run()
+//  Thread.sleep(20000)
+  //  executor.scheduleAtFixedRate(teamCrawler, 0, 10, TimeUnit.MINUTES)
 
 
 }

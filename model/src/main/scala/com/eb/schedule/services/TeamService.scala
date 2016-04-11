@@ -1,17 +1,18 @@
 package com.eb.schedule.model.services
 
-import com.eb.schedule.dto.{DTOUtils, TeamDTO}
+import com.eb.schedule.dto.TeamDTO
 import com.eb.schedule.model.dao.TeamRepository
 import com.eb.schedule.model.slick.Team
+import com.eb.schedule.utils.DTOUtils
 import com.google.inject.Inject
-
+import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 
 /**
   * Created by Egor on 20.02.2016.
   */
 trait TeamService {
-  def findById(id: Int): Future[Option[Team]]
+  def findById(id: Int): Future[Option[TeamDTO]]
 
   def exists(id: Int): Future[Boolean]
 
@@ -28,8 +29,8 @@ trait TeamService {
 
 
 class TeamServiceImpl @Inject()(teamRepository: TeamRepository) extends TeamService {
-  def findById(id: Int): Future[Option[Team]] = {
-    teamRepository.findById(id)
+  def findById(id: Int): Future[Option[TeamDTO]] = {
+    teamRepository.findById(id).map(DTOUtils.crateTeamDTO)
   }
 
   def exists(id: Int): Future[Boolean] = {

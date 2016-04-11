@@ -1,5 +1,6 @@
-package com.eb.schedule.dto
+package com.eb.schedule.utils
 
+import com.eb.schedule.dto.{NetWorthDTO, _}
 import com.eb.schedule.model.MatchStatus
 import com.eb.schedule.model.slick._
 
@@ -40,6 +41,18 @@ object DTOUtils {
     }
   }
 
+  def crateTeamDTO(t: Option[Team]): Option[TeamDTO] = {
+    if (t.isDefined) {
+      val team: Team = t.get
+      val dto: TeamDTO = new TeamDTO(team.id)
+      dto.name = team.name
+      dto.tag = team.tag
+      Some(dto)
+    } else {
+      None
+    }
+  }
+
   def transformMatchSeriesFromDTO(s: SeriesDTO): MatchSeries = {
     new MatchSeries(s.gameId, s.matchId, s.gameNumber)
   }
@@ -57,7 +70,7 @@ object DTOUtils {
   }
 
   def transformScheduledGameFromDTO(g: ScheduledGameDTO): ScheduledGame = {
-    new ScheduledGame(g.id, g.matchId, g.radiantTeam.id, g.direTeam.id, g.league.id, g.startDate, g.matchStatus)
+    new ScheduledGame(g.id, g.matchId, g.radiantTeam.id, g.direTeam.id, g.league.id, g.startDate, g.matchStatus.status)
   }
 
 

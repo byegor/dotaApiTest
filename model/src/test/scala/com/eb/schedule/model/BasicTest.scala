@@ -9,8 +9,8 @@ import _root_.slick.profile.BasicStreamingAction
 import com.eb.schedule.configure.{CoreModule, H2Module}
 import com.eb.schedule.model.db.{DB, H2DB}
 import com.eb.schedule.model.services._
-import com.eb.schedule.model.slick._
-import com.eb.schedule.services.HeroService
+import com.eb.schedule.model.slick.{Hero, League, _}
+import com.eb.schedule.services.{HeroService, NetWorthService, SeriesService}
 import com.google.inject.Guice
 import org.scalatest.{BeforeAndAfter, FunSuite}
 
@@ -31,6 +31,8 @@ abstract class BasicTest extends FunSuite with BeforeAndAfter {
   val taskService = injector.getInstance(classOf[UpdateTaskService])
   val leagueService = injector.getInstance(classOf[HeroService])
   val scheduledGameService = injector.getInstance(classOf[ScheduledGameService])
+  val netWorthService = injector.getInstance(classOf[NetWorthService])
+  val seriesService = injector.getInstance(classOf[SeriesService])
 
   val initDb = {
     val tables = Await.result(db.run(MTable.getTables), 2.seconds).toList
@@ -39,12 +41,22 @@ abstract class BasicTest extends FunSuite with BeforeAndAfter {
         Team.table.schema.create,
         UpdateTask.table.schema.create,
         League.table.schema.create,
+        Hero.table.schema.create,
+        Item.table.schema.create,
         ScheduledGame.table.schema.create,
         NetWorth.table.schema.create,
         MatchSeries.table.schema.create
       ).transactionally
       ), Duration.Inf)
     }
+  }
+  before {
+    Await.result(db.run(DBIO.seq(
+      League.table += new League(4210, ""),
+      Team.table += new Team(36, "", "", -1),
+      Team.table += new Team(1838315, "", "", -1)
+    ).transactionally
+    ), Duration.Inf)
   }
 
   after {
@@ -54,7 +66,11 @@ abstract class BasicTest extends FunSuite with BeforeAndAfter {
       ScheduledGame.table.delete,
       Team.table.delete,
       UpdateTask.table.delete,
-      League.table.delete
+      League.table.delete,
+      Hero.table.delete,
+      Item.table.delete,
+      NetWorth.table.delete,
+      MatchSeries.table.delete
     ).transactionally
     ), Duration.Inf)
   }

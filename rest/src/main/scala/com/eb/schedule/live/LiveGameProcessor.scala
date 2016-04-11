@@ -12,13 +12,14 @@ import org.json.{JSONArray, JSONObject}
 import org.slf4j.LoggerFactory
 
 import scala.collection.mutable
-import scala.concurrent.Future
+import scala.concurrent.duration.Duration
+import scala.concurrent.{Await, Future}
 
 /**
   * Created by Egor on 23.03.2016.
   */
-//todo logs
-class LiveGameProcessor @Inject()(val liveGameHelper: LiveGameHelper, val netWorthService: NetWorthService, val gameService: ScheduledGameService, val seriesService: SeriesService) {
+
+class LiveGameProcessor @Inject()(val liveGameHelper: LiveGameHelper, val netWorthService: NetWorthService, val gameService: ScheduledGameService, val seriesService: SeriesService, val httpUtils: HttpUtils) {
 
   private val log = LoggerFactory.getLogger(this.getClass)
 
@@ -30,18 +31,21 @@ class LiveGameProcessor @Inject()(val liveGameHelper: LiveGameHelper, val netWor
     val matchIdToGameId: collection.mutable.Map[Long, Int] = new mutable.HashMap[Long, Int]()
     for (current <- currentGames) {
       if (!LiveGameContainer.exists(current.matchId)) {
+        log.debug("found new live game with matchId: " + current.matchId)
         val scheduledGame: Option[ScheduledGameDTO] = gameService.getScheduledGames(current)
         if (scheduledGame.isEmpty) {
           val startDate: Timestamp = new Timestamp(System.currentTimeMillis() - current.basicInfo.duration.toLong)
-          val scheduledGameIdFuture: Future[Int] = gameService.insertAndGet(new ScheduledGameDTO(-1, Some(current.matchId), current.radiantTeam, current.direTeam, current.basicInfo.league, startDate, MatchStatus.LIVE.status))
-          scheduledGameIdFuture.onSuccess {
-            case id => matchIdToGameId.put(current.matchId, id)
-          }
+          val scheduledGameDTO: ScheduledGameDTO = new ScheduledGameDTO(-1, Some(current.matchId), current.radiantTeam, current.direTeam, current.basicInfo.league, startDate, MatchStatus.LIVE)
+          val scheduledGameIdFuture: Future[Int] = gameService.insertAndGet(scheduledGameDTO)
+          log.debug("creating new scheduled game: " + scheduledGameDTO)
+          val gameId: Int = Await.result(scheduledGameIdFuture, Duration.Inf)
+          matchIdToGameId.put(current.matchId, gameId)
         } else {
           val gameDTO: ScheduledGameDTO = scheduledGame.get
           if (gameDTO.matchStatus == MatchStatus.SCHEDULED) {
             gameDTO.matchStatus = MatchStatus.LIVE
             gameService.update(gameDTO)
+            log.debug("update status for game:" + gameDTO.matchId)
           }
         }
       }
@@ -50,13 +54,16 @@ class LiveGameProcessor @Inject()(val liveGameHelper: LiveGameHelper, val netWor
     }
 
     val finishedMatches: Seq[Long] = findFinishedMatches(currentGames)
-    for (id <- finishedMatches) {
-      val lgOpt: Option[CurrentGameDTO] = LiveGameContainer.getLiveGame(id)
+    for (matchId <- finishedMatches) {
+      val lgOpt: Option[CurrentGameDTO] = LiveGameContainer.getLiveGame(matchId)
       val liveGame: CurrentGameDTO = lgOpt.get
-      //todo what if future still not complete
       val maybeInt: Option[Int] = matchIdToGameId.get(liveGame.matchId)
-      storeMatchSeries(liveGame, maybeInt.get)
-      clearLiveGameContainer(lgOpt.get)
+      if(maybeInt.isDefined){
+        storeMatchSeries(liveGame, maybeInt.get)
+        clearLiveGameContainer(lgOpt.get)
+      }else{
+        log.error("WTF scheduled game id should be there: " + matchId)
+      }
     }
   }
 
@@ -76,7 +83,7 @@ class LiveGameProcessor @Inject()(val liveGameHelper: LiveGameHelper, val netWor
 
   //todo
   def executeGet(): JSONObject = {
-    HttpUtils.getResponseAsJson(GET_LIVE_LEAGUE_MATCHES)
+    httpUtils.getResponseAsJson(GET_LIVE_LEAGUE_MATCHES)
   }
 
   def insertNetWorth(netWorth: NetWorthDTO) = {

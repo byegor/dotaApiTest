@@ -6,7 +6,7 @@ package com.eb.schedule.dto
 //todo check if Long
 class PlayerDTO(val accountId: Int) {
   var name = ""
-  var hero: HeroDTO = ???
+  var hero: HeroDTO = _
   var items: List[ItemDTO] = Nil
   var level = 1
   var kills = 0

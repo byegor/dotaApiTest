@@ -26,7 +26,7 @@ object LiveGameContainer {
   }
 
   def exists(matchId: Long): Boolean = {
-    currentLiveGames.canEqual(matchId)
+    currentLiveGames.contains(matchId)
   }
 
   def getLiveMatchesId(): Iterable[Long] = {

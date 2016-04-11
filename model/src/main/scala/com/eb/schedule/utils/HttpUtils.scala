@@ -9,7 +9,7 @@ import com.mashape.unirest.http.{HttpResponse, Unirest}
 import org.json.JSONObject
 
 
-object HttpUtils {
+class HttpUtils {
 
   private val mapper: ObjectMapper = new ObjectMapper()
   private val lock: AnyRef = new Object()

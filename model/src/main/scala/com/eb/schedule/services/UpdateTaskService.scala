@@ -1,8 +1,9 @@
 package com.eb.schedule.model.services
 
-import com.eb.schedule.dto.{DTOUtils, LeagueDTO, TaskDTO}
+import com.eb.schedule.dto.{LeagueDTO, TaskDTO}
 import com.eb.schedule.model.dao.UpdateTaskRepository
 import com.eb.schedule.model.slick.{League, Team, UpdateTask}
+import com.eb.schedule.utils.DTOUtils
 import com.google.inject.Inject
 
 import scala.concurrent.Future
