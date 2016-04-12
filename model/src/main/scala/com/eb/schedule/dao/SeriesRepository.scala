@@ -15,7 +15,7 @@ import scala.concurrent.Future
   */
 trait SeriesRepository {
 
-  def findSeriesId(id: Int): Future[MatchSeries]
+  def findSeriesId(id: Int): Future[Seq[MatchSeries]]
 
   def exists(id: Int): Future[Boolean]
 
@@ -29,8 +29,8 @@ class SeriesRepositoryImpl @Inject()(database: DB) extends SeriesRepository {
 
   def filterQuery(id: Int): Query[MatchSeriesTable, MatchSeries, Seq] = series.filter(_.scheduledGameId === id)
 
-  def findSeriesId(id: Int): Future[MatchSeries] =
-    db.run(filterQuery(id).result.head)
+  def findSeriesId(id: Int): Future[Seq[MatchSeries]] =
+    db.run(filterQuery(id).result)
 
   def exists(id: Int): Future[Boolean] =
     db.run(filterQuery(id).exists.result)

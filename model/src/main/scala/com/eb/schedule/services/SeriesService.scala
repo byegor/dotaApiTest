@@ -12,7 +12,7 @@ import scala.concurrent.Future
   * Created by Egor on 20.02.2016.
   */
 trait SeriesService {
-  def findBySeriesId(id: Int): Future[SeriesDTO]
+  def findBySeriesId(id: Int): Future[Seq[SeriesDTO]]
 
   def exists(id: Int): Future[Boolean]
 
@@ -20,8 +20,8 @@ trait SeriesService {
 }
 
 class SeriesServiceImpl @Inject()(rep: SeriesRepository) extends SeriesService {
-  def findBySeriesId(id: Int): Future[SeriesDTO] = {
-    rep.findSeriesId(id).map(h => DTOUtils.crateDTO(h))
+  def findBySeriesId(id: Int): Future[Seq[SeriesDTO]] = {
+    rep.findSeriesId(id).map(seq => seq.map(DTOUtils.crateDTO))
   }
 
   def exists(id: Int): Future[Boolean] = {
