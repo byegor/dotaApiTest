@@ -9,7 +9,7 @@ import org.json.{JSONArray, JSONObject}
 import org.slf4j.LoggerFactory
 
 
-class ItemsCrawler @Inject()(itemService: ItemService){
+class ItemsCrawler @Inject()(itemService: ItemService, httpUtils: HttpUtils) extends Runnable {
 
   private val log = LoggerFactory.getLogger(this.getClass)
 
@@ -25,12 +25,12 @@ class ItemsCrawler @Inject()(itemService: ItemService){
 
   def parseName(name: String): String = {
     name
-//    name.replace("item_", "").replace("_", " ")
+    //    name.replace("item_", "").replace("_", " ")
   }
 
 
   def getItemsInfoFromSteam(): JSONArray = {
-    val teamInfo: JSONObject = HttpUtils.getResponseAsJson(GET_ITEMS)
+    val teamInfo: JSONObject = httpUtils.getResponseAsJson(GET_ITEMS)
     val result: JSONObject = teamInfo.getJSONObject("result")
     val items: JSONArray = result.getJSONArray("items")
     items

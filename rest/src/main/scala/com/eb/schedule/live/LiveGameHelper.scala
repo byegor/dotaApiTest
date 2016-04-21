@@ -6,6 +6,7 @@ import com.eb.schedule.model.SeriesType
 import com.eb.schedule.services.NetWorthService
 import com.google.inject.Inject
 import org.json.{JSONArray, JSONObject}
+import org.slf4j.LoggerFactory
 
 import scala.collection.mutable
 import scala.concurrent.duration.Duration
@@ -16,13 +17,22 @@ import scala.concurrent.{Await, Future}
   */
 class LiveGameHelper @Inject()(val heroCache: HeroCache, val itemCache: ItemCache, val leagueCache: LeagueCache, val teamCache: TeamCache, val netWorthService: NetWorthService) {
 
-  def transformToDTO(game: JSONObject): CurrentGameDTO = {
-    val matchId: Long = game.getLong("match_id")
-    val currentGame: CurrentGameDTO = new CurrentGameDTO(matchId)
-    fillGameWithTeams(game, currentGame)
-    fillGameWithOther(game, currentGame)
-    fillGameWithNetWorth(currentGame)
-    currentGame
+  private val log = LoggerFactory.getLogger(this.getClass)
+
+  def transformToDTO(game: JSONObject): Option[CurrentGameDTO] = {
+    try {
+      val matchId: Long = game.getLong("match_id")
+      val currentGame: CurrentGameDTO = new CurrentGameDTO(matchId)
+      fillGameWithTeams(game, currentGame)
+      fillGameWithOther(game, currentGame)
+      fillGameWithNetWorth(currentGame)
+      Some(currentGame)
+    }catch {
+      case e => {
+        log.error("couldn't parse live game: " + game, e)
+        None
+      }
+    }
   }
 
   def fillGameWithTeams(game: JSONObject, currentGame: CurrentGameDTO): Unit = {

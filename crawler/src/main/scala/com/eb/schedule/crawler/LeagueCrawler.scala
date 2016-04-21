@@ -1,22 +1,18 @@
 package com.eb.schedule.crawler
 
 import com.eb.schedule.crawler.CrawlerUrls._
-import com.eb.schedule.dto.{ItemDTO, LeagueDTO, TaskDTO}
-import com.eb.schedule.model.Finished
+import com.eb.schedule.dto.{LeagueDTO, TaskDTO}
 import com.eb.schedule.model.services.{LeagueService, UpdateTaskService}
-import com.eb.schedule.model.slick.{League, UpdateTask}
-import com.eb.schedule.services.ItemService
 import com.eb.schedule.utils.HttpUtils
 import com.google.inject.Inject
 import org.json.{JSONArray, JSONObject}
 import org.slf4j.LoggerFactory
 
-import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.duration.Duration
 import scala.concurrent.{Await, Future}
 
 
-class LeagueCrawler @Inject()(leagueService: LeagueService, taskService: UpdateTaskService) {
+class LeagueCrawler @Inject()(leagueService: LeagueService, taskService: UpdateTaskService, httpUtils: HttpUtils) extends Runnable{
 
   private val log = LoggerFactory.getLogger(this.getClass)
 
@@ -44,7 +40,7 @@ class LeagueCrawler @Inject()(leagueService: LeagueService, taskService: UpdateT
 
 
   def getItemsInfoFromSteam(): JSONArray = {
-    val teamInfo: JSONObject = HttpUtils.getResponseAsJson(GET_LEAGUES)
+    val teamInfo: JSONObject = httpUtils.getResponseAsJson(GET_LEAGUES)
     val result: JSONObject = teamInfo.getJSONObject("result")
     val items: JSONArray = result.getJSONArray("leagues")
     items

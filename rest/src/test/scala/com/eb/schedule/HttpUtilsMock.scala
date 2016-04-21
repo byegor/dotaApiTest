@@ -16,4 +16,11 @@ class HttpUtilsMock extends HttpUtils {
     val liveMatchResult: JSONObject = new JSONObject(lines)
     liveMatchResult
   }
+
+  def getGame(): JSONObject = {
+    val source: BufferedSource = io.Source.fromURL(getClass.getResource("/game.json"))
+    val lines = try source.mkString finally source.close()
+    val game: JSONObject = new JSONObject(lines)
+    game
+  }
 }

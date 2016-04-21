@@ -10,18 +10,22 @@ import com.google.inject.Inject
 import org.json.{JSONArray, JSONObject}
 import org.slf4j.LoggerFactory
 
-import scala.concurrent.duration.Duration
+import scala.concurrent.duration.DurationInt
 import scala.concurrent.{Await, Future}
 
 
-class TeamCrawlerRunner @Inject()(teamService: TeamService, taskService: UpdateTaskService) extends Runnable {
+class TeamCrawlerRunner @Inject()(teamService: TeamService, taskService: UpdateTaskService, httpUtils: HttpUtils) extends Runnable {
 
   private val log = LoggerFactory.getLogger(this.getClass)
 
   def run() {
-    val tasks: Future[Seq[TaskDTO]] = taskService.getPendingTeamTasks()
-    val result: Seq[TaskDTO] = Await.result(tasks, Duration.Inf)
-    result.foreach(task => storeTeam(task.id.toInt))
+    try {
+      val tasks: Future[Seq[TaskDTO]] = taskService.getPendingTeamTasks()
+      val result: Seq[TaskDTO] = Await.result(tasks, 10 seconds)
+      result.foreach(task => storeTeam(task.id.toInt))
+    }catch {
+      case e => println(e.getMessage)
+    }
   }
 
   private def storeTeam(teamId: Int): Unit = {
@@ -56,14 +60,14 @@ class TeamCrawlerRunner @Inject()(teamService: TeamService, taskService: UpdateT
   }
 
   def getTeamInfoFromSteam(teamId: Int): JSONObject = {
-    val teamInfo: JSONObject = HttpUtils.getResponseAsJson(GET_TEAM_BY_ID + teamId)
+    val teamInfo: JSONObject = httpUtils.getResponseAsJson(GET_TEAM_BY_ID + teamId)
     val result: JSONObject = teamInfo.getJSONObject("result")
     val teams: JSONArray = result.getJSONArray("teams")
     teams.getJSONObject(0)
   }
 
   private def getTeamLogoInfoFromSteam(logoUid: Long): JSONObject = {
-    HttpUtils.getResponseAsJson(GET_TEAM_LOGO + logoUid)
+    httpUtils.getResponseAsJson(GET_TEAM_LOGO + logoUid)
   }
 
   def downloadTeamLogo(logoUid: Long, tag: String): Unit = {
@@ -71,7 +75,7 @@ class TeamCrawlerRunner @Inject()(teamService: TeamService, taskService: UpdateT
       val logoInfo: JSONObject = getTeamLogoInfoFromSteam(logoUid)
       val data: JSONObject = logoInfo.getJSONObject("data")
       val logoUrl: String = data.getString("url")
-      HttpUtils.downloadFile(logoUrl, "assets/" + tag + ".png")
+      httpUtils.downloadFile(logoUrl, "assets/" + tag + ".png")
     }
   }
 }
