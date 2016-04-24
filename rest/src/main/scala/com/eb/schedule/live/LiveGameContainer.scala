@@ -33,6 +33,10 @@ object LiveGameContainer {
     currentLiveGames.keys
   }
 
+  def getLiveMatches(): Iterable[CurrentGameDTO] = {
+    currentLiveGames.values
+  }
+
   def removeLiveGame(matchId: Long) = {
     currentLiveGames.remove(matchId)
     basicGamesInfo.remove(matchId)

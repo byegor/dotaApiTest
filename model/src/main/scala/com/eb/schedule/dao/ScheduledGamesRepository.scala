@@ -1,6 +1,6 @@
 package com.eb.schedule.model.dao
 
-import com.eb.schedule.dto.CurrentGameDTO
+import com.eb.schedule.dto.{CurrentGameDTO, ScheduledGameDTO}
 import com.eb.schedule.model.MatchStatus
 import com.eb.schedule.model.db.DB
 import com.eb.schedule.model.slick.ScheduledGame.ScheduledGameTable
@@ -37,6 +37,8 @@ trait ScheduledGameRepository {
   def delete(id: Int): Future[Int]
 
   def getScheduledGames(team1: Int, team2: Int, league: Int, matchStatus: MatchStatus): Future[Option[ScheduledGame]]
+
+  def getScheduledGamesByStatus(matchStatus: MatchStatus): Future[Seq[ScheduledGame]]
 }
 
 class ScheduledGameRepositoryImpl @Inject()(val database: DB) extends ScheduledGameRepository {
@@ -50,8 +52,6 @@ class ScheduledGameRepositoryImpl @Inject()(val database: DB) extends ScheduledG
   def findById(id: Int): Future[ScheduledGame] =
     db.run(filterQuery(id).result.head)
 
-  /*def findByMatchId(matchId: Long): Future[Option[ScheduledGame]] =
-    db.run(games.filter(_.matchId === matchId).result.headOption)*/
 
   def exists(id: Int): Future[Boolean] =
     db.run(filterQuery(id).exists.result)
@@ -90,13 +90,6 @@ class ScheduledGameRepositoryImpl @Inject()(val database: DB) extends ScheduledG
       .update(status))
   }
 
-  /*def updateStatusByMatchId(id: Long, status: Byte): Future[Int] = {
-    db.run(games
-      .filter(g => g.matchId === id)
-      .map(x => x.status)
-      .update(status))
-  }*/
-
   def delete(id: Int): Future[Int] =
     db.run(filterQuery(id).delete)
 
@@ -108,6 +101,10 @@ class ScheduledGameRepositoryImpl @Inject()(val database: DB) extends ScheduledG
 
   def getScheduledGames(team1: Int, team2: Int, league: Int, matchStatus: MatchStatus): Future[Option[ScheduledGame]] = {
     db.run(getScheduledGameQuery(team1, team2, league, matchStatus).result.headOption)
+  }
+
+  def getScheduledGamesByStatus(matchStatus: MatchStatus): Future[Seq[ScheduledGame]] = {
+    db.run(games.filter(_.status === matchStatus.status).result)
   }
 }
 

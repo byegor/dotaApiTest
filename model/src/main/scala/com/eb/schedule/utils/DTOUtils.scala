@@ -1,7 +1,7 @@
 package com.eb.schedule.utils
 
 import com.eb.schedule.dto.{NetWorthDTO, _}
-import com.eb.schedule.model.MatchStatus
+import com.eb.schedule.model.{MatchStatus, SeriesType}
 import com.eb.schedule.model.slick._
 
 /**
@@ -14,7 +14,7 @@ object DTOUtils {
   }
 
   def crateDTO(g: ScheduledGame): ScheduledGameDTO = {
-    new ScheduledGameDTO(g.id, new TeamDTO(g.radiant), new TeamDTO(g.dire), new LeagueDTO(g.leagueId), g.startDate, MatchStatus.fromValue(g.status))
+    new ScheduledGameDTO(g.id, new TeamDTO(g.radiant), new TeamDTO(g.dire), new LeagueDTO(g.leagueId), SeriesType.fromCode(g.seriesType), g.startDate, MatchStatus.fromValue(g.status))
   }
 
   def crateDTO(l: League): LeagueDTO = {
@@ -70,7 +70,7 @@ object DTOUtils {
   }
 
   def transformScheduledGameFromDTO(g: ScheduledGameDTO): ScheduledGame = {
-    new ScheduledGame(g.id, g.radiantTeam.id, g.direTeam.id, g.league.id, g.startDate, g.matchStatus.status)
+    new ScheduledGame(g.id, g.radiantTeam.id, g.direTeam.id, g.league.id, g.seriesType.code, g.startDate, g.matchStatus.status)
   }
 
 

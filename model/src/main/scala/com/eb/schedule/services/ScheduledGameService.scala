@@ -27,13 +27,15 @@ trait ScheduledGameService {
 
   def update(game: ScheduledGameDTO): Future[Int]
 
-  def updateStatus(id: Int, status: Byte): Future[Int]
+  def updateStatus(id: Int, status: MatchStatus): Future[Int]
 
   /*def updateStatusByMatchId(id: Long, status: Byte): Future[Int]*/
 
   def delete(id: Int): Future[Int]
 
   def getScheduledGames(matchDetails: CurrentGameDTO, matchStatus: MatchStatus): Option[ScheduledGameDTO]
+
+  def getScheduledGamesByStatus(matchStatus: MatchStatus): Future[Seq[ScheduledGameDTO]]
 }
 
 
@@ -65,8 +67,8 @@ class ScheduledGameServiceImpl @Inject()(repository: ScheduledGameRepository) ex
     repository.update(DTOUtils.transformScheduledGameFromDTO(game))
   }
 
-  def updateStatus(id: Int, status: Byte): Future[Int] = {
-    repository.updateStatus(id, status)
+  def updateStatus(id: Int, status: MatchStatus): Future[Int] = {
+    repository.updateStatus(id, status.status)
   }
 
   /*def updateStatusByMatchId(id: Long, status: Byte): Future[Int] = {
@@ -87,5 +89,8 @@ class ScheduledGameServiceImpl @Inject()(repository: ScheduledGameRepository) ex
     }
   }
 
+  def getScheduledGamesByStatus(matchStatus: MatchStatus): Future[Seq[ScheduledGameDTO]] = {
+    repository.getScheduledGamesByStatus(matchStatus).map(f => f.map(game => DTOUtils.crateDTO(game)))
+  }
 
 }

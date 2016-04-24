@@ -1,7 +1,7 @@
 package com.eb.schedule.config
 
 import com.eb.schedule.cache.{HeroCache, ItemCache, LeagueCache, TeamCache}
-import com.eb.schedule.live.LiveGameHelper
+import com.eb.schedule.live.{LiveGameHelper, LiveGameProcessor, RestartProcessor}
 import com.google.inject.AbstractModule
 
 /**
@@ -18,7 +18,11 @@ class RestModule extends AbstractModule {
     bind(classOf[TeamCache]).in(classOf[com.google.inject.Singleton])
 
     //helpers
-    bind(classOf[LiveGameHelper]).in(classOf[com.google.inject.Singleton])
+    bind(classOf[LiveGameHelper])
+
+    //hilevel
+    bind(classOf[RestartProcessor])
+    bind(classOf[LiveGameProcessor])
 
   }
 

@@ -3,7 +3,7 @@ package com.eb.schedule.live
 import java.sql.Timestamp
 
 import com.eb.schedule.dto._
-import com.eb.schedule.model.MatchStatus
+import com.eb.schedule.model.{MatchStatus, SeriesType}
 import com.eb.schedule.{HttpUtilsMock, RestBasicTest}
 import org.json.{JSONArray, JSONObject}
 
@@ -46,7 +46,7 @@ class LiveGameProcessorTest extends RestBasicTest {
   }
 
   test("scheduled game") {
-    Await.result(scheduledGameService.insert(new ScheduledGameDTO(-1, new TeamDTO(36), new TeamDTO(1838315), new LeagueDTO(4210), new Timestamp(1l), MatchStatus.SCHEDULED)), Duration.Inf)
+    Await.result(scheduledGameService.insert(new ScheduledGameDTO(-1, new TeamDTO(36), new TeamDTO(1838315), new LeagueDTO(4210), SeriesType.BO3, new Timestamp(1l), MatchStatus.SCHEDULED)), Duration.Inf)
     LiveGameContainer.removeLiveGame(MATCH_ID)
     processor.run()
     var cnt = 0
@@ -82,6 +82,7 @@ class LiveGameProcessorTest extends RestBasicTest {
       }
     })
     emptyProcessor.run()
+    emptyProcessor.run()
     Thread.sleep(2000)
     assert(!LiveGameContainer.exists(MATCH_ID))
     val gameOpt: Option[ScheduledGameDTO] = scheduledGameService.getScheduledGames(currentMatch, MatchStatus.LIVE)
@@ -100,8 +101,10 @@ class LiveGameProcessorTest extends RestBasicTest {
     }).run()
     Thread.sleep(2000)
     emptyProcessor.run()
-    Thread.sleep(2000)
-    assert(!LiveGameContainer.exists(MATCH_ID))
+    Thread.sleep(500)
+    emptyProcessor.run()
+    Thread.sleep(1000)
+    assert(!LiveGameContainer.exists(2234857741l))
     val finishedMatch: Option[ScheduledGameDTO] = scheduledGameService.getScheduledGames(currentMatch, MatchStatus.FINISHED)
     assert(finishedMatch.isDefined)
     val series: Seq[SeriesDTO] = Await.result(seriesService.findBySeriesId(finishedMatch.get.id), Duration.Inf)
