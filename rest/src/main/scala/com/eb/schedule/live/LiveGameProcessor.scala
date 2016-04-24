@@ -17,9 +17,7 @@ import scala.concurrent.ExecutionContext.Implicits.global
 /**
   * Created by Egor on 23.03.2016.
   */
-//todo league crawler don't update task status
 //todo couldn't find scoreboard on start of game - decrease logs
-
 class LiveGameProcessor @Inject()(val liveGameHelper: LiveGameHelper, val netWorthService: NetWorthService, val gameService: ScheduledGameService, val seriesService: SeriesService, val httpUtils: HttpUtils) extends Runnable {
 
   private val log = LoggerFactory.getLogger(this.getClass)
