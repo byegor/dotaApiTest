@@ -16,9 +16,9 @@ import scala.concurrent.duration.Duration
   */
 
 //todo
-class TeamCrawlerRunnerTest extends BasicTest {
+class TeamCrawlerRunnerTest{/* extends BasicTest {
 
- /* test("crawle and create team") {
+  test("crawle and create team") {
     taskService.insert(new UpdateTask(36l, Team.getClass.getSimpleName, 0.toByte))
 
     val crawler = org.mockito.Mockito.spy(new TeamCrawlerRunner(teamService, taskService))

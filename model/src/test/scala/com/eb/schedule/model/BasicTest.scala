@@ -12,6 +12,7 @@ import com.eb.schedule.model.services._
 import com.eb.schedule.model.slick.{Hero, League, _}
 import com.eb.schedule.services.{HeroService, NetWorthService, SeriesService}
 import com.google.inject.Guice
+import org.h2.jdbc.JdbcSQLException
 import org.scalatest.{BeforeAndAfter, FunSuite}
 
 import scala.concurrent.Await
@@ -35,8 +36,9 @@ abstract class BasicTest extends FunSuite with BeforeAndAfter {
   val seriesService = injector.getInstance(classOf[SeriesService])
 
   val initDb = {
-    val tables = Await.result(db.run(MTable.getTables), 2.seconds).toList
+    val tables = Await.result(db.run(MTable.getTables), 10.seconds).toList
     if (tables.isEmpty) {
+      try{
       Await.result(db.run(DBIO.seq(
         Team.table.schema.create,
         UpdateTask.table.schema.create,
@@ -48,6 +50,9 @@ abstract class BasicTest extends FunSuite with BeforeAndAfter {
         MatchSeries.table.schema.create
       ).transactionally
       ), Duration.Inf)
+      }catch {
+        case e:JdbcSQLException => println("hope already exists :)")
+      }
     }
   }
   before {

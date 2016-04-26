@@ -4,7 +4,6 @@ import com.eb.schedule.config.RestModule
 import com.eb.schedule.configure.{CoreModule, H2Module}
 import com.eb.schedule.live.LiveGameHelper
 import com.eb.schedule.model.BasicTest
-import com.eb.schedule.model.services.TeamService
 import com.google.inject.Guice
 
 /**

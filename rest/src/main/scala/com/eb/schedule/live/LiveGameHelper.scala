@@ -28,7 +28,7 @@ class LiveGameHelper @Inject()(val heroCache: HeroCache, val itemCache: ItemCach
       fillGameWithNetWorth(currentGame)
       Some(currentGame)
     }catch {
-      case e => {
+      case e : Throwable => {
         log.error("couldn't parse live game: " + game, e)
         None
       }

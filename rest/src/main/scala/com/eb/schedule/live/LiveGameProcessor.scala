@@ -36,7 +36,7 @@ class LiveGameProcessor @Inject()(val liveGameHelper: LiveGameHelper, val netWor
       val finishedMatches: Seq[Long] = findFinishedMatches(currentGames)
       finishedMatches.foreach(processFinishedMatches)
     } catch {
-      case e => log.error("error", e)
+      case e : Throwable => log.error("error", e)
     }
   }
 

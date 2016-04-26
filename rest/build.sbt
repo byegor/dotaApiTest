@@ -1,4 +1,4 @@
-name := "ui"
+name := "rest"
 
 version := "0.1"
 

@@ -31,7 +31,7 @@ object CrawlerStarter extends App {
 
   executor.scheduleAtFixedRate(teamCrawler, 0, 60, TimeUnit.SECONDS)
   executor.scheduleAtFixedRate(leagueCrawler, 10, 60, TimeUnit.SECONDS)
-  executor.scheduleAtFixedRate(itemsCrawler, 20, 60, TimeUnit.SECONDS)
+//  executor.scheduleAtFixedRate(itemsCrawler, 20, 60, TimeUnit.SECONDS)
 
 
 
