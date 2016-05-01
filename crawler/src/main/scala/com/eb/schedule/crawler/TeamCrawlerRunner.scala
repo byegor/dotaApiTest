@@ -1,11 +1,12 @@
 package com.eb.schedule.crawler
 
 import com.eb.schedule.crawler.CrawlerUrls._
-import com.eb.schedule.dto.{TeamDTO, TaskDTO}
+import com.eb.schedule.dto.{TaskDTO, TeamDTO}
 import com.eb.schedule.model.Failed
 import com.eb.schedule.model.services.{TeamService, UpdateTaskService}
 import com.eb.schedule.model.slick.{Team, UpdateTask}
 import com.eb.schedule.utils.HttpUtils
+import com.google.gson.{JsonArray, JsonObject}
 import com.google.inject.Inject
 import org.json.{JSONArray, JSONObject}
 import org.slf4j.LoggerFactory
@@ -39,13 +40,13 @@ class TeamCrawlerRunner @Inject()(teamService: TeamService, taskService: UpdateT
 
   private def getTeamInfo(teamId: Int): Option[TeamDTO] = {
     try {
-      val team: JSONObject = getTeamInfoFromSteam(teamId)
-      val id: Int = team.getInt("team_id")
+      val team: JsonObject = getTeamInfoFromSteam(teamId)
+      val id: Int = team.get("team_id").getAsInt
       if (id == teamId) {
         val teamDto: TeamDTO = new TeamDTO(teamId)
-        teamDto.name = team.getString("name")
-        teamDto.tag = team.getString("tag")
-        teamDto.logo = team.getLong("logo")
+        teamDto.name = team.get("name").getAsString
+        teamDto.tag = team.get("tag").getAsString
+        teamDto.logo = team.get("logo").getAsLong
         Some(teamDto)
       } else {
         log.error("Couldn't find such team on steam: " + teamId)
@@ -59,22 +60,22 @@ class TeamCrawlerRunner @Inject()(teamService: TeamService, taskService: UpdateT
     }
   }
 
-  def getTeamInfoFromSteam(teamId: Int): JSONObject = {
-    val teamInfo: JSONObject = httpUtils.getResponseAsJson(GET_TEAM_BY_ID + teamId)
-    val result: JSONObject = teamInfo.getJSONObject("result")
-    val teams: JSONArray = result.getJSONArray("teams")
-    teams.getJSONObject(0)
+  def getTeamInfoFromSteam(teamId: Int): JsonObject = {
+    val teamInfo: JsonObject = httpUtils.getResponseAsJson(GET_TEAM_BY_ID + teamId)
+    val result: JsonObject = teamInfo.getAsJsonObject("result")
+    val teams: JsonArray = result.getAsJsonArray("teams")
+    teams.get(0).getAsJsonObject
   }
 
-  private def getTeamLogoInfoFromSteam(logoUid: Long): JSONObject = {
+  private def getTeamLogoInfoFromSteam(logoUid: Long): JsonObject = {
     httpUtils.getResponseAsJson(GET_TEAM_LOGO + logoUid)
   }
 
   def downloadTeamLogo(logoUid: Long, tag: String): Unit = {
     if (logoUid > 0) {
-      val logoInfo: JSONObject = getTeamLogoInfoFromSteam(logoUid)
-      val data: JSONObject = logoInfo.getJSONObject("data")
-      val logoUrl: String = data.getString("url")
+      val logoInfo: JsonObject = getTeamLogoInfoFromSteam(logoUid)
+      val data: JsonObject = logoInfo.getAsJsonObject("data")
+      val logoUrl: String = data.get("url").getAsString
       httpUtils.downloadFile(logoUrl, "assets/" + tag + ".png")
     }
   }

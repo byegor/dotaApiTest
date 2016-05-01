@@ -6,6 +6,7 @@ import com.eb.schedule.model.Finished
 import com.eb.schedule.model.services.{LeagueService, UpdateTaskService}
 import com.eb.schedule.model.slick.{League, UpdateTask}
 import com.eb.schedule.utils.HttpUtils
+import com.google.gson.{JsonArray, JsonObject}
 import com.google.inject.Inject
 import org.json.{JSONArray, JSONObject}
 import org.slf4j.LoggerFactory
@@ -22,14 +23,14 @@ class LeagueCrawler @Inject()(leagueService: LeagueService, taskService: UpdateT
     val tasks: Future[Seq[TaskDTO]] = taskService.getPendingLeagueTasks()
     val result: Seq[TaskDTO] = Await.result(tasks, Duration.Inf)
     val ids: Seq[Long] = result.map(_.id)
-    val steamItems: JSONArray = getItemsInfoFromSteam()
-    for (i <- 0 until steamItems.length()) {
-      val itemJson: JSONObject = steamItems.getJSONObject(i)
+    val steamItems: JsonArray = getItemsInfoFromSteam()
+    for (i <- 0 until steamItems.size()) {
+      val itemJson: JsonObject = steamItems.get(i).getAsJsonObject
 
-      val leagueId: Int = itemJson.getInt("leagueid")
+      val leagueId: Int = itemJson.get("leagueid").getAsInt
       if (ids.contains(leagueId)) {
         log.info("find league to process: " + leagueId)
-        leagueService.insert(new LeagueDTO(leagueId, parseName(itemJson.getString("name")), itemJson.getString("tournament_url")))
+        leagueService.insert(new LeagueDTO(leagueId, parseName(itemJson.get("name").getAsString), itemJson.get("tournament_url").getAsString))
         taskService.update(new UpdateTask(leagueId, League.getClass.getSimpleName, Finished.status.toByte))
       }
     }
@@ -42,10 +43,10 @@ class LeagueCrawler @Inject()(leagueService: LeagueService, taskService: UpdateT
   }
 
 
-  def getItemsInfoFromSteam(): JSONArray = {
-    val teamInfo: JSONObject = httpUtils.getResponseAsJson(GET_LEAGUES)
-    val result: JSONObject = teamInfo.getJSONObject("result")
-    val items: JSONArray = result.getJSONArray("leagues")
+  def getItemsInfoFromSteam(): JsonArray = {
+    val teamInfo: JsonObject = httpUtils.getResponseAsJson(GET_LEAGUES)
+    val result: JsonObject = teamInfo.getAsJsonObject("result")
+    val items: JsonArray = result.getAsJsonArray("leagues")
     items
   }
 

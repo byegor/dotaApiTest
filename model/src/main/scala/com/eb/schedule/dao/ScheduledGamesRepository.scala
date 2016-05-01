@@ -36,6 +36,8 @@ trait ScheduledGameRepository {
 
   def delete(id: Int): Future[Int]
 
+  def getScheduledGames(team1: Int, team2: Int, league: Int): Future[Seq[ScheduledGame]]
+
   def getScheduledGames(team1: Int, team2: Int, league: Int, matchStatus: MatchStatus): Future[Option[ScheduledGame]]
 
   def getScheduledGamesByStatus(matchStatus: MatchStatus): Future[Seq[ScheduledGame]]
@@ -97,6 +99,16 @@ class ScheduledGameRepositoryImpl @Inject()(val database: DB) extends ScheduledG
   private def getScheduledGameQuery(team1: Int, team2: Int, league: Int, matchStatus: MatchStatus) = {
     games.filter(g => g.status === matchStatus.status && g.leagueId === league && ((g.radiant === team1 && g.dire === team2) || (g.radiant === team2 && g.dire === team1)))
       .sortBy(_.startDate)
+  }
+
+  private def getScheduledGameQuery(team1: Int, team2: Int, league: Int) = {
+    games.filter(g => g.leagueId === league && ((g.radiant === team1 && g.dire === team2) || (g.radiant === team2 && g.dire === team1)))
+      .sortBy(_.startDate)
+  }
+
+
+  def getScheduledGames(team1: Int, team2: Int, league: Int): Future[Seq[ScheduledGame]] = {
+    db.run(getScheduledGameQuery(team1, team2, league).result)
   }
 
   def getScheduledGames(team1: Int, team2: Int, league: Int, matchStatus: MatchStatus): Future[Option[ScheduledGame]] = {

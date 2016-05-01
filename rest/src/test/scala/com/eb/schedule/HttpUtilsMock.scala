@@ -1,6 +1,7 @@
 package com.eb.schedule
 
 import com.eb.schedule.utils.HttpUtils
+import com.google.gson.{JsonObject, JsonParser}
 import org.json.JSONObject
 
 import scala.io.BufferedSource
@@ -10,17 +11,15 @@ import scala.io.BufferedSource
   */
 class HttpUtilsMock extends HttpUtils {
 
-  override def getResponseAsJson(url: String): JSONObject = {
+  override def getResponseAsJson(url: String): JsonObject = {
     val source: BufferedSource = io.Source.fromURL(getClass.getResource("/live.json"))
     val lines = try source.mkString finally source.close()
-    val liveMatchResult: JSONObject = new JSONObject(lines)
-    liveMatchResult
+    new JsonParser().parse(lines).getAsJsonObject
   }
 
-  def getGame(): JSONObject = {
+  def getGame(): JsonObject = {
     val source: BufferedSource = io.Source.fromURL(getClass.getResource("/game.json"))
     val lines = try source.mkString finally source.close()
-    val game: JSONObject = new JSONObject(lines)
-    game
+    new JsonParser().parse(lines).getAsJsonObject
   }
 }

@@ -1,8 +1,8 @@
-package egor.dota.ui
+package com.eb.schedule.rest
 
 import javax.servlet.ServletContext
 
-import egor.dota.ui.resource.TeamResource
+import com.eb.schedule.rest.resource.TeamResource
 import org.scalatra.LifeCycle
 
 /**

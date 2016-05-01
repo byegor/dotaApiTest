@@ -3,32 +3,27 @@ package com.eb.schedule.utils
 import java.io._
 import java.net.URL
 
-import com.fasterxml.jackson.databind
-import com.fasterxml.jackson.databind.{DeserializationFeature, ObjectMapper}
+import com.google.gson.{JsonObject, JsonParser}
 import com.mashape.unirest.http.{HttpResponse, Unirest}
-import org.json.JSONObject
 
 
 class HttpUtils {
 
-  private val mapper: ObjectMapper = new ObjectMapper()
   private val lock: AnyRef = new Object()
+  private val jsonParser = new JsonParser
 
-  //todo
-  def getResponseAsJson(url: String): JSONObject = {
+  def getResponseAsJson(url: String): JsonObject = {
     lock.synchronized {
       for (i <- 0 to 10) {
         try {
-          mapper.disable(DeserializationFeature.FAIL_ON_READING_DUP_TREE_KEY)
           val response: HttpResponse[String] = Unirest.get(url).asString()
-          val tree: databind.JsonNode = mapper.readTree(response.getBody.getBytes)
-
-          return new JSONObject(tree.toString)
+          val result: JsonObject = jsonParser.parse(response.getBody).getAsJsonObject
+          return result
         } catch {
           case e: Exception => if (i == 9) throw e else Thread.sleep(1500)
         }
       }
-      new JSONObject()
+      new JsonObject()
     }
   }
 

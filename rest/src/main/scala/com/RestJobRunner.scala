@@ -13,16 +13,19 @@ import com.google.inject.Guice
 /**
   * Created by Egor on 18.04.2016.
   */
-object RestTestMain extends App {
+object RestJobRunner {
 
   private val executor: ScheduledExecutorService = Executors.newScheduledThreadPool(3);
   val injector = Guice.createInjector(new MysqlModule, new CoreModule, new RestModule)
 
-
-  private val restartProcessor: RestartProcessor = injector.getInstance(classOf[RestartProcessor])
-  restartProcessor.process()
-
   val liveGameProcessor: LiveGameProcessor = injector.getInstance(classOf[LiveGameProcessor])
-  executor.scheduleAtFixedRate(liveGameProcessor, 0, 60, TimeUnit.SECONDS)
+  private val restartProcessor: RestartProcessor = injector.getInstance(classOf[RestartProcessor])
+
+  def start() = {
+    restartProcessor.process()
+    val liveGameProcessor: LiveGameProcessor = injector.getInstance(classOf[LiveGameProcessor])
+    executor.scheduleAtFixedRate(liveGameProcessor, 0, 60, TimeUnit.SECONDS)
+  }
+
 
 }

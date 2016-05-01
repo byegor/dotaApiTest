@@ -47,7 +47,7 @@ class LeagueCache @Inject()(val leagueService: LeagueService, taskService: Updat
           result.get
         }else{
           taskService.insert(new UpdateTask(id, League.getClass.getSimpleName, 0))
-          unknownLeague
+          new LeagueDTO(id)
         }
       }
     }

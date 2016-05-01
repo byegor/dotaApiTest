@@ -20,6 +20,6 @@ javaOptions ++= Seq(
   "-Xrunjdwp:transport=dt_socket,server=y,suspend=n,address=8000"
 )
 
-mainClass in assembly := Some("egor.dota.ui.JettyRunner")
+mainClass in assembly := Some("com.eb.schedule.ui.JettyRunner")
 
 unmanagedResourceDirectories in Compile += { baseDirectory.value / "src/main/webapp" }

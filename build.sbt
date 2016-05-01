@@ -13,11 +13,13 @@ libraryDependencies in ThisBuild ++= Seq(
   "org.scalacheck" %% "scalacheck" % "1.12.2" % "test",
   "org.mockito" % "mockito-all" % "1.9.5" % "test",
   "com.google.inject" % "guice" % "4.0",
+  "com.google.code.gson" % "gson" % "2.6.2",
+  "com.google.guava" % "guava" % "19.0",
 
   "ch.qos.logback" % "logback-core" % "1.1.3",
-  "ch.qos.logback" % "logback-classic" % "1.1.3",
+  "ch.qos.logback" % "logback-classic" % "1.1.3"
 
-  "org.json" % "json" % "20140107"
+//  "org.json" % "json" % "20140107"
 )
 
 lazy val root = project.in(file(".")) aggregate(model, rest, crawler)

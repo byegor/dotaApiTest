@@ -24,7 +24,8 @@ class RestartProcessor @Inject()(val liveGameProcessor: LiveGameProcessor, sched
                                                    if isSameGame(stored, current)
     ) yield stored
 
-    stillRunning.foreach(game => scheduledGameService.updateStatus(game.id, MatchStatus.FINISHED))
+    val finishedGames: Seq[ScheduledGameDTO] = storedGames.diff(stillRunning)
+    finishedGames.foreach(game => scheduledGameService.updateStatus(game.id, MatchStatus.FINISHED))
   }
 
   def isSameGame(storedGame: ScheduledGameDTO, livaGame: CurrentGameDTO): Boolean = {

@@ -1,4 +1,4 @@
-package egor.dota.ui.resource
+package com.eb.schedule.rest.resource
 
 import org.scalatra.ScalatraServlet
 

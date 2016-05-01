@@ -3,6 +3,8 @@ package com.eb.schedule.crawler
 import com.eb.schedule.dto.TeamDTO
 import com.eb.schedule.model.BasicTest
 import com.eb.schedule.model.slick.{Team, UpdateTask}
+import com.google.gson.JsonParser
+import jdk.nashorn.internal.parser.JSONParser
 import org.json.{JSONArray, JSONObject}
 import org.mockito.Matchers._
 import org.mockito.Mockito._
@@ -68,6 +70,6 @@ class TeamCrawlerRunnerTest{/* extends BasicTest {
     teams.getJSONObject(0)
   }
 */
-  val teamJsonResponse = new JSONObject("{\n\"result\": {\n\"status\": 1,\n\"teams\": [\n{\n\"team_id\": 36,\n\"name\": \"Natus Vincere\",\n\"tag\": \"Na`Vi\",\n\"time_created\": 1338843412,\n\"rating\": \"inactive\",\n\"logo\": 46499322609643214,\n\"logo_sponsor\": 0,\n\"country_code\": \"ua\",\n\"url\": \"\",\n\"games_played_with_current_roster\": 0,\n\"player_0_account_id\": 70388657,\n\"player_1_account_id\": 86723143,\n\"player_2_account_id\": 89550641,\n\"player_3_account_id\": 89625472,\n\"player_4_account_id\": 117421467,\n\"player_5_account_id\": 169181898,\n\"player_6_account_id\": 176184718,\n\"admin_account_id\": 70388657,\n\"league_id_0\": 4\n}\n]\n}\n}")
+  val teamJsonResponse = new JsonParser().parse("{\n\"result\": {\n\"status\": 1,\n\"teams\": [\n{\n\"team_id\": 36,\n\"name\": \"Natus Vincere\",\n\"tag\": \"Na`Vi\",\n\"time_created\": 1338843412,\n\"rating\": \"inactive\",\n\"logo\": 46499322609643214,\n\"logo_sponsor\": 0,\n\"country_code\": \"ua\",\n\"url\": \"\",\n\"games_played_with_current_roster\": 0,\n\"player_0_account_id\": 70388657,\n\"player_1_account_id\": 86723143,\n\"player_2_account_id\": 89550641,\n\"player_3_account_id\": 89625472,\n\"player_4_account_id\": 117421467,\n\"player_5_account_id\": 169181898,\n\"player_6_account_id\": 176184718,\n\"admin_account_id\": 70388657,\n\"league_id_0\": 4\n}\n]\n}\n}")
 
 }

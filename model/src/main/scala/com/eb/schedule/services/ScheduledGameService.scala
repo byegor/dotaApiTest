@@ -1,5 +1,7 @@
 package com.eb.schedule.model.services
 
+import java.util.concurrent.TimeUnit
+
 import com.eb.schedule.dto.{CurrentGameDTO, ScheduledGameDTO}
 import com.eb.schedule.model.MatchStatus
 import com.eb.schedule.model.dao.ScheduledGameRepository
@@ -33,6 +35,8 @@ trait ScheduledGameService {
 
   def delete(id: Int): Future[Int]
 
+  def getScheduledGames(matchDetails: CurrentGameDTO): Option[ScheduledGameDTO]
+
   def getScheduledGames(matchDetails: CurrentGameDTO, matchStatus: MatchStatus): Option[ScheduledGameDTO]
 
   def getScheduledGamesByStatus(matchStatus: MatchStatus): Future[Seq[ScheduledGameDTO]]
@@ -40,6 +44,9 @@ trait ScheduledGameService {
 
 
 class ScheduledGameServiceImpl @Inject()(repository: ScheduledGameRepository) extends ScheduledGameService {
+
+  private val THREE_HOURS: Long = TimeUnit.HOURS.toMillis(3)
+
   def findById(id: Int): Future[ScheduledGame] = {
     repository.findById(id)
   }
@@ -78,6 +85,17 @@ class ScheduledGameServiceImpl @Inject()(repository: ScheduledGameRepository) ex
 
   def delete(id: Int): Future[Int] = {
     repository.delete(id)
+  }
+
+  def getScheduledGames(liveGameDTO: CurrentGameDTO): Option[ScheduledGameDTO] ={
+    val future: Future[Seq[ScheduledGame]] = repository.getScheduledGames(liveGameDTO.radiantTeam.id, liveGameDTO.direTeam.id, liveGameDTO.basicInfo.league.leagueId)
+    val result: Seq[ScheduledGame] = Await.result(future, Duration.Inf)
+    val now: Long = System.currentTimeMillis()
+    val maybeScheduledGame: Option[ScheduledGame] = result.find(game => (now - game.startDate.getTime) < THREE_HOURS)
+    maybeScheduledGame match {
+      case Some(g) => Some(DTOUtils.crateDTO(g))
+      case None => None
+    }
   }
 
   def getScheduledGames(liveGameDTO: CurrentGameDTO, matchStatus: MatchStatus): Option[ScheduledGameDTO] = {
