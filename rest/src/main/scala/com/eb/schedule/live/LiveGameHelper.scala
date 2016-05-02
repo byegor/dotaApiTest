@@ -1,6 +1,6 @@
 package com.eb.schedule.live
 
-import com.eb.schedule.cache.{HeroCache, ItemCache, LeagueCache, TeamCache}
+import com.eb.schedule.cache._
 import com.eb.schedule.dto.{CurrentGameDTO, NetWorthDTO, PlayerDTO, TeamDTO}
 import com.eb.schedule.model.SeriesType
 import com.eb.schedule.services.NetWorthService
@@ -15,7 +15,7 @@ import scala.concurrent.{Await, Future}
 /**
   * Created by Egor on 10.04.2016.
   */
-class LiveGameHelper @Inject()(val heroCache: HeroCache, val itemCache: ItemCache, val leagueCache: LeagueCache, val teamCache: TeamCache, val netWorthService: NetWorthService) {
+class LiveGameHelper @Inject()(val heroCache: HeroCache, val itemCache: ItemCache, val leagueCache: LeagueCache, val teamCache: TeamCache, playerCache:PlayerCache, val netWorthService: NetWorthService) {
 
   private val log = LoggerFactory.getLogger(this.getClass)
 
@@ -113,8 +113,11 @@ class LiveGameHelper @Inject()(val heroCache: HeroCache, val itemCache: ItemCach
       val player: JsonObject = basicPlayerInfo.get(i).getAsJsonObject
       val team: Int = player.get("team").getAsInt
       if (team < 2) {
-        val playerDTO: PlayerDTO = new PlayerDTO(player.get("account_id").getAsInt)
-        playerDTO.name = player.get("name").getAsString
+        val accountId: Int = player.get("account_id").getAsInt
+        val name: String = player.get("name").getAsString
+        playerCache.put(accountId, name)
+        val playerDTO: PlayerDTO = new PlayerDTO(accountId)
+        playerDTO.name = name
         if (team == 0) {
           radiantPlayers.put(playerDTO.accountId, playerDTO)
         } else {

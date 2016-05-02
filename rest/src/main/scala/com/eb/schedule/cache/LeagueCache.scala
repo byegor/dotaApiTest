@@ -1,10 +1,12 @@
 package com.eb.schedule.cache
 
-import java.util.concurrent.ConcurrentHashMap
+import java.util.concurrent.{ConcurrentHashMap, TimeUnit}
 
-import com.eb.schedule.dto.{ItemDTO, LeagueDTO}
+import com.eb.schedule.dto.{ItemDTO, LeagueDTO, TeamDTO}
+import com.eb.schedule.exception.CacheItemNotFound
 import com.eb.schedule.model.services.{LeagueService, UpdateTaskService}
 import com.eb.schedule.model.slick.{League, UpdateTask}
+import com.google.common.cache.{CacheBuilder, CacheLoader, LoadingCache}
 import com.google.inject.Inject
 import org.slf4j.LoggerFactory
 
@@ -19,38 +21,30 @@ class LeagueCache @Inject()(val leagueService: LeagueService, taskService: Updat
 
   private val log = LoggerFactory.getLogger(this.getClass)
 
-  private val lock: AnyRef = new Object()
-
   private val unknownLeague: LeagueDTO = new LeagueDTO(-1)
 
-  private val leagueCache: scala.collection.concurrent.Map[Int, LeagueDTO] = new ConcurrentHashMap[Int, LeagueDTO]()
-
-  //todo what if unknown league to steam - it will always create task
-  def getLeague(id: Int): LeagueDTO = {
-    val maybeLeagueDTO: Option[LeagueDTO] = leagueCache.get(id)
-    if(maybeLeagueDTO.isDefined){
-      maybeLeagueDTO.get
-    }else{
-      loadLeague(id)
-    }
-  }
-
-  def loadLeague(id:Int): LeagueDTO = {
-    lock.synchronized{
-      val maybeLeagueDTO: Option[LeagueDTO] = leagueCache.get(id)
-      if(maybeLeagueDTO.isDefined){
-        maybeLeagueDTO.get
-      }else{
-        val result: Option[LeagueDTO] = Await.result(leagueService.findById(id), Duration.Inf)
-        if(result.isDefined){
-          leagueCache.put(id, result.get)
+  val cache: LoadingCache[Int, LeagueDTO] = CacheBuilder.newBuilder()
+    .expireAfterAccess(3, TimeUnit.HOURS)
+    .maximumSize(10)
+    .build(new CacheLoader[Int, LeagueDTO]() {
+      def load(leagueId: Int): LeagueDTO = {
+        val result: Option[LeagueDTO] = Await.result(leagueService.findById(leagueId), Duration.Inf)
+        if (result.isDefined) {
           result.get
-        }else{
-          taskService.insert(new UpdateTask(id, League.getClass.getSimpleName, 0))
-          new LeagueDTO(id)
+        } else {
+          throw new CacheItemNotFound
         }
       }
+    })
+
+  def getLeague(id: Int): LeagueDTO = {
+    try {
+      cache.get(id)
+    } catch {
+      case e: CacheItemNotFound =>
+        taskService.insert(new UpdateTask(id, League.getClass.getSimpleName, 0))
+        log.debug("Couldn't find league: " + id)
+        unknownLeague
     }
   }
-
 }

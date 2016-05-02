@@ -1,11 +1,13 @@
 package com.eb.schedule.cache
 
-import java.util.concurrent.ConcurrentHashMap
+import java.util.concurrent.{ConcurrentHashMap, TimeUnit}
 
 import com.eb.schedule.dto.{HeroDTO, LeagueDTO, TeamDTO}
+import com.eb.schedule.exception.CacheItemNotFound
 import com.eb.schedule.model.services.{TeamService, UpdateTaskService}
 import com.eb.schedule.model.slick.{League, Team, UpdateTask}
 import com.eb.schedule.services.HeroService
+import com.google.common.cache.{CacheBuilder, CacheLoader, LoadingCache}
 import com.google.inject.Inject
 import org.slf4j.LoggerFactory
 
@@ -20,38 +22,31 @@ import scala.collection.JavaConversions._
 class TeamCache @Inject()(val teamService: TeamService, taskService: UpdateTaskService) {
 
   private val log = LoggerFactory.getLogger(this.getClass)
-  private val lock: AnyRef = new Object()
 
   val unknownTeam: TeamDTO = new TeamDTO(-1)
 
-  private val cache: scala.collection.concurrent.Map[Int, TeamDTO] = new ConcurrentHashMap[Int, TeamDTO]()
-
-
-
-  def getTeam(id: Int): TeamDTO = {
-    val teamOpt: Option[TeamDTO] = cache.get(id)
-    if(teamOpt.isDefined){
-      teamOpt.get
-    }else{
-      loadTeam(id)
-    }
-  }
-
-  def loadTeam(id:Int): TeamDTO = {
-    lock.synchronized{
-      val teamOpt: Option[TeamDTO] = cache.get(id)
-      if(teamOpt.isDefined){
-        teamOpt.get
-      }else{
-        val result: Option[TeamDTO] = Await.result(teamService.findById(id), Duration.Inf)
-        if(result.isDefined){
-          cache.put(id, result.get)
+  val cache: LoadingCache[Int, TeamDTO] = CacheBuilder.newBuilder()
+    .expireAfterAccess(3, TimeUnit.HOURS)
+    .maximumSize(200)
+    .build(new CacheLoader[Int, TeamDTO]() {
+      def load(teamId: Int): TeamDTO = {
+        val result: Option[TeamDTO] = Await.result(teamService.findById(teamId), Duration.Inf)
+        if (result.isDefined) {
           result.get
-        }else{
-          taskService.insert(new UpdateTask(id, Team.getClass.getSimpleName, 0))
-          unknownTeam
+        } else {
+          throw new CacheItemNotFound
         }
       }
+    })
+
+  def getTeam(id: Int): TeamDTO = {
+    try {
+      cache.get(id)
+    } catch {
+      case e: CacheItemNotFound =>
+        taskService.insert(new UpdateTask(id, Team.getClass.getSimpleName, 0))
+        log.debug("couldn't find a team in cache: " + id)
+        unknownTeam
     }
   }
 
