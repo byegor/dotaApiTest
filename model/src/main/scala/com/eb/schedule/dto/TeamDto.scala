@@ -9,6 +9,10 @@ class TeamDTO(val id: Int) {
   var logo:Long = -1
   var players: List[PlayerDTO] = Nil
   var netWorth: Int = 0
+  var towerStatus:Int = -1
+  var barrackStatus:Int = -1
+  var picks:List[HeroDTO] = Nil
+  var bans:List[HeroDTO] = Nil
 
   def copy() = {
     val t: TeamDTO = new TeamDTO(id)

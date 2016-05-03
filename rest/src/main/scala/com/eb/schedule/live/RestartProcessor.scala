@@ -17,7 +17,7 @@ class RestartProcessor @Inject()(val liveGameProcessor: LiveGameProcessor, sched
     val liveGames: Future[Seq[ScheduledGameDTO]] = scheduledGameService.getScheduledGamesByStatus(MatchStatus.LIVE)
     liveGameProcessor.run()
     val storedGames: Seq[ScheduledGameDTO] = Await.result(liveGames, Duration.Inf)
-    val currentLive: Iterable[CurrentGameDTO] = LiveGameContainer.getLiveMatches()
+    val currentLive: Iterable[CurrentGameDTO] = GameContainer.getLiveMatches()
 
     val stillRunning: Seq[ScheduledGameDTO] = for (stored <- storedGames;
                                                    current <- currentLive

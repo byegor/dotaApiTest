@@ -44,7 +44,7 @@ class LiveGameProcessor @Inject()(val liveGameHelper: LiveGameHelper, val netWor
   def processCurrentLiveGame(currentOpt: Option[CurrentGameDTO]): Unit = {
     if (currentOpt.isDefined) {
       val current: CurrentGameDTO = currentOpt.get
-      if (!LiveGameContainer.exists(current.matchId)) {
+      if (!GameContainer.exists(current.matchId)) {
         log.debug("found new live game with matchId: " + current.matchId)
         val scheduledGame: Option[ScheduledGameDTO] = gameService.getScheduledGames(current)
         if (scheduledGame.isEmpty) {
@@ -88,18 +88,18 @@ class LiveGameProcessor @Inject()(val liveGameHelper: LiveGameHelper, val netWor
   }
 
   def updateLiveGameContainer(currentGameDTO: CurrentGameDTO) = {
-    LiveGameContainer.updateLiveGame(currentGameDTO)
+    GameContainer.updateLiveGame(currentGameDTO)
   }
 
   def findFinishedMatches(liveGames: Seq[Option[CurrentGameDTO]]): Seq[Long] = {
     val stillRunning: Seq[Long] = liveGames.filter(_.isDefined).map(_.get.matchId)
-    val id: Iterable[Long] = LiveGameContainer.getLiveMatchesId()
+    val id: Iterable[Long] = GameContainer.getLiveMatchesId()
     val diff: Seq[Long] = id.toSeq.diff(stillRunning)
     diff.filterNot(id => finished.add(id))
   }
 
   def processFinishedMatches(matchId: Long) {
-    val lgOpt: Option[CurrentGameDTO] = LiveGameContainer.getLiveGame(matchId)
+    val lgOpt: Option[CurrentGameDTO] = GameContainer.getLiveGame(matchId)
     val liveGame: CurrentGameDTO = lgOpt.get
     val scheduledGame: Option[ScheduledGameDTO] = gameService.getScheduledGames(liveGame, MatchStatus.LIVE)
 
@@ -133,6 +133,6 @@ class LiveGameProcessor @Inject()(val liveGameHelper: LiveGameHelper, val netWor
   }
 
   def clearLiveGameContainer(liveGame: CurrentGameDTO) = {
-    LiveGameContainer.removeLiveGame(liveGame.matchId)
+    GameContainer.removeLiveGame(liveGame.matchId)
   }
 }

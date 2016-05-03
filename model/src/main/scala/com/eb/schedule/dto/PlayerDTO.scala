@@ -3,7 +3,6 @@ package com.eb.schedule.dto
 /**
   * Created by Egor on 26.03.2016.
   */
-//todo check if Long
 class PlayerDTO(val accountId: Int) {
   var name = ""
   var hero: HeroDTO = _

@@ -31,7 +31,7 @@ class LiveGameProcessorTest extends RestBasicTest {
     var cnt = 0
     var scheduledGameDTO: Option[ScheduledGameDTO] = None
     while (cnt < 4) {
-      scheduledGameDTO = scheduledGameService.getScheduledGames(LiveGameContainer.getLiveGame(MATCH_ID).get, MatchStatus.LIVE)
+      scheduledGameDTO = scheduledGameService.getScheduledGames(GameContainer.getLiveGame(MATCH_ID).get, MatchStatus.LIVE)
       if (scheduledGameDTO.isDefined) {
         cnt = 5
       } else {
@@ -41,17 +41,17 @@ class LiveGameProcessorTest extends RestBasicTest {
     }
     assert(scheduledGameDTO.isDefined, "failed to store new scheduled game")
     assert(scheduledGameDTO.get.matchStatus == MatchStatus.LIVE, "status of the game is wrong")
-    assert(LiveGameContainer.exists(MATCH_ID))
+    assert(GameContainer.exists(MATCH_ID))
   }
 
   test("scheduled game") {
     Await.result(scheduledGameService.insert(new ScheduledGameDTO(-1, new TeamDTO(36), new TeamDTO(1838315), new LeagueDTO(4210), SeriesType.BO3, new Timestamp(1l), MatchStatus.SCHEDULED)), Duration.Inf)
-    LiveGameContainer.removeLiveGame(MATCH_ID)
+    GameContainer.removeLiveGame(MATCH_ID)
     processor.run()
     var cnt = 0
     var scheduledGameDTO: Option[ScheduledGameDTO] = None
     while (cnt < 4) {
-      scheduledGameDTO = scheduledGameService.getScheduledGames(LiveGameContainer.getLiveGame(MATCH_ID).get, MatchStatus.LIVE)
+      scheduledGameDTO = scheduledGameService.getScheduledGames(GameContainer.getLiveGame(MATCH_ID).get, MatchStatus.LIVE)
       if (scheduledGameDTO.isDefined) {
         cnt = 6
       } else {
@@ -64,11 +64,11 @@ class LiveGameProcessorTest extends RestBasicTest {
   }
 
   test("finish match") {
-    LiveGameContainer.removeLiveGame(MATCH_ID)
+    GameContainer.removeLiveGame(MATCH_ID)
     processor.run()
     Thread.sleep(3000)
 
-    val currentMatch: CurrentGameDTO = LiveGameContainer.getLiveGame(MATCH_ID).get
+    val currentMatch: CurrentGameDTO = GameContainer.getLiveGame(MATCH_ID).get
 
     val emptyProcessor = new LiveGameProcessor(liveGameHelper, netWorthService, scheduledGameService, seriesService, new HttpUtilsMock() {
       override def getResponseAsJson(url: String): JsonObject = {
@@ -83,7 +83,7 @@ class LiveGameProcessorTest extends RestBasicTest {
     emptyProcessor.run()
     emptyProcessor.run()
     Thread.sleep(2000)
-    assert(!LiveGameContainer.exists(MATCH_ID))
+    assert(!GameContainer.exists(MATCH_ID))
     val gameOpt: Option[ScheduledGameDTO] = scheduledGameService.getScheduledGames(currentMatch, MatchStatus.LIVE)
     assert(gameOpt.isDefined, "it is not the last game, so should be live status")
 
@@ -103,7 +103,7 @@ class LiveGameProcessorTest extends RestBasicTest {
     Thread.sleep(500)
     emptyProcessor.run()
     Thread.sleep(1000)
-    assert(!LiveGameContainer.exists(2234857741l))
+    assert(!GameContainer.exists(2234857741l))
     val finishedMatch: Option[ScheduledGameDTO] = scheduledGameService.getScheduledGames(currentMatch, MatchStatus.FINISHED)
     assert(finishedMatch.isDefined)
     val series: Seq[SeriesDTO] = Await.result(seriesService.findBySeriesId(finishedMatch.get.id), Duration.Inf)

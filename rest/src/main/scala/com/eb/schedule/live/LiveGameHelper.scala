@@ -15,7 +15,7 @@ import scala.concurrent.{Await, Future}
 /**
   * Created by Egor on 10.04.2016.
   */
-class LiveGameHelper @Inject()(val heroCache: HeroCache, val itemCache: ItemCache, val leagueCache: LeagueCache, val teamCache: TeamCache, playerCache:PlayerCache, val netWorthService: NetWorthService) {
+class LiveGameHelper @Inject()(val heroCache: HeroCache, val itemCache: ItemCache, val leagueCache: LeagueCache, val teamCache: TeamCache, playerCache: PlayerCache, val netWorthService: NetWorthService) {
 
   private val log = LoggerFactory.getLogger(this.getClass)
 
@@ -60,8 +60,10 @@ class LiveGameHelper @Inject()(val heroCache: HeroCache, val itemCache: ItemCach
 
     val radiantScoreBoard: JsonObject = scoreBoard.get("radiant").getAsJsonObject
     currentGame.radiantTeam.players = parseDeepPlayerInfo(radiantScoreBoard.get("players").getAsJsonArray, playerInfo._1)
+    fillWithPicks(radiantScoreBoard, currentGame.radiantTeam)
     val direScoreBoard: JsonObject = scoreBoard.get("dire").getAsJsonObject
     currentGame.direTeam.players = parseDeepPlayerInfo(direScoreBoard.get("players").getAsJsonArray, playerInfo._2)
+    fillWithPicks(direScoreBoard, currentGame.direTeam)
   }
 
   def fillGameWithNetWorth(currentGame: CurrentGameDTO): Unit = {
@@ -127,6 +129,22 @@ class LiveGameHelper @Inject()(val heroCache: HeroCache, val itemCache: ItemCach
     }
 
     (radiantPlayers, direPlayers)
+  }
+
+  private def fillWithPicks(scoreboard: JsonObject, team: TeamDTO): Unit = {
+    val picks: JsonArray = scoreboard.getAsJsonArray("picks")
+    for (i <- 0 until picks.size()) {
+      val pick: JsonObject = picks.get(i).getAsJsonObject
+      val heroId: Int = pick.get("hero_id").getAsInt
+      team.picks ::= heroCache.getHero(heroId)
+    }
+    val bans: JsonArray = scoreboard.getAsJsonArray("bans")
+    for (i <- 0 until bans.size()) {
+      val ban: JsonObject = bans.get(i).getAsJsonObject
+      val heroId: Int = ban.get("hero_id").getAsInt
+      team.picks ::= heroCache.getHero(heroId)
+    }
+
   }
 
   private def parseTeam(json: JsonObject): TeamDTO = {
