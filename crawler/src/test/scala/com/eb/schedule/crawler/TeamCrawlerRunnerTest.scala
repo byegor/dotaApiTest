@@ -18,7 +18,6 @@ import scala.concurrent.duration.Duration
   * Created by Egor on 20.02.2016.
   */
 
-//todo
 class TeamCrawlerRunnerTest extends BasicTest {
 
   test("crawle and create team") {
