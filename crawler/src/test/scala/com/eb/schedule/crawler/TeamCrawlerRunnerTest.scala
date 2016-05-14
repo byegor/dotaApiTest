@@ -23,7 +23,7 @@ class TeamCrawlerRunnerTest extends BasicTest {
   test("crawle and create team") {
     taskService.insert(new UpdateTask(36l, Team.getClass.getSimpleName, 0.toByte))
 
-    val crawler = org.mockito.Mockito.spy(new TeamCrawlerRunner(teamService, taskService, new HttpUtils(){
+    val crawler = org.mockito.Mockito.spy(new TeamCrawlerRunner(teamService, taskService, new HttpUtils() {
       override def getResponseAsJson(url: String): JsonObject = {
         teamJsonResponse.getAsJsonObject
       }
@@ -47,7 +47,7 @@ class TeamCrawlerRunnerTest extends BasicTest {
     val teamDTO: TeamDTO = new TeamDTO(36)
     teamService.insert(teamDTO)
 
-    val crawler = org.mockito.Mockito.spy(new TeamCrawlerRunner(teamService, taskService, new HttpUtils(){
+    val crawler = org.mockito.Mockito.spy(new TeamCrawlerRunner(teamService, taskService, new HttpUtils() {
       override def getResponseAsJson(url: String): JsonObject = {
         teamJsonResponse.getAsJsonObject
       }
