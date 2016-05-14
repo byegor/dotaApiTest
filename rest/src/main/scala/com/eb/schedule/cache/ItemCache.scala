@@ -16,8 +16,6 @@ class ItemCache @Inject()(val itemService: ItemService) {
 
   private val log = LoggerFactory.getLogger(this.getClass)
 
-  private val unknownItem: ItemDTO = new ItemDTO(-1)
-
   private val cache: mutable.Map[Int, ItemDTO] = {
     val items: Seq[ItemDTO] = Await.result(itemService.findAll(), Duration.Inf)
     val itemMap: mutable.Map[Int, ItemDTO] = new mutable.HashMap[Int, ItemDTO]()
@@ -31,7 +29,7 @@ class ItemCache @Inject()(val itemService: ItemService) {
       option.get
     } else {
       log.error("Couldn't find an item: " + id)
-      unknownItem
+      new ItemDTO(id)
     }
   }
 

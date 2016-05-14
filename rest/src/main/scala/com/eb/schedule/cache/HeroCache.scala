@@ -16,8 +16,6 @@ class HeroCache @Inject()(val heroService: HeroService) {
 
   private val log = LoggerFactory.getLogger(this.getClass)
 
-  private val unknownHero: HeroDTO = new HeroDTO(-1)
-
   private val cache: mutable.Map[Int, HeroDTO] = {
     val heroes: Seq[HeroDTO] = Await.result(heroService.findAll(), Duration.Inf)
     val heroMap: mutable.Map[Int, HeroDTO] = new mutable.HashMap[Int, HeroDTO]()
@@ -31,7 +29,7 @@ class HeroCache @Inject()(val heroService: HeroService) {
       option.get
     } else {
       log.error("Couldn't find a hero: " + id)
-      unknownHero
+      new HeroDTO(id)
     }
   }
 

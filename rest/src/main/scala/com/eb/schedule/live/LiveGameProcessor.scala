@@ -19,7 +19,10 @@ import scala.concurrent.ExecutionContext.Implicits.global
   * Created by Egor on 23.03.2016.
   */
 //todo log to file
-class LiveGameProcessor @Inject()(val liveGameHelper: LiveGameHelper, val netWorthService: NetWorthService, val gameService: ScheduledGameService, val seriesService: SeriesService,  val taskService:UpdateTaskService, val httpUtils: HttpUtils) extends Runnable {
+//todo bo2
+//todo get all from cache
+//todo CacheItemNotFound
+class LiveGameProcessor @Inject()(val liveGameHelper: LiveGameHelper, val netWorthService: NetWorthService, val gameService: ScheduledGameService, val seriesService: SeriesService, val taskService: UpdateTaskService, val httpUtils: HttpUtils) extends Runnable {
 
   private val log = LoggerFactory.getLogger(this.getClass)
 
@@ -60,7 +63,7 @@ class LiveGameProcessor @Inject()(val liveGameHelper: LiveGameHelper, val netWor
           gameService.update(gameDTO).onSuccess {
             case i => updateLiveGameContainer(current)
           }
-          log.debug("update status for game:" + gameDTO.id)
+          log.debug("found game: " + current.matchId + " for series: " + gameDTO.id)
         }
       }
       if (current.basicInfo.duration > 0) {
@@ -103,33 +106,14 @@ class LiveGameProcessor @Inject()(val liveGameHelper: LiveGameHelper, val netWor
     val liveGame: CurrentGameDTO = lgOpt.get
     val scheduledGame: Option[ScheduledGameDTO] = gameService.getScheduledGames(liveGame, MatchStatus.LIVE)
 
-    val isLastGame: Boolean = isLast(liveGame)
-    if (isLastGame) {
-      updateGameStatus(scheduledGame.get.id)
-    }else{
-      taskService.insert(new UpdateTask(matchId, MatchSeries.getClass.getSimpleName, 0))
-    }
-
     clearLiveGameContainer(liveGame)
     storeMatchSeries(liveGame, scheduledGame.get.id)
     finished.remove(matchId)
-    log.debug("finished game: " + matchId)
-  }
-
-  def isLast(liveGame: CurrentGameDTO): Boolean = {
-    val radiantWin: Byte = liveGame.basicInfo.radiantWin
-    val direWin = liveGame.basicInfo.direWin
-    val seriesType = liveGame.basicInfo.seriesType
-
-    (radiantWin + direWin + 1) == seriesType.gamesCount
-  }
-
-  def updateGameStatus(gameId: Int) = {
-    gameService.updateStatus(gameId, MatchStatus.FINISHED)
+    log.debug("finished game: " + matchId + " series id: " + scheduledGame.get.id)
   }
 
   def storeMatchSeries(liveGame: CurrentGameDTO, gameId: Int) = {
-    seriesService.insert(new SeriesDTO(gameId, liveGame.matchId, (liveGame.basicInfo.radiantWin + liveGame.basicInfo.direWin + 1).toByte))
+    seriesService.insert(new SeriesDTO(gameId, liveGame.matchId, (liveGame.basicInfo.radiantWin + liveGame.basicInfo.direWin + 1).toByte, None))
   }
 
   def clearLiveGameContainer(liveGame: CurrentGameDTO) = {

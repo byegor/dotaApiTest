@@ -11,6 +11,7 @@ import scala.concurrent.{Await, Future}
 /**
   * Created by Egor on 22.04.2016.
   */
+//todo test it, add logs
 class RestartProcessor @Inject()(val liveGameProcessor: LiveGameProcessor, scheduledGameService: ScheduledGameService) {
 
   def process(): Unit = {

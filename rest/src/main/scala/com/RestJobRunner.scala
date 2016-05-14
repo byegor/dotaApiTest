@@ -23,7 +23,6 @@ object RestJobRunner {
 
   def start() = {
     restartProcessor.process()
-    val liveGameProcessor: LiveGameProcessor = injector.getInstance(classOf[LiveGameProcessor])
     executor.scheduleAtFixedRate(liveGameProcessor, 0, 60, TimeUnit.SECONDS)
   }
 

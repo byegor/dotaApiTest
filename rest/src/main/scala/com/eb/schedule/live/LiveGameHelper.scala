@@ -133,24 +133,25 @@ class LiveGameHelper @Inject()(val heroCache: HeroCache, val itemCache: ItemCach
 
   private def fillWithPicks(scoreboard: JsonObject, team: TeamDTO): Unit = {
     val picks: JsonArray = scoreboard.getAsJsonArray("picks")
-    for (i <- 0 until picks.size()) {
-      val pick: JsonObject = picks.get(i).getAsJsonObject
-      val heroId: Int = pick.get("hero_id").getAsInt
-      team.picks ::= heroCache.getHero(heroId)
+    if (picks != null) {
+      for (i <- 0 until picks.size()) {
+        val pick: JsonObject = picks.get(i).getAsJsonObject
+        val heroId: Int = pick.get("hero_id").getAsInt
+        team.picks ::= heroCache.getHero(heroId)
+      }
+      val bans: JsonArray = scoreboard.getAsJsonArray("bans")
+      for (i <- 0 until bans.size()) {
+        val ban: JsonObject = bans.get(i).getAsJsonObject
+        val heroId: Int = ban.get("hero_id").getAsInt
+        team.picks ::= heroCache.getHero(heroId)
+      }
     }
-    val bans: JsonArray = scoreboard.getAsJsonArray("bans")
-    for (i <- 0 until bans.size()) {
-      val ban: JsonObject = bans.get(i).getAsJsonObject
-      val heroId: Int = ban.get("hero_id").getAsInt
-      team.picks ::= heroCache.getHero(heroId)
-    }
-
   }
 
   private def parseTeam(json: JsonObject): TeamDTO = {
     val teamId: Int = json.get("team_id").getAsInt
     val teamDto: TeamDTO = teamCache.getTeam(teamId)
-    if (teamDto != teamCache.unknownTeam) {
+    if (teamDto.name != "") {
       teamDto
     } else {
       val team: TeamDTO = new TeamDTO(teamId)

@@ -23,7 +23,7 @@ object GameContainer {
   private val matchCache: Cache[Long, MatchDTO] = CacheBuilder.newBuilder()
     .expireAfterAccess(4, TimeUnit.DAYS)
     .maximumSize(100)
-    .build()
+    .build().asInstanceOf[Cache[Long, MatchDTO]]
 
   def putMatch(matchDTO: MatchDTO): Unit ={
     matchCache.put(matchDTO.matchId, matchDTO)

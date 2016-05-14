@@ -13,6 +13,7 @@ import com.eb.schedule.model.slick.{Hero, League, _}
 import com.eb.schedule.services.{HeroService, NetWorthService, SeriesService}
 import com.google.inject.Guice
 import org.h2.jdbc.JdbcSQLException
+import org.scalatest.concurrent.ScalaFutures
 import org.scalatest.{BeforeAndAfter, FunSuite}
 
 import scala.concurrent.Await
@@ -23,7 +24,7 @@ import scala.concurrent.ExecutionContext.Implicits.global
 /**
   * Created by Egor on 20.02.2016.
   */
-abstract class BasicTest extends FunSuite with BeforeAndAfter {
+abstract class BasicTest extends FunSuite with BeforeAndAfter with ScalaFutures{
 
   val injector = Guice.createInjector(new H2Module, new CoreModule)
   val db = injector.getInstance(classOf[DB]).db
@@ -79,4 +80,8 @@ abstract class BasicTest extends FunSuite with BeforeAndAfter {
     ).transactionally
     ), Duration.Inf)
   }
+
+  import org.scalatest.time.{Millis, Seconds, Span}
+
+  implicit val defaultPatience = PatienceConfig(timeout = Span(5, Seconds), interval = Span(500, Millis))
 }

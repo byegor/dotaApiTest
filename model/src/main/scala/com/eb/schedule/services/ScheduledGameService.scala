@@ -17,7 +17,7 @@ import scala.concurrent.{Await, Future}
   * Created by Egor on 20.02.2016.
   */
 trait ScheduledGameService {
-  def findById(id: Int): Future[ScheduledGame]
+  def findById(id: Int): Future[ScheduledGameDTO]
 
   /*def findByMatchId(matchId: Long): Future[Option[ScheduledGameDTO]]*/
 
@@ -47,8 +47,8 @@ class ScheduledGameServiceImpl @Inject()(repository: ScheduledGameRepository) ex
 
   private val THREE_HOURS: Long = TimeUnit.HOURS.toMillis(3)
 
-  def findById(id: Int): Future[ScheduledGame] = {
-    repository.findById(id)
+  def findById(id: Int): Future[ScheduledGameDTO] = {
+    repository.findById(id).map(DTOUtils.crateDTO)
   }
 
   /*def findByMatchId(matchId: Long): Future[Option[ScheduledGameDTO]] = {
@@ -87,7 +87,7 @@ class ScheduledGameServiceImpl @Inject()(repository: ScheduledGameRepository) ex
     repository.delete(id)
   }
 
-  def getScheduledGames(liveGameDTO: CurrentGameDTO): Option[ScheduledGameDTO] ={
+  def getScheduledGames(liveGameDTO: CurrentGameDTO): Option[ScheduledGameDTO] = {
     val future: Future[Seq[ScheduledGame]] = repository.getScheduledGames(liveGameDTO.radiantTeam.id, liveGameDTO.direTeam.id, liveGameDTO.basicInfo.league.leagueId)
     val result: Seq[ScheduledGame] = Await.result(future, Duration.Inf)
     val now: Long = System.currentTimeMillis()

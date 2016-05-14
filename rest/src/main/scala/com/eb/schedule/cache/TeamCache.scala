@@ -23,9 +23,7 @@ class TeamCache @Inject()(val teamService: TeamService, taskService: UpdateTaskS
 
   private val log = LoggerFactory.getLogger(this.getClass)
 
-  val unknownTeam: TeamDTO = new TeamDTO(-1)
-
-  val cache: LoadingCache[Int, TeamDTO] = CacheBuilder.newBuilder()
+  val cache: LoadingCache[Int, TeamDTO] =  CacheBuilder.newBuilder()
     .expireAfterAccess(3, TimeUnit.HOURS)
     .maximumSize(200)
     .build(new CacheLoader[Int, TeamDTO]() {
@@ -37,16 +35,16 @@ class TeamCache @Inject()(val teamService: TeamService, taskService: UpdateTaskS
           throw new CacheItemNotFound
         }
       }
-    })
+    }).asInstanceOf[LoadingCache[Int, TeamDTO]]
 
   def getTeam(id: Int): TeamDTO = {
     try {
       cache.get(id)
     } catch {
-      case e: CacheItemNotFound =>
+      case e: Exception =>
         taskService.insert(new UpdateTask(id, Team.getClass.getSimpleName, 0))
         log.debug("couldn't find a team in cache: " + id)
-        unknownTeam
+        new TeamDTO(id)
     }
   }
 

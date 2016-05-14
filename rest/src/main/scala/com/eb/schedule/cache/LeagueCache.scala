@@ -21,8 +21,6 @@ class LeagueCache @Inject()(val leagueService: LeagueService, taskService: Updat
 
   private val log = LoggerFactory.getLogger(this.getClass)
 
-  private val unknownLeague: LeagueDTO = new LeagueDTO(-1)
-
   val cache: LoadingCache[Int, LeagueDTO] = CacheBuilder.newBuilder()
     .expireAfterAccess(3, TimeUnit.HOURS)
     .maximumSize(10)
@@ -35,16 +33,16 @@ class LeagueCache @Inject()(val leagueService: LeagueService, taskService: Updat
           throw new CacheItemNotFound
         }
       }
-    })
+    }).asInstanceOf[LoadingCache[Int, LeagueDTO]]
 
   def getLeague(id: Int): LeagueDTO = {
     try {
       cache.get(id)
     } catch {
-      case e: CacheItemNotFound =>
+      case e: Exception =>
         taskService.insert(new UpdateTask(id, League.getClass.getSimpleName, 0))
         log.debug("Couldn't find league: " + id)
-        unknownLeague
+        new LeagueDTO(id)
     }
   }
 }

@@ -18,7 +18,7 @@ class LiveGameProcessorTest extends RestBasicTest {
   val MATCH_ID: Long = 2234857740l
 
   private def createProcessor(): LiveGameProcessor = {
-    new LiveGameProcessor(liveGameHelper, netWorthService, scheduledGameService, seriesService, new HttpUtilsMock)
+    new LiveGameProcessor(liveGameHelper, netWorthService, scheduledGameService, seriesService, taskService, new HttpUtilsMock)
   }
 
   test("getLiveLeagueGames") {
@@ -70,7 +70,7 @@ class LiveGameProcessorTest extends RestBasicTest {
 
     val currentMatch: CurrentGameDTO = GameContainer.getLiveGame(MATCH_ID).get
 
-    val emptyProcessor = new LiveGameProcessor(liveGameHelper, netWorthService, scheduledGameService, seriesService, new HttpUtilsMock() {
+    val emptyProcessor = new LiveGameProcessor(liveGameHelper, netWorthService, scheduledGameService, seriesService, taskService, new HttpUtilsMock() {
       override def getResponseAsJson(url: String): JsonObject = {
         val json: JsonObject = new JsonObject()
         val array: JsonArray = new JsonArray()
@@ -87,7 +87,7 @@ class LiveGameProcessorTest extends RestBasicTest {
     val gameOpt: Option[ScheduledGameDTO] = scheduledGameService.getScheduledGames(currentMatch, MatchStatus.LIVE)
     assert(gameOpt.isDefined, "it is not the last game, so should be live status")
 
-    new LiveGameProcessor(liveGameHelper, netWorthService, scheduledGameService, seriesService, new HttpUtilsMock() {
+    new LiveGameProcessor(liveGameHelper, netWorthService, scheduledGameService, seriesService, taskService, new HttpUtilsMock() {
       override def getResponseAsJson(url: String): JsonObject = {
         val json: JsonObject = new JsonObject()
         val array: JsonArray = new JsonArray()

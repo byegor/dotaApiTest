@@ -43,13 +43,13 @@ class PlayerCache @Inject()(val teamService: TeamService, taskService: UpdateTas
           throw new CacheItemNotFound
         }
       }
-    })
+    }).asInstanceOf[LoadingCache[Int, String]]
 
   def getPlayerName(id: Int): String = {
     try {
       cache.get(id)
     } catch {
-      case e: CacheItemNotFound =>
+      case e: Exception =>
         log.error("couldn't find a user name: " + id)
         unknownUser
     }

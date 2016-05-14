@@ -12,6 +12,7 @@ object CrawlerUrls {
 
   val GET_ITEMS: String = "https://api.steampowered.com/IEconDOTA2_570/GetGameItems/v0001/?key=9EBD51CD27F27324F1554C53BEDA17C3"
 
-//1 is a bo3, 2 is a bo5.
+  val GET_MATCH_DETAILS: String = "https://api.steampowered.com/IDOTA2Match_570/GetMatchDetails/v001/?key=9EBD51CD27F27324F1554C53BEDA17C3&match_id="
+
 
 }
