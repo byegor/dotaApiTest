@@ -21,4 +21,7 @@ class TeamDTO(val id: Int) {
     t.logo = logo
     t
   }
+
+
+  override def toString = s"TeamDTO($id, $name)"
 }
