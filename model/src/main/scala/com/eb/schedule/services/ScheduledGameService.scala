@@ -45,7 +45,7 @@ trait ScheduledGameService {
 
 class ScheduledGameServiceImpl @Inject()(repository: ScheduledGameRepository) extends ScheduledGameService {
 
-  private val THREE_HOURS: Long = TimeUnit.HOURS.toMillis(3)
+  private val TEN_HOURS: Long = TimeUnit.HOURS.toMillis(10)
 
   def findById(id: Int): Future[ScheduledGameDTO] = {
     repository.findById(id).map(DTOUtils.crateDTO)
@@ -91,7 +91,7 @@ class ScheduledGameServiceImpl @Inject()(repository: ScheduledGameRepository) ex
     val future: Future[Seq[ScheduledGame]] = repository.getScheduledGames(liveGameDTO.radiantTeam.id, liveGameDTO.direTeam.id, liveGameDTO.basicInfo.league.leagueId)
     val result: Seq[ScheduledGame] = Await.result(future, Duration.Inf)
     val now: Long = System.currentTimeMillis()
-    val maybeScheduledGame: Option[ScheduledGame] = result.find(game => (now - game.startDate.getTime) < THREE_HOURS)
+    val maybeScheduledGame: Option[ScheduledGame] = result.find(game => (now - game.startDate.getTime) < TEN_HOURS)
     maybeScheduledGame match {
       case Some(g) => Some(DTOUtils.crateDTO(g))
       case None => None

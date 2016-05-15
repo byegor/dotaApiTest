@@ -15,8 +15,12 @@ class WinnerCrawler @Inject()(seriesService: SeriesService, httpUtils: HttpUtils
   private val log = LoggerFactory.getLogger(this.getClass)
 
   override def run(): Unit = {
+    try{
     val series: Future[Seq[SeriesDTO]] = seriesService.getSeriesWithoutWinner()
     series.map(seq => seq.foreach(updateWinners))
+    }catch {
+      case e: Throwable => log.error("", e)
+    }
   }
 
   def updateWinners(series: SeriesDTO): Unit = {

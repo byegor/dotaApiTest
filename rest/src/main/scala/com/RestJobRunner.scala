@@ -18,11 +18,12 @@ object RestJobRunner {
   private val executor: ScheduledExecutorService = Executors.newScheduledThreadPool(3);
   val injector = Guice.createInjector(new MysqlModule, new CoreModule, new RestModule)
 
-  val liveGameProcessor: LiveGameProcessor = injector.getInstance(classOf[LiveGameProcessor])
-  private val restartProcessor: RestartProcessor = injector.getInstance(classOf[RestartProcessor])
+
+  //  private val restartProcessor: RestartProcessor = injector.getInstance(classOf[RestartProcessor])
 
   def start() = {
-    restartProcessor.process()
+    val liveGameProcessor: LiveGameProcessor = injector.getInstance(classOf[LiveGameProcessor])
+    //    todo restartProcessor.process()
     executor.scheduleAtFixedRate(liveGameProcessor, 0, 60, TimeUnit.SECONDS)
   }
 

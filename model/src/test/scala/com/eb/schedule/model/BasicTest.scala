@@ -24,7 +24,7 @@ import scala.concurrent.ExecutionContext.Implicits.global
 /**
   * Created by Egor on 20.02.2016.
   */
-abstract class BasicTest extends FunSuite with BeforeAndAfter with ScalaFutures{
+abstract class BasicTest extends FunSuite with BeforeAndAfter with ScalaFutures {
 
   val injector = Guice.createInjector(new H2Module, new CoreModule)
   val db = injector.getInstance(classOf[DB]).db
@@ -37,9 +37,7 @@ abstract class BasicTest extends FunSuite with BeforeAndAfter with ScalaFutures{
   val seriesService = injector.getInstance(classOf[SeriesService])
 
   val initDb = {
-    val tables = Await.result(db.run(MTable.getTables), 10.seconds).toList
-    if (tables.isEmpty) {
-      try{
+    try {
       Await.result(db.run(DBIO.seq(
         Team.table.schema.create,
         UpdateTask.table.schema.create,
@@ -51,18 +49,22 @@ abstract class BasicTest extends FunSuite with BeforeAndAfter with ScalaFutures{
         MatchSeries.table.schema.create
       ).transactionally
       ), Duration.Inf)
-      }catch {
-        case e:JdbcSQLException => println("hope already exists :)")
-      }
+    } catch {
+      case e: JdbcSQLException => println("hope already exists :)")
     }
   }
+
   before {
-    Await.result(db.run(DBIO.seq(
-      League.table += new League(4210, ""),
-      Team.table += new Team(36, "", "", -1),
-      Team.table += new Team(1838315, "", "", -1)
-    ).transactionally
-    ), Duration.Inf)
+    try {
+      Await.result(db.run(DBIO.seq(
+        League.table += new League(4210, ""),
+        Team.table += new Team(36, "", "", -1),
+        Team.table += new Team(1838315, "", "", -1)
+      ).transactionally
+      ), Duration.Inf)
+    } catch {
+      case e: JdbcSQLException => println("ignore: " + e.getMessage)
+    }
   }
 
   after {
@@ -74,9 +76,7 @@ abstract class BasicTest extends FunSuite with BeforeAndAfter with ScalaFutures{
       UpdateTask.table.delete,
       League.table.delete,
       Hero.table.delete,
-      Item.table.delete,
-      NetWorth.table.delete,
-      MatchSeries.table.delete
+      Item.table.delete
     ).transactionally
     ), Duration.Inf)
   }

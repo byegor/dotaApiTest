@@ -100,7 +100,7 @@ class MatchParser(teamCache: TeamCache, leagueCache: LeagueCache, playerCache: P
     def parseTeam(id: String, teamName: String, teamLogo: String) = {
       val teamId: Int = json.get(id).getAsInt
       val teamDto: TeamDTO = teamCache.getTeam(teamId)
-      if (teamDto != teamCache.unknownTeam) {
+      if (teamDto.name != "") {
         teamDto
       } else {
         val team: TeamDTO = new TeamDTO(teamId)

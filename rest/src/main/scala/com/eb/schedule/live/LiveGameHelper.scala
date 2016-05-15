@@ -149,15 +149,19 @@ class LiveGameHelper @Inject()(val heroCache: HeroCache, val itemCache: ItemCach
   }
 
   private def parseTeam(json: JsonObject): TeamDTO = {
-    val teamId: Int = json.get("team_id").getAsInt
-    val teamDto: TeamDTO = teamCache.getTeam(teamId)
-    if (teamDto.name != "") {
-      teamDto
+    if (json == null) {
+      new TeamDTO(0)
     } else {
-      val team: TeamDTO = new TeamDTO(teamId)
-      team.name = json.get("team_name").getAsString
-      team.logo = json.get("team_logo").getAsLong
-      team
+      val teamId: Int = json.get("team_id").getAsInt
+      val teamDto: TeamDTO = teamCache.getTeam(teamId)
+      if (teamDto.name != "") {
+        teamDto
+      } else {
+        val team: TeamDTO = new TeamDTO(teamId)
+        team.name = json.get("team_name").getAsString
+        team.logo = json.get("team_logo").getAsLong
+        team
+      }
     }
   }
 

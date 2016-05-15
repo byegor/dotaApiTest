@@ -24,8 +24,8 @@ class TeamCrawlerRunner @Inject()(teamService: TeamService, taskService: UpdateT
       val tasks: Future[Seq[TaskDTO]] = taskService.getPendingTeamTasks()
       val result: Seq[TaskDTO] = Await.result(tasks, 10.seconds)
       result.foreach(task => storeTeam(task.id.toInt))
-    }catch {
-      case e : Throwable => println(e.getMessage)
+    } catch {
+      case e: Throwable => log.error("", e)
     }
   }
 

@@ -22,6 +22,8 @@ import scala.concurrent.ExecutionContext.Implicits.global
 //todo bo2
 //todo get all from cache
 //todo CacheItemNotFound
+//todo set match series before
+//todo insert task if exists
 class LiveGameProcessor @Inject()(val liveGameHelper: LiveGameHelper, val netWorthService: NetWorthService, val gameService: ScheduledGameService, val seriesService: SeriesService, val taskService: UpdateTaskService, val httpUtils: HttpUtils) extends Runnable {
 
   private val log = LoggerFactory.getLogger(this.getClass)

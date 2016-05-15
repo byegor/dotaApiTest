@@ -15,13 +15,17 @@ class ItemsCrawler @Inject()(itemService: ItemService, httpUtils: HttpUtils) ext
   private val log = LoggerFactory.getLogger(this.getClass)
 
   def run() {
-    val steamItems: JsonArray = getItemsInfoFromSteam()
-    var items: List[ItemDTO] = Nil
-    for (i <- 0 until steamItems.size()) {
-      val itemJson: JsonObject = steamItems.get(i).getAsJsonObject
-      items ::= new ItemDTO(itemJson.get("id").getAsInt, parseName(itemJson.get("name").getAsString))
+    try {
+      val steamItems: JsonArray = getItemsInfoFromSteam()
+      var items: List[ItemDTO] = Nil
+      for (i <- 0 until steamItems.size()) {
+        val itemJson: JsonObject = steamItems.get(i).getAsJsonObject
+        items ::= new ItemDTO(itemJson.get("id").getAsInt, parseName(itemJson.get("name").getAsString))
+      }
+      itemService.insert(items)
+    }catch {
+      case e: Throwable => log.error("", e)
     }
-    itemService.insert(items)
   }
 
   def parseName(name: String): String = {

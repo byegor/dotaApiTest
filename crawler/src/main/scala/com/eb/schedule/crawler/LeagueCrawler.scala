@@ -20,19 +20,23 @@ class LeagueCrawler @Inject()(leagueService: LeagueService, taskService: UpdateT
   private val log = LoggerFactory.getLogger(this.getClass)
 
   def run() {
-    val tasks: Future[Seq[TaskDTO]] = taskService.getPendingLeagueTasks()
-    val result: Seq[TaskDTO] = Await.result(tasks, Duration.Inf)
-    val ids: Seq[Long] = result.map(_.id)
-    val steamItems: JsonArray = getItemsInfoFromSteam()
-    for (i <- 0 until steamItems.size()) {
-      val itemJson: JsonObject = steamItems.get(i).getAsJsonObject
+    try {
+      val tasks: Future[Seq[TaskDTO]] = taskService.getPendingLeagueTasks()
+      val result: Seq[TaskDTO] = Await.result(tasks, Duration.Inf)
+      val ids: Seq[Long] = result.map(_.id)
+      val steamItems: JsonArray = getItemsInfoFromSteam()
+      for (i <- 0 until steamItems.size()) {
+        val itemJson: JsonObject = steamItems.get(i).getAsJsonObject
 
-      val leagueId: Int = itemJson.get("leagueid").getAsInt
-      if (ids.contains(leagueId)) {
-        log.info("find league to process: " + leagueId)
-        leagueService.insert(new LeagueDTO(leagueId, parseName(itemJson.get("name").getAsString), itemJson.get("tournament_url").getAsString))
-        taskService.update(new UpdateTask(leagueId, League.getClass.getSimpleName, Finished.status.toByte))
+        val leagueId: Int = itemJson.get("leagueid").getAsInt
+        if (ids.contains(leagueId)) {
+          log.info("find league to process: " + leagueId)
+          leagueService.insert(new LeagueDTO(leagueId, parseName(itemJson.get("name").getAsString), itemJson.get("tournament_url").getAsString))
+          taskService.update(new UpdateTask(leagueId, League.getClass.getSimpleName, Finished.status.toByte))
+        }
       }
+    } catch {
+      case e: Throwable => log.error("", e)
     }
   }
 
@@ -46,8 +50,13 @@ class LeagueCrawler @Inject()(leagueService: LeagueService, taskService: UpdateT
   def getItemsInfoFromSteam(): JsonArray = {
     val teamInfo: JsonObject = httpUtils.getResponseAsJson(GET_LEAGUES)
     val result: JsonObject = teamInfo.getAsJsonObject("result")
-    val items: JsonArray = result.getAsJsonArray("leagues")
-    items
+    if(result != null){
+      val items: JsonArray = result.getAsJsonArray("leagues")
+      items
+    }else{
+      new JsonArray
+    }
+
   }
 
 }
