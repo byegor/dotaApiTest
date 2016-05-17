@@ -40,7 +40,7 @@ class UpdateTaskRepositoryImpl @Inject()(database: DB) extends UpdateTaskReposit
 
 
   def exists(id: Long, classname: String): Future[Boolean] =
-    db.run(filterQuery(id, classname).exists.result)
+    db.run(tasks.filter(t => t.id === id && t.classname === classname && t.result === 0.toByte).exists.result)
 
 
   def insert(task: UpdateTask): Future[Int] = {

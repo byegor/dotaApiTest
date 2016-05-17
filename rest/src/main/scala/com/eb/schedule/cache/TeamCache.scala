@@ -42,8 +42,11 @@ class TeamCache @Inject()(val teamService: TeamService, taskService: UpdateTaskS
       cache.get(id)
     } catch {
       case e: Exception =>
-        taskService.insert(new UpdateTask(id, Team.getClass.getSimpleName, 0))
-        log.debug("couldn't find a team in cache: " + id)
+        if(e.getCause.isInstanceOf[CacheItemNotFound]){
+          taskService.insert(new UpdateTask(id, Team.getClass.getSimpleName, 0))
+        }else{
+          log.error("couldn't get item from cache: ", e)
+        }
         new TeamDTO(id)
     }
   }

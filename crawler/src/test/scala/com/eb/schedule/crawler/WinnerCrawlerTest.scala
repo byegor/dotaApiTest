@@ -31,7 +31,10 @@ class WinnerCrawlerTest extends BasicTest {
       val game: ScheduledGameDTO = new ScheduledGameDTO(1, new TeamDTO(36), new TeamDTO(1838315), new LeagueDTO(4210), SeriesType.BO3, new Timestamp(0), MatchStatus.LIVE)
       val gameId: Future[Int] = scheduledGameService.insertAndGet(game)
       gameId.onComplete {
-        case Success(gameId) => seriesService.insert(new SeriesDTO(gameId, 1l)); id = gameId
+        case Success(gameId) =>
+          seriesService.insert(new SeriesDTO(gameId, 1l, 1, None, true))
+          seriesService.insert(new SeriesDTO(gameId, 2l, 2, None, false))
+          id = gameId
         case Failure(e) => throw e;
       }
     }

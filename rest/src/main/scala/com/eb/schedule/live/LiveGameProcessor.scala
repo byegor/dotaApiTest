@@ -21,9 +21,6 @@ import scala.concurrent.ExecutionContext.Implicits.global
 //todo log to file
 //todo bo2
 //todo get all from cache
-//todo CacheItemNotFound
-//todo set match series before
-//todo insert task if exists
 class LiveGameProcessor @Inject()(val liveGameHelper: LiveGameHelper, val netWorthService: NetWorthService, val gameService: ScheduledGameService, val seriesService: SeriesService, val taskService: UpdateTaskService, val httpUtils: HttpUtils) extends Runnable {
 
   private val log = LoggerFactory.getLogger(this.getClass)
@@ -55,19 +52,21 @@ class LiveGameProcessor @Inject()(val liveGameHelper: LiveGameHelper, val netWor
         if (scheduledGame.isEmpty) {
           val startDate: Timestamp = new Timestamp(System.currentTimeMillis() - current.basicInfo.duration.toLong)
           val scheduledGameDTO: ScheduledGameDTO = new ScheduledGameDTO(-1, current.radiantTeam, current.direTeam, current.basicInfo.league, current.basicInfo.seriesType, startDate, MatchStatus.LIVE)
-          gameService.insert(scheduledGameDTO).onSuccess {
-            case i => updateLiveGameContainer(current)
+          gameService.insertAndGet(scheduledGameDTO).onSuccess {
+            case gameId =>
+              seriesService.insertOrUpdate(new SeriesDTO(gameId, current.matchId, (current.basicInfo.radiantWin + current.basicInfo.direWin + 1).toByte, None, false))
           }
           log.debug("creating new scheduled game: " + scheduledGameDTO)
         } else {
           val gameDTO: ScheduledGameDTO = scheduledGame.get
           gameDTO.matchStatus = MatchStatus.LIVE
           gameService.update(gameDTO).onSuccess {
-            case i => updateLiveGameContainer(current)
+            case i => seriesService.insertOrUpdate(new SeriesDTO(gameDTO.id, current.matchId, (current.basicInfo.radiantWin + current.basicInfo.direWin + 1).toByte, None, false))
           }
           log.debug("found game: " + current.matchId + " for series: " + gameDTO.id)
         }
       }
+      updateLiveGameContainer(current)
       if (current.basicInfo.duration > 0) {
         insertNetWorth(current.netWorth)
       }
@@ -109,13 +108,13 @@ class LiveGameProcessor @Inject()(val liveGameHelper: LiveGameHelper, val netWor
     val scheduledGame: Option[ScheduledGameDTO] = gameService.getScheduledGames(liveGame, MatchStatus.LIVE)
 
     clearLiveGameContainer(liveGame)
-    storeMatchSeries(liveGame, scheduledGame.get.id)
+    storeMatchSeries(matchId)
     finished.remove(matchId)
     log.debug("finished game: " + matchId + " series id: " + scheduledGame.get.id)
   }
 
-  def storeMatchSeries(liveGame: CurrentGameDTO, gameId: Int) = {
-    seriesService.insert(new SeriesDTO(gameId, liveGame.matchId, (liveGame.basicInfo.radiantWin + liveGame.basicInfo.direWin + 1).toByte, None))
+  def storeMatchSeries(matchId: Long) = {
+    seriesService.updateFinishedState(matchId, true)
   }
 
   def clearLiveGameContainer(liveGame: CurrentGameDTO) = {

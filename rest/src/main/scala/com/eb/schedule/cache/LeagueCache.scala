@@ -5,7 +5,7 @@ import java.util.concurrent.{ConcurrentHashMap, TimeUnit}
 import com.eb.schedule.dto.{ItemDTO, LeagueDTO, TeamDTO}
 import com.eb.schedule.exception.CacheItemNotFound
 import com.eb.schedule.model.services.{LeagueService, UpdateTaskService}
-import com.eb.schedule.model.slick.{League, UpdateTask}
+import com.eb.schedule.model.slick.{League, Team, UpdateTask}
 import com.google.common.cache.{CacheBuilder, CacheLoader, LoadingCache}
 import com.google.inject.Inject
 import org.slf4j.LoggerFactory
@@ -40,8 +40,11 @@ class LeagueCache @Inject()(val leagueService: LeagueService, taskService: Updat
       cache.get(id)
     } catch {
       case e: Exception =>
-        taskService.insert(new UpdateTask(id, League.getClass.getSimpleName, 0))
-        log.debug("Couldn't find league: " + id)
+        if (e.getCause.isInstanceOf[CacheItemNotFound]) {
+          taskService.insert(new UpdateTask(id, League.getClass.getSimpleName, 0))
+        } else {
+          log.error("couldn't get item from cache: ", e)
+        }
         new LeagueDTO(id)
     }
   }

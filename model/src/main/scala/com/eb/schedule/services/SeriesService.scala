@@ -16,11 +16,15 @@ import scala.concurrent.{Await, Future}
 trait SeriesService {
   def findBySeriesId(id: Int): Future[Seq[SeriesDTO]]
 
-  def exists(id: Int): Future[Boolean]
+  def exists(id: Int, matchId: Long): Future[Boolean]
 
   def insert(series: SeriesDTO): Future[Int]
 
+  def insertOrUpdate(series: SeriesDTO)
+
   def update(series: SeriesDTO): Future[Int]
+
+  def updateFinishedState(matchId: Long, finished: Boolean): Future[Int]
 
   def getUnfinishedSeries(): Map[ScheduledGameDTO, Seq[SeriesDTO]]
 
@@ -32,25 +36,35 @@ class SeriesServiceImpl @Inject()(rep: SeriesRepository) extends SeriesService {
     rep.findSeriesId(id).map(seq => seq.map(DTOUtils.crateDTO))
   }
 
-  def exists(id: Int): Future[Boolean] = {
-    rep.exists(id)
+  def exists(id: Int, matchId: Long): Future[Boolean] = {
+    rep.exists(id, matchId)
   }
 
   def insert(series: SeriesDTO) = {
     rep.insert(DTOUtils.transformMatchSeriesFromDTO(series))
   }
 
+  def insertOrUpdate(series: SeriesDTO) = {
+    exists(series.gameId, series.matchId).onSuccess {
+      case exists => if (!exists) insert(series) else update(series)
+    }
+  }
+
   def update(series: SeriesDTO) = {
     rep.update(DTOUtils.transformMatchSeriesFromDTO(series))
   }
 
+  def updateFinishedState(matchId: Long, finished: Boolean): Future[Int] = {
+    rep.update(matchId, finished)
+  }
+
   def getUnfinishedSeries(): Map[ScheduledGameDTO, Seq[SeriesDTO]] = {
-    val series: Seq[(ScheduledGame, MatchSeries)] = Await.result(rep.getUnfinishedSeries(), Duration.Inf)
+    val series: Seq[(ScheduledGame, MatchSeries)] = Await.result(rep.getUnfinishedSeries, Duration.Inf)
     val unfinishedSeries: Seq[(ScheduledGameDTO, SeriesDTO)] = series.map(game => (DTOUtils.crateDTO(game._1), DTOUtils.crateDTO(game._2)))
     unfinishedSeries.groupBy(_._1).mapValues(_.map(_._2))
   }
 
   def getSeriesWithoutWinner(): Future[Seq[SeriesDTO]] = {
-    rep.getSeriesWithoutWinner().map(future => future.map(DTOUtils.crateDTO))
+    rep.getSeriesWithoutWinner.map(future => future.map(DTOUtils.crateDTO))
   }
 }

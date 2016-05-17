@@ -22,7 +22,7 @@ object DTOUtils {
   }
 
   def crateDTO(l: MatchSeries): SeriesDTO = {
-    new SeriesDTO(l.scheduledGameId, l.matchId, l.gameNumber, l.radiantWin)
+    new SeriesDTO(l.scheduledGameId, l.matchId, l.gameNumber, l.radiantWin, l.finished)
   }
 
   def crateNetWorthDTO(nw: Option[NetWorth]): Option[NetWorthDTO] = {
@@ -54,7 +54,7 @@ object DTOUtils {
   }
 
   def transformMatchSeriesFromDTO(s: SeriesDTO): MatchSeries = {
-    new MatchSeries(s.gameId, s.matchId, s.gameNumber, s.radiantWin)
+    new MatchSeries(s.gameId, s.matchId, s.gameNumber, s.radiantWin, s.finished)
   }
 
   def transformTeamFromDTO(t: TeamDTO): Team = {

@@ -22,7 +22,7 @@ class PlayerCache @Inject()(val teamService: TeamService, taskService: UpdateTas
 
   private val log = LoggerFactory.getLogger(this.getClass)
   private val URL = "https://api.steampowered.com/ISteamUser/GetPlayerSummaries/v0002/?key=9EBD51CD27F27324F1554C53BEDA17C3&steamids="
-  private val ADDER:Long = 76561197960265728l
+  private val ADDER: Long = 76561197960265728l
 
   val unknownUser: String = "Unknown"
 
@@ -32,14 +32,14 @@ class PlayerCache @Inject()(val teamService: TeamService, taskService: UpdateTas
     .maximumSize(1000)
     .build(new CacheLoader[Int, String]() {
       def load(id: Int): String = {
-        val accountId:Long = ADDER + id
+        val accountId: Long = ADDER + id
         val json: JsonObject = httpUtils.getResponseAsJson(URL + accountId)
         val response: JsonObject = json.get("response").getAsJsonObject
-        if(response.has("players")){
+        if (response.has("players")) {
           val jsonArray: JsonArray = response.get("players").getAsJsonArray
           val player: JsonObject = jsonArray.get(0).getAsJsonObject
           player.get("personaname").getAsString
-        }else{
+        } else {
           throw new CacheItemNotFound
         }
       }
@@ -55,7 +55,7 @@ class PlayerCache @Inject()(val teamService: TeamService, taskService: UpdateTas
     }
   }
 
-  def put(id:Int, name:String): Unit ={
+  def put(id: Int, name: String): Unit = {
     cache.put(id, name)
   }
 

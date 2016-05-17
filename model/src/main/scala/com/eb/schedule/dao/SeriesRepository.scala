@@ -19,15 +19,17 @@ trait SeriesRepository {
 
   def findSeriesId(id: Int): Future[Seq[MatchSeries]]
 
-  def exists(id: Int): Future[Boolean]
+  def exists(id: Int, matchId:Long): Future[Boolean]
 
   def insert(matchSeries: MatchSeries): Future[Int]
 
   def update(series: MatchSeries): Future[Int]
 
-  def getUnfinishedSeries(): Future[Seq[(ScheduledGame, MatchSeries)]]
+  def update(matchId: Long, finished: Boolean): Future[Int]
 
-  def getSeriesWithoutWinner(): Future[Seq[MatchSeries]]
+  def getUnfinishedSeries: Future[Seq[(ScheduledGame, MatchSeries)]]
+
+  def getSeriesWithoutWinner: Future[Seq[MatchSeries]]
 }
 
 class SeriesRepositoryImpl @Inject()(database: DB) extends SeriesRepository {
@@ -41,8 +43,8 @@ class SeriesRepositoryImpl @Inject()(database: DB) extends SeriesRepository {
   def findSeriesId(id: Int): Future[Seq[MatchSeries]] =
     db.run(filterQuery(id).result)
 
-  def exists(id: Int): Future[Boolean] =
-    db.run(filterQuery(id).exists.result)
+  def exists(id: Int, matchId:Long): Future[Boolean] =
+    db.run(series.filter(series => series.scheduledGameId === id && series.matchId === matchId).exists.result)
 
   def insert(matchSeries: MatchSeries): Future[Int] = {
     val future: Future[Int] = db.run(series += matchSeries)
@@ -58,6 +60,13 @@ class SeriesRepositoryImpl @Inject()(database: DB) extends SeriesRepository {
     )
   }
 
+  def update(matchId: Long, finished: Boolean): Future[Int] ={
+    db.run(
+      series.filter(game => game.matchId === matchId).map(_.finished).update(finished)
+    )
+  }
+
+
   def getUnfinishedSeries(): Future[Seq[(ScheduledGame, MatchSeries)]] = {
     db.run(
       (for {
@@ -69,7 +78,7 @@ class SeriesRepositoryImpl @Inject()(database: DB) extends SeriesRepository {
 
   def getSeriesWithoutWinner(): Future[Seq[MatchSeries]] = {
     db.run(
-      series.filter(game => game.radiantWin.isEmpty).result
+      series.filter(game => game.radiantWin.isEmpty && game.finished).result
     )
   }
 }

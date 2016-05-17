@@ -17,7 +17,7 @@ trait UpdateTaskService {
 
   def exists(id: Long, classname: String): Future[Boolean]
 
-  def insert(task: UpdateTask): Future[Int]
+  def insert(task: UpdateTask)
 
   def update(task: UpdateTask): Future[Int]
 
@@ -38,8 +38,10 @@ class UpdateTaskServiceImpl @Inject()(taskRepository: UpdateTaskRepository) exte
     taskRepository.exists(id, classname)
   }
 
-  def insert(task: UpdateTask): Future[Int] = {
-    taskRepository.insert(task)
+  def insert(task: UpdateTask) = {
+    taskRepository.exists(task.id, task.classname).onSuccess{
+      case exists => if(!exists) taskRepository.insert(task)
+    }
   }
 
   def update(task: UpdateTask): Future[Int] = {
