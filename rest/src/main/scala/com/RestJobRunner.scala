@@ -14,16 +14,14 @@ import com.google.inject.Guice
   * Created by Egor on 18.04.2016.
   */
 object RestJobRunner {
-
-  private val executor: ScheduledExecutorService = Executors.newScheduledThreadPool(3);
-  val injector = Guice.createInjector(new MysqlModule, new CoreModule, new RestModule)
-
-
-  //  private val restartProcessor: RestartProcessor = injector.getInstance(classOf[RestartProcessor])
+  val executor: ScheduledExecutorService = Executors.newScheduledThreadPool(2)
 
   def start() = {
+    val injector = Guice.createInjector(new MysqlModule, new CoreModule, new RestModule)
+    Thread.sleep(2000)//have no idea now why it helps to start
     val liveGameProcessor: LiveGameProcessor = injector.getInstance(classOf[LiveGameProcessor])
-    //    todo restartProcessor.process()
+    val restartProcessor: RestartProcessor = injector.getInstance(classOf[RestartProcessor])
+    restartProcessor.process()
     executor.scheduleAtFixedRate(liveGameProcessor, 0, 60, TimeUnit.SECONDS)
   }
 

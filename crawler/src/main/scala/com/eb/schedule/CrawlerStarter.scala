@@ -29,6 +29,7 @@ object CrawlerStarter extends App {
   private val leagueCrawler: LeagueCrawler = new LeagueCrawler(leagueService, taskService, httpUtils)
   private val seriesCrawler: SeriesCrawler = new SeriesCrawler(seriesService, scheduledGameService, httpUtils)
   private val winnerCrawler: WinnerCrawler = new WinnerCrawler(seriesService, httpUtils)
+  private val longRunningCrawler: LongRunningGamesCrawler = new LongRunningGamesCrawler(seriesService, scheduledGameService, httpUtils)
   //  private val itemsCrawler: ItemsCrawler = new ItemsCrawler(itemService, httpUtils)
 
 
@@ -36,7 +37,5 @@ object CrawlerStarter extends App {
   executor.scheduleAtFixedRate(leagueCrawler, 10, 60, TimeUnit.SECONDS)
   executor.scheduleAtFixedRate(winnerCrawler, 20, 60, TimeUnit.SECONDS)
   executor.scheduleAtFixedRate(seriesCrawler, 30, 60, TimeUnit.SECONDS)
-  //  executor.scheduleAtFixedRate(itemsCrawler, 20, 60, TimeUnit.SECONDS)
-
-
+  executor.scheduleAtFixedRate(longRunningCrawler, 40, 60, TimeUnit.SECONDS)
 }

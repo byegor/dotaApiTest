@@ -1,5 +1,6 @@
 package com.eb.schedule.dao
 
+import com.eb.schedule.dto.SeriesDTO
 import com.eb.schedule.model.MatchStatus
 import com.eb.schedule.model.db.DB
 import com.eb.schedule.model.slick.MatchSeries.MatchSeriesTable
@@ -30,6 +31,8 @@ trait SeriesRepository {
   def getUnfinishedSeries: Future[Seq[(ScheduledGame, MatchSeries)]]
 
   def getSeriesWithoutWinner: Future[Seq[MatchSeries]]
+
+  def getRunningSeries(): Future[Seq[MatchSeries]]
 }
 
 class SeriesRepositoryImpl @Inject()(database: DB) extends SeriesRepository {
@@ -79,6 +82,12 @@ class SeriesRepositoryImpl @Inject()(database: DB) extends SeriesRepository {
   def getSeriesWithoutWinner(): Future[Seq[MatchSeries]] = {
     db.run(
       series.filter(game => game.radiantWin.isEmpty && game.finished).result
+    )
+  }
+
+  def getRunningSeries(): Future[Seq[MatchSeries]] = {
+    db.run(
+      series.filter(game => !game.finished).result
     )
   }
 }

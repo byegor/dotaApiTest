@@ -29,6 +29,9 @@ trait SeriesService {
   def getUnfinishedSeries(): Map[ScheduledGameDTO, Seq[SeriesDTO]]
 
   def getSeriesWithoutWinner(): Future[Seq[SeriesDTO]]
+
+  def getRunningSeries(): Future[Seq[SeriesDTO]]
+
 }
 
 class SeriesServiceImpl @Inject()(rep: SeriesRepository) extends SeriesService {
@@ -67,4 +70,9 @@ class SeriesServiceImpl @Inject()(rep: SeriesRepository) extends SeriesService {
   def getSeriesWithoutWinner(): Future[Seq[SeriesDTO]] = {
     rep.getSeriesWithoutWinner.map(future => future.map(DTOUtils.crateDTO))
   }
+
+  def getRunningSeries(): Future[Seq[SeriesDTO]] ={
+    rep.getRunningSeries().map(future => future.map(DTOUtils.crateDTO))
+  }
+
 }
