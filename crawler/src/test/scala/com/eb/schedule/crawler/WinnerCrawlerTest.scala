@@ -17,7 +17,7 @@ import scala.util.{Failure, Success}
   */
 class WinnerCrawlerTest extends BasicTest {
 
-  val winnerCrawler = new WinnerCrawler(seriesService, new HttpUtils() {
+  val winnerCrawler = new WinnerCrawler(seriesService, scheduledGameService, new HttpUtils() {
     override def getResponseAsJson(url: String): JsonObject = {
       val source: BufferedSource = io.Source.fromURL(getClass.getResource("/match.json"))
       val lines = try source.mkString finally source.close()

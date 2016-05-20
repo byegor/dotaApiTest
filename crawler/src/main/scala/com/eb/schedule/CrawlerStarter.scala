@@ -28,7 +28,7 @@ object CrawlerStarter extends App {
   private val teamCrawler: TeamCrawlerRunner = new TeamCrawlerRunner(teamService, taskService, httpUtils)
   private val leagueCrawler: LeagueCrawler = new LeagueCrawler(leagueService, taskService, httpUtils)
   private val seriesCrawler: SeriesCrawler = new SeriesCrawler(seriesService, scheduledGameService, httpUtils)
-  private val winnerCrawler: WinnerCrawler = new WinnerCrawler(seriesService, httpUtils)
+  private val winnerCrawler: WinnerCrawler = new WinnerCrawler(seriesService, scheduledGameService, httpUtils)
   private val longRunningCrawler: LongRunningGamesCrawler = new LongRunningGamesCrawler(seriesService, scheduledGameService, httpUtils)
   //  private val itemsCrawler: ItemsCrawler = new ItemsCrawler(itemService, httpUtils)
 
