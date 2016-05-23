@@ -1,5 +1,7 @@
 package com.eb.schedule.model.db
 
+import slick.backend.DatabaseConfig
+import slick.driver.JdbcProfile
 import slick.jdbc.JdbcBackend
 
 /**
@@ -8,6 +10,7 @@ import slick.jdbc.JdbcBackend
 
 trait DB {
 
-  def db:JdbcBackend#DatabaseDef
+  val dbConfig: DatabaseConfig[JdbcProfile]
 
+  def db: JdbcBackend#DatabaseDef
 }

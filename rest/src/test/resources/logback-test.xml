@@ -8,16 +8,23 @@
         </layout>
     </appender>
 
-    <logger name="com.eb" level="debug"
-            additivity="false">
-        <appender-ref ref="STDOUT"/>
+    <appender name="STDOUTOFF" class="ch.qos.logback.core.ConsoleAppender">
+        <layout class="ch.qos.logback.classic.PatternLayout">
+            <Pattern>
+                %d{yyyy-MM-dd HH:mm:ss} [%thread] %-5level %logger{36} - %msg%n
+            </Pattern>
+        </layout>
+    </appender>
+
+    <logger name="com.eb.schedule.cache" level="OFF">
+        <appender-ref ref="STDOUTOFF"/>
     </logger>
     <logger name="com.mysql" level="debug"
             additivity="false">
         <appender-ref ref="STDOUT"/>
     </logger>
 
-    <root level="info">
+    <root level="INFO">
         <appender-ref ref="STDOUT"/>
     </root>
 

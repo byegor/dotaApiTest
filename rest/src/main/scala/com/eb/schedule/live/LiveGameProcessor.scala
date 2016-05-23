@@ -5,7 +5,6 @@ import java.sql.Timestamp
 import com.eb.schedule.dto._
 import com.eb.schedule.model.MatchStatus
 import com.eb.schedule.model.services.{ScheduledGameService, UpdateTaskService}
-import com.eb.schedule.model.slick.{MatchSeries, UpdateTask}
 import com.eb.schedule.services.{NetWorthService, SeriesService}
 import com.eb.schedule.utils.HttpUtils
 import com.google.gson.{JsonArray, JsonObject}

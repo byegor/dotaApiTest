@@ -30,11 +30,13 @@ lazy val rest = project.in(file("rest")) dependsOn (model % "test->test;compile-
 
 lazy val crawler = project.in(file("crawler")) dependsOn (model % "test->test;compile->compile")
 
-assemblyMergeStrategy in assembly := {
+/*assemblyMergeStrategy in assembly := {
 //  case PathList("javax", "servlet", xs @ _*)         => MergeStrategy.first
 //  case PathList(ps @ _*) if ps.last endsWith ".html" => MergeStrategy.first
   case "logback.xml"                                 => MergeStrategy.last
   case x =>
     val oldStrategy = (assemblyMergeStrategy in assembly).value
     oldStrategy(x)
-}
+}*/
+
+parallelExecution in ThisBuild := false

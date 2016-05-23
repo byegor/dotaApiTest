@@ -6,9 +6,7 @@ import com.eb.schedule.model.slick.Team.TeamsTable
 import com.eb.schedule.model.slick._
 import com.google.inject.Inject
 import org.slf4j.LoggerFactory
-import slick.driver.MySQLDriver.api._
 import slick.jdbc.JdbcBackend
-import slick.lifted.TableQuery
 
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
@@ -35,11 +33,12 @@ trait TeamRepository {
 }
 
 
-class TeamRepositoryImpl @Inject()(database: DB) extends TeamRepository {
+class TeamRepositoryImpl @Inject()(val database: DB) extends TeamRepository {
 
   private val log = LoggerFactory.getLogger(this.getClass)
 
-  val db: JdbcBackend#DatabaseDef = database.db
+  val db: JdbcBackend#DatabaseDef = database.dbConfig.db
+  import database.dbConfig.driver.api._
 
   private lazy val teams = Team.table
   private lazy val tasks = UpdateTask.table
