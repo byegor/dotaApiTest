@@ -1,8 +1,9 @@
-package com.eb.schedule.live
+package com.eb.schedule.task
 
 import java.sql.Timestamp
 
 import com.eb.schedule.dto._
+import com.eb.schedule.live.{GameContainer, LiveGameHelper}
 import com.eb.schedule.model.MatchStatus
 import com.eb.schedule.model.services.{ScheduledGameService, UpdateTaskService}
 import com.eb.schedule.services.{NetWorthService, SeriesService}
@@ -17,8 +18,7 @@ import scala.concurrent.ExecutionContext.Implicits.global
 /**
   * Created by Egor on 23.03.2016.
   */
-//todo log to file
-class LiveGameProcessor @Inject()(val liveGameHelper: LiveGameHelper, val netWorthService: NetWorthService, val gameService: ScheduledGameService, val seriesService: SeriesService, val taskService: UpdateTaskService, val httpUtils: HttpUtils) extends Runnable {
+class LiveGameTask @Inject()(val liveGameHelper: LiveGameHelper, val netWorthService: NetWorthService, val gameService: ScheduledGameService, val seriesService: SeriesService, val taskService: UpdateTaskService, val httpUtils: HttpUtils) extends Runnable {
 
   private val log = LoggerFactory.getLogger(this.getClass)
 

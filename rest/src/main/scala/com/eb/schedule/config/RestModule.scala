@@ -1,7 +1,9 @@
 package com.eb.schedule.config
 
 import com.eb.schedule.cache._
-import com.eb.schedule.live.{LiveGameHelper, LiveGameProcessor, RestartProcessor}
+import com.eb.schedule.task.LiveGameTask
+import com.eb.schedule.live.{LiveGameHelper, RestartProcessor}
+import com.eb.schedule.services.{ScheduleRestService, ScheduledRestServiceImpl}
 import com.google.inject.AbstractModule
 
 /**
@@ -10,6 +12,9 @@ import com.google.inject.AbstractModule
 class RestModule extends AbstractModule {
 
   override def configure(): Unit = {
+
+    //service
+    bind(classOf[ScheduleRestService]).to(classOf[ScheduledRestServiceImpl])
 
     //cache
     bind(classOf[HeroCache]).in(classOf[com.google.inject.Singleton])
@@ -20,10 +25,11 @@ class RestModule extends AbstractModule {
 
     //helpers
     bind(classOf[LiveGameHelper])
+    bind(classOf[CacheHelper])
 
     //hilevel
     bind(classOf[RestartProcessor])
-    bind(classOf[LiveGameProcessor])
+    bind(classOf[LiveGameTask])
 
   }
 

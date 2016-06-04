@@ -4,7 +4,8 @@ import java.util.concurrent.{Executors, ScheduledExecutorService, TimeUnit}
 
 import com.eb.schedule.config.RestModule
 import com.eb.schedule.configure.{CoreModule, MysqlModule}
-import com.eb.schedule.live.{LiveGameHelper, LiveGameProcessor, RestartProcessor}
+import com.eb.schedule.task.LiveGameTask
+import com.eb.schedule.live.{LiveGameHelper, RestartProcessor}
 import com.eb.schedule.model.services.{LeagueService, ScheduledGameService, TeamService, UpdateTaskService}
 import com.eb.schedule.services.{ItemService, NetWorthService, SeriesService}
 import com.eb.schedule.utils.HttpUtils
@@ -19,7 +20,7 @@ object RestJobRunner {
   def start() = {
     val injector = Guice.createInjector(new MysqlModule, new CoreModule, new RestModule)
     Thread.sleep(2000)//have no idea now why it helps to start
-    val liveGameProcessor: LiveGameProcessor = injector.getInstance(classOf[LiveGameProcessor])
+    val liveGameProcessor: LiveGameTask = injector.getInstance(classOf[LiveGameTask])
     val restartProcessor: RestartProcessor = injector.getInstance(classOf[RestartProcessor])
     restartProcessor.process()
     executor.scheduleAtFixedRate(liveGameProcessor, 0, 60, TimeUnit.SECONDS)

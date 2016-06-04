@@ -24,5 +24,4 @@ class MatchDTO {
   var gameNumber:Byte = _
   var winByRadiant:Byte = 0
   var winByDire:Byte = 0
-
 }

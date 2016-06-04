@@ -11,4 +11,5 @@ import slick.jdbc.JdbcBackend
 object MysqlDB extends DB{
   val dbConfig: DatabaseConfig[JdbcProfile] = DatabaseConfig.forConfig[JdbcProfile]("hikari")
   def db: JdbcBackend#DatabaseDef = dbConfig.db
+  import com.github.tototoshi.slick.MySQLJodaSupport._
 }

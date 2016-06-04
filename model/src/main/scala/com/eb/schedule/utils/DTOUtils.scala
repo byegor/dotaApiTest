@@ -25,8 +25,16 @@ object DTOUtils {
     new SeriesDTO(l.scheduledGameId, l.matchId, l.gameNumber, l.radiantWin, l.finished)
   }
 
+  def crateMatchDTO(series: Option[MatchSeries]): Option[SeriesDTO] = {
+    series match {
+      case Some(l) => Some(new SeriesDTO(l.scheduledGameId, l.matchId, l.gameNumber, l.radiantWin, l.finished))
+      case None => None
+    }
+
+  }
+
   def crateNetWorthDTO(nw: Option[NetWorth]): Option[NetWorthDTO] = {
-    val res:Option[NetWorthDTO] = nw match {
+    val res: Option[NetWorthDTO] = nw match {
       case Some(n) => Some(new NetWorthDTO(n.matchId, n.netWorth.split(",").map(_.toInt).toList))
       case None => None
     }

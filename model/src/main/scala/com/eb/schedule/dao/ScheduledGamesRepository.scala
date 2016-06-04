@@ -1,15 +1,14 @@
 package com.eb.schedule.model.dao
 
-import com.eb.schedule.dto.{CurrentGameDTO, ScheduledGameDTO}
+import java.sql.Timestamp
+
 import com.eb.schedule.model.MatchStatus
 import com.eb.schedule.model.db.DB
 import com.eb.schedule.model.slick.ScheduledGame.ScheduledGameTable
 import com.eb.schedule.model.slick._
 import com.google.inject.Inject
 import org.slf4j.LoggerFactory
-import slick.driver.MySQLDriver.api._
-import slick.jdbc.JdbcBackend
-import slick.lifted.TableQuery
+import slick.jdbc.GetResult
 
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
@@ -41,10 +40,14 @@ trait ScheduledGameRepository {
   def getScheduledGames(team1: Int, team2: Int, league: Int, matchStatus: MatchStatus): Future[Option[ScheduledGame]]
 
   def getScheduledGamesByStatus(matchStatus: MatchStatus): Future[Seq[ScheduledGame]]
+
+  def getGamesBetweenDate(start: Timestamp, end: Timestamp): Future[Seq[(ScheduledGame, Option[MatchSeries])]]
 }
 
 class ScheduledGameRepositoryImpl @Inject()(val database: DB) extends ScheduledGameRepository {
   private val log = LoggerFactory.getLogger(this.getClass)
+
+  import database.dbConfig.driver.api._
 
   val db = database.db
   lazy val games = ScheduledGame.table
@@ -118,5 +121,15 @@ class ScheduledGameRepositoryImpl @Inject()(val database: DB) extends ScheduledG
   def getScheduledGamesByStatus(matchStatus: MatchStatus): Future[Seq[ScheduledGame]] = {
     db.run(games.filter(_.status === matchStatus.status).result)
   }
+
+  def getGamesBetweenDate(start: Timestamp, end: Timestamp): Future[Seq[(ScheduledGame, Option[MatchSeries])]] = {
+    db.run(
+      (for {
+        (g, matchSeries) <- ScheduledGame.table joinLeft MatchSeries.table on (_.id === _.scheduledGameId)
+        if g.startDate > start && g.startDate < end
+      } yield (g, matchSeries)).result
+    )
+  }
+
 }
 

@@ -2,7 +2,7 @@ package com.eb.schedule.rest
 
 import javax.servlet.ServletContext
 
-import com.eb.schedule.rest.resource.TeamResource
+import com.eb.schedule.rest.resource.{LiveResource, TeamResource}
 import org.scalatra.LifeCycle
 
 /**
@@ -11,5 +11,6 @@ import org.scalatra.LifeCycle
 class ScalatraBootstrap extends LifeCycle {
   override def init(context: ServletContext) {
     context.mount(new TeamResource, "/team")
+    context.mount(new LiveResource, "/live")
   }
 }
