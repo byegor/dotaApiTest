@@ -1,16 +1,13 @@
 package com.eb.schedule.model.services
 
 import java.sql.Timestamp
-import java.time.temporal._
-import java.time.{Instant, LocalDate}
-import java.util.Date
 import java.util.concurrent.TimeUnit
+import java.util.{Calendar, Date}
 
 import com.eb.schedule.dto.{CurrentGameDTO, ScheduledGameDTO, SeriesDTO}
 import com.eb.schedule.model.MatchStatus
 import com.eb.schedule.model.dao.ScheduledGameRepository
 import com.eb.schedule.model.slick.{MatchSeries, ScheduledGame}
-import com.eb.schedule.shared.bean.GameBean
 import com.eb.schedule.utils.DTOUtils
 import com.google.inject.Inject
 import org.slf4j.LoggerFactory
@@ -114,10 +111,16 @@ class ScheduledGameServiceImpl @Inject()(repository: ScheduledGameRepository) ex
   }
 
   def getGamesBetweenDate(millis: Long): Future[Map[ScheduledGameDTO, Seq[Option[SeriesDTO]]]] = {
-    val start: Instant = Instant.ofEpochMilli(millis).truncatedTo(ChronoUnit.DAYS)
-    val end: Instant = start.plus(1, ChronoUnit.DAYS)
+    val c = Calendar.getInstance()
+    c.setTimeInMillis(millis)
+    c.set(Calendar.HOUR_OF_DAY, 0)
+    c.set(Calendar.MINUTE, 0)
+    val start = c.getTimeInMillis
+    c.add(Calendar.DAY_OF_YEAR, 1)
+    val end = c.getTimeInMillis
 
-    val gamesByDate: Future[Seq[(ScheduledGame, Option[MatchSeries])]] = repository.getGamesBetweenDate(new Timestamp(start.toEpochMilli), new Timestamp(end.toEpochMilli))
+
+    val gamesByDate: Future[Seq[(ScheduledGame, Option[MatchSeries])]] = repository.getGamesBetweenDate(new Timestamp(start), new Timestamp(end))
     val gamesDto: Future[Seq[(ScheduledGameDTO, Option[SeriesDTO])]] = gamesByDate.map(seq => seq.map(game => (DTOUtils.crateDTO(game._1), DTOUtils.crateMatchDTO(game._2))))
     val map: Future[Map[ScheduledGameDTO, Seq[Option[SeriesDTO]]]] = gamesDto.map(seq => seq.groupBy(_._1).mapValues(_.map(_._2)))
     map.onFailure {
