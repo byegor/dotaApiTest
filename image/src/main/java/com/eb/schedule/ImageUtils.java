@@ -7,6 +7,8 @@ import com.mashape.unirest.http.HttpResponse;
 import com.mashape.unirest.http.JsonNode;
 import com.mashape.unirest.http.Unirest;
 import org.json.JSONObject;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.*;
 import java.nio.file.Files;
@@ -19,6 +21,8 @@ import java.util.concurrent.TimeUnit;
  * Created by Egor on 14.06.2016.
  */
 public class ImageUtils {
+
+    private final Logger logger = LoggerFactory.getLogger(ImageUtils.class);
 
     private static final String GET_TEAM_LOGO = "http://api.steampowered.com/ISteamRemoteStorage/GetUGCFileDetails/v1/?key=9EBD51CD27F27324F1554C53BEDA17C3&appid=570&ugcid=";
 
@@ -48,14 +52,13 @@ public class ImageUtils {
     public byte[] getImage(String id) {
         try {
             return images.get(id);
-        } catch (ExecutionException e) {
-            // TODO logging
-            System.out.println(e.getMessage());
+        } catch (ExecutionException ignore) {
         }
         return defaultImage;
     }
 
     private byte[] processImage(String id) {
+        logger.debug("processing id");
         try {
             HttpResponse<JsonNode> jsonResponse = Unirest.get(GET_TEAM_LOGO + id)
                     .header("accept", "application/json")
@@ -76,14 +79,13 @@ public class ImageUtils {
                 }
             }
         } catch (Exception e) {
-            // TODO logging
-            System.out.println(e.getMessage());
+            logger.error("couldn't get image with id: " + id);
         }
         return defaultImage;
     }
 
     private void saveImage(ByteArrayOutputStream outputStream, String id) throws Exception {
-        try (FileOutputStream file = new FileOutputStream(new File(dataFolder + id + ".png"))) {
+        try (FileOutputStream file = new FileOutputStream(new File(dataFolder, id + ".png"))) {
             outputStream.writeTo(file);
         }
     }

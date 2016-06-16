@@ -16,7 +16,7 @@ import java.io.IOException;
 @RestController
 public class ImageController {
 
-    @Value("${imageFolder:f:/nginx-1.11.1/data/assets}")
+    @Value("${imageFolder:f:/nginx-1.11.1/image}")
     String imageFolder;
 
     private ImageUtils imageUtils;
@@ -27,7 +27,7 @@ public class ImageController {
         imageUtils = new ImageUtils(imageFolder);
     }
 
-    @RequestMapping(path = "/image/{id}", method = RequestMethod.GET, produces = MediaType.IMAGE_JPEG_VALUE)
+    @RequestMapping(value = "/image/{id}", method = RequestMethod.GET, produces = MediaType.IMAGE_JPEG_VALUE)
     public byte[] image(@PathVariable("id") String id) {
         return imageUtils.getImage(id);
     }
