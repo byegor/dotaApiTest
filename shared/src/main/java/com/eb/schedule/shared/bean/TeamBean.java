@@ -15,10 +15,14 @@ public class TeamBean {
     @SerializedName("t")
     public String tag;
 
-    public TeamBean(int id, String name, String tag) {
+    @SerializedName("l")
+    public String logo;
+
+    public TeamBean(int id, String name, String tag, long logo) {
         this.id = id;
         this.name = name;
         this.tag = tag;
+        this.logo = "" + logo;
     }
 
     @Override
@@ -27,6 +31,7 @@ public class TeamBean {
         sb.append("id=").append(id);
         sb.append(", name='").append(name).append('\'');
         sb.append(", tag='").append(tag).append('\'');
+        sb.append(", logo='").append(logo).append('\'');
         sb.append('}');
         return sb.toString();
     }
@@ -53,5 +58,13 @@ public class TeamBean {
 
     public void setTag(String tag) {
         this.tag = tag;
+    }
+
+    public String getLogo() {
+        return logo;
+    }
+
+    public void setLogo(String logo) {
+        this.logo = logo;
     }
 }

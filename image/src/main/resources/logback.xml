@@ -1,7 +1,7 @@
 <configuration>
 
     <appender name="FILE-AUDIT"   class="ch.qos.logback.core.rolling.RollingFileAppender">
-        <file>logs/debug.log</file>
+        <file>logs/image-service.log</file>
         <encoder class="ch.qos.logback.classic.encoder.PatternLayoutEncoder">
             <Pattern>
                 %d{yyyy-MM-dd HH:mm:ss} - %msg%n

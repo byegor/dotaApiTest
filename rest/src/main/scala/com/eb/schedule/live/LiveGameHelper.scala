@@ -3,6 +3,7 @@ package com.eb.schedule.live
 import com.eb.schedule.cache._
 import com.eb.schedule.dto.{CurrentGameDTO, NetWorthDTO, PlayerDTO, TeamDTO}
 import com.eb.schedule.model.SeriesType
+import com.eb.schedule.model.services.TeamService
 import com.eb.schedule.services.NetWorthService
 import com.google.gson.{JsonArray, JsonObject}
 import com.google.inject.Inject
@@ -15,7 +16,7 @@ import scala.concurrent.{Await, Future}
 /**
   * Created by Egor on 10.04.2016.
   */
-class LiveGameHelper @Inject()(val heroCache: HeroCache, val itemCache: ItemCache, val leagueCache: LeagueCache, val teamCache: TeamCache, playerCache: PlayerCache, val netWorthService: NetWorthService) {
+class LiveGameHelper @Inject()(val heroCache: HeroCache, val itemCache: ItemCache, val leagueCache: LeagueCache, val teamCache: TeamCache, playerCache: PlayerCache, val netWorthService: NetWorthService, val teamService: TeamService) {
 
   private val log = LoggerFactory.getLogger(this.getClass)
 
@@ -160,6 +161,7 @@ class LiveGameHelper @Inject()(val heroCache: HeroCache, val itemCache: ItemCach
         val team: TeamDTO = new TeamDTO(teamId)
         team.name = json.get("team_name").getAsString
         team.logo = json.get("team_logo").getAsLong
+        teamService.insert(team)
         team
       }
     }

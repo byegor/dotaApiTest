@@ -6,19 +6,20 @@ import slick.lifted.{Rep, Tag}
 /**
   * Created by Egor on 23.03.2016.
   */
-case class MatchSeries(scheduledGameId: Int, matchId: Long, gameNumber: Byte, radiantWin:Option[Boolean], finished:Boolean)
+case class MatchSeries(scheduledGameId: Int, matchId: Long, gameNumber: Byte, radiantWin:Option[Boolean], finished:Boolean, radiantTeam:Int)
 
 object MatchSeries {
 
   class MatchSeriesTable(_tableTag: Tag) extends Table[MatchSeries](_tableTag, "match_series") {
-    def * = (scheduledGameId, matchId, gameNumber, radiantWin, finished) <>((MatchSeries.apply _).tupled, MatchSeries.unapply)
-    def ? = (Rep.Some(scheduledGameId), Rep.Some(matchId), Rep.Some(gameNumber), Rep.Some(radiantWin), Rep.Some(finished)).shaped.<>({ r => import r._; _1.map(_ => MatchSeries.apply(_1.get, _2.get, _3.get, _4.get, _5.get)) }, (_: Any) => throw new Exception("Inserting into ? projection not supported."))
+    def * = (scheduledGameId, matchId, gameNumber, radiantWin, finished, radiantTeam) <>((MatchSeries.apply _).tupled, MatchSeries.unapply)
+    def ? = (Rep.Some(scheduledGameId), Rep.Some(matchId), Rep.Some(gameNumber), Rep.Some(radiantWin), Rep.Some(finished), Rep.Some(radiantTeam)).shaped.<>({ r => import r._; _1.map(_ => MatchSeries.apply(_1.get, _2.get, _3.get, _4.get, _5.get, _6.get)) }, (_: Any) => throw new Exception("Inserting into ? projection not supported."))
 
     val scheduledGameId: Rep[Int] = column[Int]("scheduled_game_id")
     val matchId: Rep[Long] = column[Long]("match_id")
     val gameNumber: Rep[Byte] = column[Byte]("game_number")
     val radiantWin: Rep[Option[Boolean]] = column[Option[Boolean]]("radiant_win")
     val finished: Rep[Boolean] = column[Boolean]("finished")
+    val radiantTeam: Rep[Int] = column[Int]("radiant_team")
 
     lazy val scheduledGamesFk = foreignKey("FK_match_series_scheduled_games", scheduledGameId, ScheduledGame.table)(r => r.id, onUpdate = ForeignKeyAction.NoAction, onDelete = ForeignKeyAction.NoAction)
     val index1 = index("match_id", matchId, unique = true)

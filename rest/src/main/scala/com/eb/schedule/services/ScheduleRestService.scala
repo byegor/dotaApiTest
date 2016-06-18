@@ -35,8 +35,8 @@ class ScheduledRestServiceImpl @Inject()(scheduledGameService: ScheduledGameServ
       val radiantTeam: TeamDTO = cacheHelper.getTeam(game.radiantTeam.id)
       val direTeam: TeamDTO = cacheHelper.getTeam(game.direTeam.id)
       val league: LeagueDTO = cacheHelper.getLeague(game.league.leagueId)
-      val gameBean = new GameBean(game.id, game.startDate.getTime, new TeamBean(radiantTeam.id, radiantTeam.name, radiantTeam.tag),
-        new TeamBean(direTeam.id, direTeam.name, direTeam.tag), new LeagueBean(league.leagueId, league.leagueName), game.seriesType.name(), 0, 0)
+      val gameBean = new GameBean(game.id, game.startDate.getTime, new TeamBean(radiantTeam.id, radiantTeam.name, radiantTeam.tag, radiantTeam.logo),
+        new TeamBean(direTeam.id, direTeam.name, direTeam.tag, direTeam.logo), new LeagueBean(league.leagueId, league.leagueName), game.seriesType.name(), 0, 0)
       matches.filter(option => option.isDefined).map(option => option.get)
         .filter(matches => matches.radiantWin.isDefined).foreach(matches => if (matches.radiantWin.get) gameBean.radiantWin = gameBean.radiantWin + 1 else gameBean.direWin = gameBean.direWin + 1)
       games += gameBean

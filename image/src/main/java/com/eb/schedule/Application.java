@@ -15,6 +15,7 @@ import java.util.concurrent.TimeUnit;
 /**
  * Created by Egor on 14.06.2016.
  */
+//todo logback via maven
 @SpringBootApplication
 public class Application {
 

@@ -22,12 +22,12 @@ object DTOUtils {
   }
 
   def crateDTO(l: MatchSeries): SeriesDTO = {
-    new SeriesDTO(l.scheduledGameId, l.matchId, l.gameNumber, l.radiantWin, l.finished)
+    new SeriesDTO(l.scheduledGameId, l.matchId, l.gameNumber, l.radiantWin, l.finished, l.radiantTeam)
   }
 
   def crateMatchDTO(series: Option[MatchSeries]): Option[SeriesDTO] = {
     series match {
-      case Some(l) => Some(new SeriesDTO(l.scheduledGameId, l.matchId, l.gameNumber, l.radiantWin, l.finished))
+      case Some(l) => Some(new SeriesDTO(l.scheduledGameId, l.matchId, l.gameNumber, l.radiantWin, l.finished, l.radiantTeam))
       case None => None
     }
 
@@ -55,6 +55,7 @@ object DTOUtils {
       val dto: TeamDTO = new TeamDTO(team.id)
       dto.name = team.name
       dto.tag = team.tag
+      dto.logo = team.logo
       Some(dto)
     } else {
       None
@@ -62,7 +63,7 @@ object DTOUtils {
   }
 
   def transformMatchSeriesFromDTO(s: SeriesDTO): MatchSeries = {
-    new MatchSeries(s.gameId, s.matchId, s.gameNumber, s.radiantWin, s.finished)
+    new MatchSeries(s.gameId, s.matchId, s.gameNumber, s.radiantWin, s.finished, s.radiantTeamId)
   }
 
   def transformTeamFromDTO(t: TeamDTO): Team = {

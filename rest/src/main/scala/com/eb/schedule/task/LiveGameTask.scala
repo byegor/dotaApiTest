@@ -51,14 +51,14 @@ class LiveGameTask @Inject()(val liveGameHelper: LiveGameHelper, val netWorthSer
           val scheduledGameDTO: ScheduledGameDTO = new ScheduledGameDTO(-1, current.radiantTeam, current.direTeam, current.basicInfo.league, current.basicInfo.seriesType, startDate, MatchStatus.LIVE)
           gameService.insertAndGet(scheduledGameDTO).onSuccess {
             case gameId =>
-              seriesService.insertOrUpdate(new SeriesDTO(gameId, current.matchId, (current.basicInfo.radiantWin + current.basicInfo.direWin + 1).toByte, None, false))
+              seriesService.insertOrUpdate(new SeriesDTO(gameId, current.matchId, (current.basicInfo.radiantWin + current.basicInfo.direWin + 1).toByte, None, false, scheduledGameDTO.radiantTeam.id))
           }
           log.debug("creating new scheduled game: " + scheduledGameDTO)
         } else {
           val gameDTO: ScheduledGameDTO = scheduledGame.get
           gameDTO.matchStatus = MatchStatus.LIVE
           gameService.update(gameDTO).onSuccess {
-            case i => seriesService.insertOrUpdate(new SeriesDTO(gameDTO.id, current.matchId, (current.basicInfo.radiantWin + current.basicInfo.direWin + 1).toByte, None, false))
+            case i => seriesService.insertOrUpdate(new SeriesDTO(gameDTO.id, current.matchId, (current.basicInfo.radiantWin + current.basicInfo.direWin + 1).toByte, None, false, gameDTO.radiantTeam.id))
           }
           log.debug("found game: " + current.matchId + " for series: " + gameDTO.id)
         }
@@ -102,12 +102,11 @@ class LiveGameTask @Inject()(val liveGameHelper: LiveGameHelper, val netWorthSer
   def processFinishedMatches(matchId: Long) {
     val lgOpt: Option[CurrentGameDTO] = GameContainer.getLiveGame(matchId)
     val liveGame: CurrentGameDTO = lgOpt.get
-    val scheduledGame: Option[ScheduledGameDTO] = gameService.getScheduledGames(liveGame, MatchStatus.LIVE)
 
     clearLiveGameContainer(liveGame)
     storeMatchSeries(matchId)
     finished.remove(matchId)
-    log.debug("finished game: " + matchId + " series id: " + scheduledGame.get.id)
+    log.debug("finished game: " + matchId)
   }
 
   def storeMatchSeries(matchId: Long) = {
