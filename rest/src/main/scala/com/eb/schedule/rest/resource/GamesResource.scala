@@ -18,8 +18,12 @@ class GamesResource(scheduleRestService: ScheduleRestService) extends ScalatraSe
   val gson = new Gson()
   get("/current") {
     //2016-05-15 17:50:11
-    val games: List[GameBean] = scheduleRestService.getGameByDate(new DateTime(2016, 5, 15, 1, 2).getMillis)
-    //    val games: List[GameBean] = scheduleRestService.getGameByDate(System.currentTimeMillis())
+    var games: List[GameBean] = scheduleRestService.getGameByDate(new DateTime().getMillis)
+    if (games.isEmpty) {
+      games = scheduleRestService.getGameByDate(new DateTime(2016, 5, 15, 1, 2).getMillis)
+    }
     gson.toJson(games.toArray)
+    //    val games: List[GameBean] = scheduleRestService.getGameByDate(System.currentTimeMillis())
+
   }
 }

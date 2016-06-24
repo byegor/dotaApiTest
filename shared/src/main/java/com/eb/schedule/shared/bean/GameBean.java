@@ -31,7 +31,10 @@ public class GameBean {
     @SerializedName("dw")
     public int direWin;
 
-    public GameBean(int id, Long startTime, TeamBean radiant, TeamBean dire, LeagueBean league, String seriesType, int radiantWin, int direWin) {
+    @SerializedName("gs")
+    public int gameStatus;
+
+    public GameBean(int id, Long startTime, TeamBean radiant, TeamBean dire, LeagueBean league, String seriesType, int radiantWin, int direWin, int gameStatus) {
         this.id = id;
         this.startTime = startTime;
         this.radiant = radiant;
@@ -40,6 +43,7 @@ public class GameBean {
         this.seriesType = seriesType;
         this.radiantWin = radiantWin;
         this.direWin = direWin;
+        this.gameStatus = gameStatus;
     }
 
     @Override
@@ -119,5 +123,13 @@ public class GameBean {
 
     public void setDireWin(int direWin) {
         this.direWin = direWin;
+    }
+
+    public int getGameStatus() {
+        return gameStatus;
+    }
+
+    public void setGameStatus(int gameStatus) {
+        this.gameStatus = gameStatus;
     }
 }
