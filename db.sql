@@ -1,6 +1,6 @@
 -- --------------------------------------------------------
 -- Хост:                         127.0.0.1
--- Версия сервера:               5.6.24-log - MySQL Community Server (GPL)
+-- Версия сервера:               5.6.30-log - MySQL Community Server (GPL)
 -- ОС Сервера:                   Win64
 -- HeidiSQL Версия:              9.2.0.4947
 -- --------------------------------------------------------
@@ -11,9 +11,32 @@
 /*!40101 SET @OLD_SQL_MODE=@@SQL_MODE, SQL_MODE='NO_AUTO_VALUE_ON_ZERO' */;
 
 -- Дамп структуры базы данных schedule
-DROP DATABASE IF EXISTS `schedule`;
 CREATE DATABASE IF NOT EXISTS `schedule` /*!40100 DEFAULT CHARACTER SET utf8 COLLATE utf8_bin */;
 USE `schedule`;
+
+
+-- Дамп структуры для таблица schedule.hero
+DROP TABLE IF EXISTS `hero`;
+CREATE TABLE IF NOT EXISTS `hero` (
+  `id` int(11) NOT NULL,
+  `name` varchar(50) NOT NULL DEFAULT '0',
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `name` (`name`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+-- Экспортируемые данные не выделены.
+
+
+-- Дамп структуры для таблица schedule.item
+DROP TABLE IF EXISTS `item`;
+CREATE TABLE IF NOT EXISTS `item` (
+  `id` int(11) NOT NULL,
+  `name` varchar(50) NOT NULL DEFAULT '0',
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `name` (`name`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+-- Экспортируемые данные не выделены.
 
 
 -- Дамп структуры для таблица schedule.league
@@ -29,61 +52,28 @@ CREATE TABLE IF NOT EXISTS `league` (
 -- Экспортируемые данные не выделены.
 
 
--- Дамп структуры для таблица schedule.live_games
-DROP TABLE IF EXISTS `live_games`;
-CREATE TABLE IF NOT EXISTS `live_games` (
-  `match_id` bigint(20) unsigned NOT NULL,
-  `radiant` int(10) unsigned NOT NULL,
-  `dire` int(10) unsigned NOT NULL,
-  `league_id` int(11) NOT NULL,
-  `series_type` tinyint(2) NOT NULL,
-  `start_date` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-  `radiant_win` tinyint(2) unsigned NOT NULL,
-  `game` tinyint(2) unsigned NOT NULL,
-  PRIMARY KEY (`match_id`),
-  KEY `FK3_league` (`league_id`),
-  KEY `FK1_team1` (`radiant`),
-  KEY `FK2_team2` (`dire`),
-  CONSTRAINT `FK1_team1` FOREIGN KEY (`radiant`) REFERENCES `team` (`id`),
-  CONSTRAINT `FK2_team2` FOREIGN KEY (`dire`) REFERENCES `team` (`id`),
-  CONSTRAINT `FK3_league` FOREIGN KEY (`league_id`) REFERENCES `league` (`id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_bin;
-
--- Экспортируемые данные не выделены.
-
-
 -- Дамп структуры для таблица schedule.match_series
 DROP TABLE IF EXISTS `match_series`;
 CREATE TABLE IF NOT EXISTS `match_series` (
+  `scheduled_game_id` int(11) NOT NULL,
   `match_id` bigint(20) unsigned NOT NULL,
-  `radiant` int(10) unsigned NOT NULL,
-  `dire` int(10) unsigned NOT NULL,
-  `league_id` int(10) NOT NULL,
-  `radiant_win` tinyint(1) unsigned NOT NULL,
-  `parent` bigint(20) unsigned DEFAULT NULL,
-  `series_type` tinyint(3) unsigned NOT NULL,
-  `radiant_score` tinyint(3) unsigned NOT NULL,
-  `dire_score` tinyint(3) unsigned NOT NULL,
-  PRIMARY KEY (`match_id`),
-  KEY `FK_radiant_team_match` (`radiant`),
-  KEY `FK_dire_team_match` (`dire`),
-  KEY `FK_league_match` (`league_id`),
-  CONSTRAINT `FK_dire_team_match` FOREIGN KEY (`dire`) REFERENCES `team` (`id`),
-  CONSTRAINT `FK_league_match` FOREIGN KEY (`league_id`) REFERENCES `league` (`id`),
-  CONSTRAINT `FK_radiant_team_match` FOREIGN KEY (`radiant`) REFERENCES `team` (`id`)
+  `game_number` tinyint(3) unsigned NOT NULL,
+  `radiant_win` tinyint(1) DEFAULT NULL,
+  `finished` tinyint(1) NOT NULL DEFAULT '0',
+  `radiant_team` int(11) DEFAULT NULL,
+  UNIQUE KEY `match_id` (`match_id`),
+  KEY `FK_match_series_scheduled_games` (`scheduled_game_id`),
+  CONSTRAINT `FK_match_series_scheduled_games` FOREIGN KEY (`scheduled_game_id`) REFERENCES `scheduled_games` (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_bin;
 
 -- Экспортируемые данные не выделены.
 
 
--- Дамп структуры для таблица schedule.picks
-DROP TABLE IF EXISTS `picks`;
-CREATE TABLE IF NOT EXISTS `picks` (
+-- Дамп структуры для таблица schedule.net_worth
+DROP TABLE IF EXISTS `net_worth`;
+CREATE TABLE IF NOT EXISTS `net_worth` (
   `match_id` bigint(20) unsigned NOT NULL,
-  `hero_id` smallint(5) unsigned NOT NULL,
-  `radiant` tinyint(1) NOT NULL,
-  `pick` tinyint(1) NOT NULL,
-  PRIMARY KEY (`match_id`)
+  `net_worth` varchar(2000) COLLATE utf8_bin NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_bin;
 
 -- Экспортируемые данные не выделены.
@@ -93,22 +83,16 @@ CREATE TABLE IF NOT EXISTS `picks` (
 DROP TABLE IF EXISTS `scheduled_games`;
 CREATE TABLE IF NOT EXISTS `scheduled_games` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
-  `match_id` bigint(20) unsigned DEFAULT NULL,
   `radiant` int(11) unsigned NOT NULL,
   `dire` int(11) unsigned NOT NULL,
+  `series_type` tinyint(3) unsigned NOT NULL,
   `league_id` int(11) NOT NULL,
   `status` tinyint(3) NOT NULL DEFAULT '0',
   `start_date` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,
-  `radiant_score` tinyint(3) NOT NULL DEFAULT '0',
-  `dire_score` tinyint(3) NOT NULL DEFAULT '0',
   PRIMARY KEY (`id`),
   KEY `FK1_radiant_sched` (`radiant`),
   KEY `FK2_dire_sched` (`dire`),
-  KEY `FK3_league_sched` (`league_id`),
-  KEY `match_id` (`match_id`),
-  CONSTRAINT `FK1_radiant_sched` FOREIGN KEY (`radiant`) REFERENCES `team` (`id`),
-  CONSTRAINT `FK2_dire_sched` FOREIGN KEY (`dire`) REFERENCES `team` (`id`),
-  CONSTRAINT `FK3_league_sched` FOREIGN KEY (`league_id`) REFERENCES `league` (`id`)
+  KEY `FK3_league_sched` (`league_id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_bin;
 
 -- Экспортируемые данные не выделены.
@@ -120,6 +104,7 @@ CREATE TABLE IF NOT EXISTS `team` (
   `id` int(10) unsigned NOT NULL,
   `name` varchar(50) COLLATE utf8_bin NOT NULL,
   `tag` varchar(20) COLLATE utf8_bin NOT NULL,
+  `logo` bigint(20) DEFAULT NULL,
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_bin;
 
