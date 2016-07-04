@@ -5,27 +5,18 @@ import com.google.gson.annotations.SerializedName;
 import java.io.Serializable;
 
 /**
- * Created by Egor on 26.05.2016.
+ * Created by Egor on 04.07.2016.
  */
-public class LeagueBean implements Serializable {
+public class HeroBean implements Serializable{
 
-    public int id;
 
+    private int id;
     @SerializedName("n")
-    public String name;
+    private String name;
 
-    public LeagueBean(int id, String name) {
+    public HeroBean(int id, String name) {
         this.id = id;
         this.name = name;
-    }
-
-    @Override
-    public String toString() {
-        final StringBuffer sb = new StringBuffer("LeagueBean{");
-        sb.append("id=").append(id);
-        sb.append(", name='").append(name).append('\'');
-        sb.append('}');
-        return sb.toString();
     }
 
     public int getId() {
@@ -42,5 +33,14 @@ public class LeagueBean implements Serializable {
 
     public void setName(String name) {
         this.name = name;
+    }
+
+    @Override
+    public String toString() {
+        final StringBuffer sb = new StringBuffer("HeroBean{");
+        sb.append("id=").append(id);
+        sb.append(", name='").append(name).append('\'');
+        sb.append('}');
+        return sb.toString();
     }
 }

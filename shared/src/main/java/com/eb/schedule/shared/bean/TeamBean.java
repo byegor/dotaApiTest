@@ -2,21 +2,23 @@ package com.eb.schedule.shared.bean;
 
 import com.google.gson.annotations.SerializedName;
 
+import java.io.Serializable;
+
 /**
  * Created by Egor on 26.05.2016.
  */
-public class TeamBean {
+public class TeamBean implements Serializable {
 
     public int id;
 
     @SerializedName("n")
-    public String name;
+    private String name;
 
     @SerializedName("t")
-    public String tag;
+    private String tag;
 
     @SerializedName("l")
-    public String logo;
+    private String logo;
 
     public TeamBean(int id, String name, String tag, long logo) {
         this.id = id;

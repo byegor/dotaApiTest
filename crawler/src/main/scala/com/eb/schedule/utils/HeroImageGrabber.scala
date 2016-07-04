@@ -23,7 +23,7 @@ object HeroImageGrabber extends App {
   private val heroServiceImpl: HeroServiceImpl = injector.getInstance(classOf[HeroServiceImpl])
   private val heroes: Seq[HeroDTO] = Await.result(heroServiceImpl.findAll(), Duration.Inf).filter(_.heroId != 0)
   for (hero <- heroes) {
-    fileDownloader("http://cdn.dota2.com/apps/dota2/images/heroes/" + hero.name + "_sb.png", "h_" + hero.heroId + ".png")
+    fileDownloader("http://cdn.dota2.com/apps/dota2/images/heroes/" + hero.name + "_full.png", "h_" + hero.heroId + ".png")
   }
 
   def fileDownloader(url: String, filename: String) = {

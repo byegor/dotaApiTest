@@ -2,11 +2,13 @@ package com.eb.schedule.shared.bean;
 
 import com.google.gson.annotations.SerializedName;
 
+import java.io.Serializable;
+
 
 /**
  * Created by Egor on 26.05.2016.
  */
-public class GameBean {
+public class GameBean implements Serializable {
 
     public int id;
 
@@ -22,7 +24,7 @@ public class GameBean {
     @SerializedName("l")
     public LeagueBean league;
 
-    @SerializedName("t")
+    @SerializedName("bo")
     public String seriesType;
 
     @SerializedName("rw")
