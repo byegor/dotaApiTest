@@ -1,30 +1,29 @@
 package com.eb.schedule.services
 
-import java.time.Instant
-import java.time.temporal.{ChronoField, ChronoUnit}
-import java.util.Date
-
 import com.eb.schedule.cache.CacheHelper
-import com.eb.schedule.dto.{LeagueDTO, ScheduledGameDTO, SeriesDTO, TeamDTO}
-import com.eb.schedule.model.dao.ScheduledGameRepository
+import com.eb.schedule.dto._
+import com.eb.schedule.live.GameContainer
 import com.eb.schedule.model.services.ScheduledGameService
-import com.eb.schedule.shared.bean.{GameBean, LeagueBean, TeamBean}
+import com.eb.schedule.shared.bean.{GameBean, LeagueBean, Match, TeamBean}
 import com.google.inject.Inject
 import org.slf4j.LoggerFactory
 
 import scala.collection.mutable.ListBuffer
-import scala.concurrent.{Await, Future}
+import scala.concurrent.Await
 import scala.concurrent.duration.Duration
-import scala.util.{Failure, Success}
 
 /**
   * Created by Egor on 04.06.2016.
   */
 trait ScheduleRestService {
   def getGameByDate(milliseconds: Long): List[GameBean]
+
+  def getGameMatchesById(gameId: Int): Seq[Match]
+
+  def getMatchById(matchId: Long): Option[Match]
 }
 
-class ScheduledRestServiceImpl @Inject()(scheduledGameService: ScheduledGameService, cacheHelper: CacheHelper) extends ScheduleRestService {
+class ScheduledRestServiceImpl @Inject()(scheduledGameService: ScheduledGameService, seriesService: SeriesService, cacheHelper: CacheHelper) extends ScheduleRestService {
 
   private val log = LoggerFactory.getLogger(this.getClass)
 
@@ -44,5 +43,33 @@ class ScheduledRestServiceImpl @Inject()(scheduledGameService: ScheduledGameServ
     games.toList
   }
 
+  override def getGameMatchesById(gameId: Int): Seq[Match] = {
+    val matchId: Option[Long] = GameContainer.getLiveMatchIdByScheduledGameId(gameId)
+    if (matchId.isDefined) {
+      val game: Option[CurrentGameDTO] = GameContainer.getLiveGame(matchId.get)
+      if (game.isDefined) {
+        val liveMatch: CurrentGameDTO = game.get
+        List(liveMatch.toMatch())
+      } else {
+        getGamesMatches(gameId)
+      }
+    } else {
+      getGamesMatches(gameId)
+    }
+  }
 
+  def getGamesMatches(gameId: Int): Seq[Match] = {
+    val series: Seq[SeriesDTO] = Await.result(seriesService.findBySeriesId(gameId), Duration.Inf)
+    val gamesMatches: Seq[Match] = series.map(game => cacheHelper.getMatch(game.matchId)).filter(_.isDefined).map(_.get)
+    gamesMatches
+  }
+
+  def getMatchById(matchId: Long): Option[Match] = {
+    val liveGame: Option[CurrentGameDTO] = GameContainer.getLiveGame(matchId)
+    if (liveGame.isDefined) {
+      Some(liveGame.get.toMatch())
+    } else {
+      cacheHelper.getMatch(matchId)
+    }
+  }
 }

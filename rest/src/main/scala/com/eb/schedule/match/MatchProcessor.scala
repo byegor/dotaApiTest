@@ -15,14 +15,13 @@ class MatchProcessor @Inject()(matchParser: MatchParser, val httpUtils: HttpUtil
 
   val GET_MATCH_DETAILS: String = "https://api.steampowered.com/IDOTA2Match_570/GetMatchDetails/v001/?key=9EBD51CD27F27324F1554C53BEDA17C3&match_id="
 
-  def findMatch(matchId: Long): Unit = {
+  def findMatch(matchId: Long): Option[MatchDTO] = {
     try {
       val matchDetails: Option[MatchDTO] = getMatchDetails(matchId)
-      if (matchDetails.isDefined) {
-        GameContainer.putMatch(matchDetails.get)
-      }
+      matchDetails
     } catch {
       case e: Throwable => log.error("error", e)
+        None
     }
   }
 

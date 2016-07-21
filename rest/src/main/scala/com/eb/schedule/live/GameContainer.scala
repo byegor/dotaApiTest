@@ -16,47 +16,43 @@ import scala.collection.JavaConversions._
 object GameContainer {
 
 
-  private val currentLiveGames: scala.collection.concurrent.Map[Long, CurrentGameDTO] = new ConcurrentHashMap[Long, CurrentGameDTO]
+  private val currentLiveMatches: scala.collection.concurrent.Map[Long, CurrentGameDTO] = new ConcurrentHashMap[Long, CurrentGameDTO]
 
-  private val basicGamesInfo: scala.collection.concurrent.Map[Long, BasicGameInfoDTO] = new ConcurrentHashMap[Long, BasicGameInfoDTO]
+  private val liveMatchIdByScheduledGameId: scala.collection.concurrent.Map[Int, Long] = new ConcurrentHashMap[Int, Long]
 
-  private val matchCache: Cache[Long, MatchDTO] = CacheBuilder.newBuilder()
-    .expireAfterAccess(4, TimeUnit.DAYS)
-    .maximumSize(100)
-    .build().asInstanceOf[Cache[Long, MatchDTO]]
-
-  def putMatch(matchDTO: MatchDTO): Unit ={
-    matchCache.put(matchDTO.matchId, matchDTO)
-  }
-
-  def getMatch(matchId:Long):Option[MatchDTO] ={
-    Option(matchCache.getIfPresent(matchId))
-  }
 
   def updateLiveGame(currentGameDTO: CurrentGameDTO): Unit = {
-    currentLiveGames.put(currentGameDTO.matchId, currentGameDTO)
-    basicGamesInfo.put(currentGameDTO.matchId, currentGameDTO.basicInfo)
+    currentLiveMatches.put(currentGameDTO.matchId, currentGameDTO)
+    liveMatchIdByScheduledGameId.put(currentGameDTO.scheduledGameId, currentGameDTO.matchId)
   }
 
   def getLiveGame(matchId: Long): Option[CurrentGameDTO] = {
-    currentLiveGames.get(matchId)
+    currentLiveMatches.get(matchId)
   }
 
   def exists(matchId: Long): Boolean = {
-    currentLiveGames.contains(matchId)
+    currentLiveMatches.contains(matchId)
   }
 
   def getLiveMatchesId(): Iterable[Long] = {
-    currentLiveGames.keys
+    currentLiveMatches.keys
   }
 
   def getLiveMatches(): Iterable[CurrentGameDTO] = {
-    currentLiveGames.values
+    currentLiveMatches.values
   }
 
-  def removeLiveGame(matchId: Long) = {
-    currentLiveGames.remove(matchId)
-    basicGamesInfo.remove(matchId)
+  def removeLiveGame(matchId: Long, scheduledGameId: Int = 1) = {
+    currentLiveMatches.remove(matchId)
+    val orElse: Long = liveMatchIdByScheduledGameId.getOrElse(scheduledGameId, -1)
+    if (orElse == matchId) {
+      liveMatchIdByScheduledGameId.remove(scheduledGameId)
+    }
+
+  }
+
+  def getLiveMatchIdByScheduledGameId(scheduledGameId: Int): Option[Long] = {
+    liveMatchIdByScheduledGameId.get(scheduledGameId)
   }
 
 }

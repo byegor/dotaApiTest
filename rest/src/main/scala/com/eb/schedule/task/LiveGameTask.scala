@@ -114,6 +114,6 @@ class LiveGameTask @Inject()(val liveGameHelper: LiveGameHelper, val netWorthSer
   }
 
   def clearLiveGameContainer(liveGame: CurrentGameDTO) = {
-    GameContainer.removeLiveGame(liveGame.matchId)
+    GameContainer.removeLiveGame(liveGame.matchId, liveGame.scheduledGameId)
   }
 }

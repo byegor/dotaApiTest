@@ -45,7 +45,7 @@ class LeagueCache @Inject()(val leagueService: LeagueService, taskService: Updat
         } else {
           log.error("couldn't get item from cache: ", e)
         }
-        new LeagueDTO(id)
+        LeagueDTO(id)
     }
   }
 }

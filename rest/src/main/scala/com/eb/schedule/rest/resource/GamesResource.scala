@@ -1,11 +1,7 @@
 package com.eb.schedule.rest.resource
 
-import java.time.temporal.ChronoField
-import java.time.{LocalDate, LocalDateTime, ZoneId}
-
-import com.eb.schedule.live.GameContainer
 import com.eb.schedule.services.ScheduleRestService
-import com.eb.schedule.shared.bean.GameBean
+import com.eb.schedule.shared.bean.{GameBean, Match}
 import com.google.gson.Gson
 import org.joda.time.DateTime
 import org.scalatra.ScalatraServlet
@@ -23,7 +19,19 @@ class GamesResource(scheduleRestService: ScheduleRestService) extends ScalatraSe
       games = scheduleRestService.getGameByDate(new DateTime(2016, 5, 15, 1, 2).getMillis)
     }
     gson.toJson(games.toArray)
-    //    val games: List[GameBean] = scheduleRestService.getGameByDate(System.currentTimeMillis())
+  }
 
+  get("/game/:id") {
+    val matches: Seq[Match] = scheduleRestService.getGameMatchesById({params("id")}.toInt)
+    gson.toJson(matches.toArray)
+  }
+
+  get("/match/:id") {
+    val m: Option[Match] = scheduleRestService.getMatchById({params("id")}.toLong)
+    if(m.isDefined){
+      gson.toJson(m)
+    }else{
+      ""
+    }
   }
 }

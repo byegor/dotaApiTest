@@ -22,6 +22,7 @@ class RestModule extends AbstractModule {
     bind(classOf[LeagueCache]).in(classOf[com.google.inject.Singleton])
     bind(classOf[TeamCache]).in(classOf[com.google.inject.Singleton])
     bind(classOf[PlayerCache]).in(classOf[com.google.inject.Singleton])
+    bind(classOf[MatchCache]).in(classOf[com.google.inject.Singleton])
 
     //helpers
     bind(classOf[LiveGameHelper])

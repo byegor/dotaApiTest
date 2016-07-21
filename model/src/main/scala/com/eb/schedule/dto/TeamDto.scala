@@ -1,5 +1,7 @@
 package com.eb.schedule.dto
 
+import com.eb.schedule.shared.bean.TeamBean
+
 /**
   * Created by Egor on 26.03.2016.
   */
@@ -24,4 +26,8 @@ class TeamDTO(val id: Int) {
 
 
   override def toString = s"TeamDTO($id, $name)"
+
+  def toTeamBean() :TeamBean = {
+    new TeamBean(id, name, tag, logo)
+  }
 }
