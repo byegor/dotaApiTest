@@ -2,15 +2,19 @@ package com.eb.schedule
 
 import com.eb.schedule.cache._
 import com.eb.schedule.dto.{PlayerDTO, TeamDTO}
+import com.eb.schedule.model.SeriesType
+import com.eb.schedule.model.slick.MatchSeries
 import com.google.gson.{JsonArray, JsonObject}
+import com.google.inject.Inject
 
 
 /**
   * Created by Egor on 02.05.2016.
   */
-class MatchParser(teamCache: TeamCache, leagueCache: LeagueCache, playerCache: PlayerCache, heroCache: HeroCache, itemCache: ItemCache) {
+class MatchParser @Inject()(teamCache: TeamCache, leagueCache: LeagueCache, playerCache: PlayerCache, heroCache: HeroCache, itemCache: ItemCache) {
 
-  def parseMatch(jsonObject: JsonObject):MatchDTO={
+
+  def parseMatch(jsonObject: JsonObject): MatchDTO = {
     new MatchBuilder(jsonObject).addBasicInfo().parseTeams().addBuildingStatus().addMatchPicks().addMatchPlayers().buildMatch()
   }
 
@@ -25,7 +29,7 @@ class MatchParser(teamCache: TeamCache, leagueCache: LeagueCache, playerCache: P
 
     def parseTeams() = {
       matchDetails.radiantTeam = parseTeam("radiant_team_id", "radiant_name", "radiant_logo")
-      matchDetails.radiantTeam = parseTeam("dire_team_id", "dire_name", "dire_logo")
+      matchDetails.direTeam = parseTeam("dire_team_id", "dire_name", "dire_logo")
       this
     }
 
@@ -36,6 +40,7 @@ class MatchParser(teamCache: TeamCache, leagueCache: LeagueCache, playerCache: P
         val heroId: Int = pick.get("hero_id").getAsInt
         val isRadiant: Boolean = pick.get("team").getAsInt == 0
         val isPick: Boolean = pick.get("is_pick").getAsBoolean
+        //todo BUG change cached item
         val team = if (isRadiant) matchDetails.radiantTeam else matchDetails.direTeam
         if (isPick) team.picks ::= heroCache.getHero(heroId) else team.bans ::= heroCache.getHero(heroId)
       }
@@ -82,14 +87,14 @@ class MatchParser(teamCache: TeamCache, leagueCache: LeagueCache, playerCache: P
 
     def parseKDA(playerJson: JsonObject, playerDTO: PlayerDTO): Unit = {
       playerDTO.kills = playerJson.get("kills").getAsInt
-      playerDTO.deaths = playerJson.get("death").getAsInt
+      playerDTO.deaths = playerJson.get("deaths").getAsInt
       playerDTO.assists = playerJson.get("assists").getAsInt
       playerDTO.level = playerJson.get("level").getAsInt
     }
 
     def parseItem(playerJson: JsonObject, playerDTO: PlayerDTO): Unit = {
       for (i <- 0 until 6) {
-        val itemId: Int = playerJson.get("item" + i).getAsInt
+        val itemId: Int = playerJson.get("item_" + i).getAsInt
         if (itemId != 0) {
           playerDTO.items ::= itemCache.getItem(itemId)
         }
@@ -99,9 +104,13 @@ class MatchParser(teamCache: TeamCache, leagueCache: LeagueCache, playerCache: P
 
     def parseTeam(id: String, teamName: String, teamLogo: String) = {
       val teamId: Int = json.get(id).getAsInt
-      val teamDto: TeamDTO = teamCache.getTeam(teamId)
-      if (teamDto.name != "") {
-        teamDto
+      val cachedTeam: CachedTeam = teamCache.getTeam(teamId)
+      if (cachedTeam.name != "") {
+        val teamDTO: TeamDTO = new TeamDTO(cachedTeam.id)
+        teamDTO.name = cachedTeam.name
+        teamDTO.logo = cachedTeam.logo
+        teamDTO.tag = cachedTeam.tag
+        teamDTO
       } else {
         val team: TeamDTO = new TeamDTO(teamId)
         team.name = json.get(teamName).getAsString

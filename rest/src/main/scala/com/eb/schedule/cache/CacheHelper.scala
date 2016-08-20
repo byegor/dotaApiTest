@@ -21,7 +21,7 @@ class CacheHelper @Inject()(val heroCache: HeroCache, val itemCache: ItemCache, 
     heroCache.getHero(id)
   }
 
-  def getTeam(id: Int): TeamDTO = {
+  def getTeam(id: Int): CachedTeam = {
     teamCache.getTeam(id)
   }
 

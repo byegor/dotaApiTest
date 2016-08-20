@@ -11,7 +11,7 @@ import scala.collection.JavaConversions._
 class MatchDTO {
   var matchId: Long = _
   var startTime: Long = _
-  var seriesType: SeriesType = _
+//  var seriesType: SeriesType = _
   var duration: Double = 0
   var radiantWin: Boolean = _
 
@@ -31,7 +31,7 @@ class MatchDTO {
     val matchBean = new Match()
     matchBean.setMatchId(matchId)
     matchBean.setStartTime(startTime)
-    matchBean.setSeriesType(seriesType.name())
+//    matchBean.setSeriesType(seriesType.name())
     matchBean.setDuration(duration)
     matchBean.setRadiantWin(radiantWin)
     matchBean.setRadiantTeam(radiantTeam.toTeamBean())
@@ -39,7 +39,9 @@ class MatchDTO {
     matchBean.setLeague(new LeagueBean(league.leagueId, league.name))
     matchBean.setRadiantScore(radiantScore)
     matchBean.setDireScore(direScore)
-    matchBean.setNetworth(scala.collection.JavaConversions.seqAsJavaList(netWorth.netWorth.map(new java.lang.Double(_))))
+    if(netWorth != null){
+      matchBean.setNetworth(scala.collection.JavaConversions.seqAsJavaList(netWorth.netWorth.map(new java.lang.Double(_))))
+    }
     matchBean.setGameNumber(gameNumber)
     matchBean.setRadianBans(radiantTeam.bans.map(h => new HeroBean(h.id, h.name)))
     matchBean.setRadianPicks(radiantTeam.picks.map(h => new HeroBean(h.id, h.name)))

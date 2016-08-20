@@ -154,9 +154,13 @@ class LiveGameHelper @Inject()(val heroCache: HeroCache, val itemCache: ItemCach
       new TeamDTO(0)
     } else {
       val teamId: Int = json.get("team_id").getAsInt
-      val teamDto: TeamDTO = teamCache.getTeam(teamId)
-      if (teamDto.name != "") {
-        teamDto
+      val cachedTeam: CachedTeam = teamCache.getTeam(teamId)
+      if (cachedTeam.name != "") {
+        val teamDTO: TeamDTO = new TeamDTO(cachedTeam.id)
+        teamDTO.name = cachedTeam.name
+        teamDTO.logo = cachedTeam.logo
+        teamDTO.tag = cachedTeam.tag
+        teamDTO
       } else {
         val team: TeamDTO = new TeamDTO(teamId)
         team.name = json.get("team_name").getAsString

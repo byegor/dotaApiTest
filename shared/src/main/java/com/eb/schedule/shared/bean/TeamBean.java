@@ -3,6 +3,7 @@ package com.eb.schedule.shared.bean;
 import com.google.gson.annotations.SerializedName;
 
 import java.io.Serializable;
+import java.util.List;
 
 /**
  * Created by Egor on 26.05.2016.
@@ -19,6 +20,9 @@ public class TeamBean implements Serializable {
 
     @SerializedName("l")
     private String logo;
+
+    @SerializedName("p")
+    private List<Player> players;
 
     public TeamBean(int id, String name, String tag, long logo) {
         this.id = id;
@@ -68,5 +72,13 @@ public class TeamBean implements Serializable {
 
     public void setLogo(String logo) {
         this.logo = logo;
+    }
+
+    public List<Player> getPlayers() {
+        return players;
+    }
+
+    public void setPlayers(List<Player> players) {
+        this.players = players;
     }
 }

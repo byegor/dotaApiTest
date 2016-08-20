@@ -1,6 +1,6 @@
 package com.eb.schedule.services
 
-import com.eb.schedule.cache.CacheHelper
+import com.eb.schedule.cache.{CacheHelper, CachedTeam}
 import com.eb.schedule.dto._
 import com.eb.schedule.live.GameContainer
 import com.eb.schedule.model.services.ScheduledGameService
@@ -31,8 +31,8 @@ class ScheduledRestServiceImpl @Inject()(scheduledGameService: ScheduledGameServ
     val games: ListBuffer[GameBean] = new ListBuffer[GameBean];
     val gamesBetweenDate: Map[ScheduledGameDTO, Seq[Option[SeriesDTO]]] = Await.result(scheduledGameService.getGamesBetweenDate(milliseconds), Duration.Inf)
     for ((game, matches) <- gamesBetweenDate) {
-      val radiantTeam: TeamDTO = cacheHelper.getTeam(game.radiantTeam.id)
-      val direTeam: TeamDTO = cacheHelper.getTeam(game.direTeam.id)
+      val radiantTeam: CachedTeam = cacheHelper.getTeam(game.radiantTeam.id)
+      val direTeam: CachedTeam = cacheHelper.getTeam(game.direTeam.id)
       val league: LeagueDTO = cacheHelper.getLeague(game.league.leagueId)
       val gameBean = new GameBean(game.id, game.startDate.getTime, new TeamBean(radiantTeam.id, radiantTeam.name, radiantTeam.tag, radiantTeam.logo),
         new TeamBean(direTeam.id, direTeam.name, direTeam.tag, direTeam.logo), new LeagueBean(league.leagueId, league.leagueName), game.seriesType.name(), 0, 0, game.matchStatus.status)
