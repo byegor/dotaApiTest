@@ -11,8 +11,8 @@ import scala.collection.JavaConversions._
 class MatchDTO {
   var matchId: Long = _
   var startTime: Long = _
-//  var seriesType: SeriesType = _
-  var duration: Double = 0
+  //  var seriesType: SeriesType = _
+  var duration: Int = 0
   var radiantWin: Boolean = _
 
   var radiantTeam: TeamDTO = _
@@ -31,15 +31,15 @@ class MatchDTO {
     val matchBean = new Match()
     matchBean.setMatchId(matchId)
     matchBean.setStartTime(startTime)
-//    matchBean.setSeriesType(seriesType.name())
-    matchBean.setDuration(duration)
+    //    matchBean.setSeriesType(seriesType.name())
+    matchBean.setDuration(getDuration())
     matchBean.setRadiantWin(radiantWin)
     matchBean.setRadiantTeam(radiantTeam.toTeamBean())
     matchBean.setDireTeam(direTeam.toTeamBean())
     matchBean.setLeague(new LeagueBean(league.leagueId, league.name))
-    matchBean.setRadiantScore(radiantScore)
-    matchBean.setDireScore(direScore)
-    if(netWorth != null){
+    matchBean.setMatchScore(radiantScore + " - " + direScore)
+
+    if (netWorth != null) {
       matchBean.setNetworth(scala.collection.JavaConversions.seqAsJavaList(netWorth.netWorth.map(new java.lang.Double(_))))
     }
     matchBean.setGameNumber(gameNumber)
@@ -49,4 +49,11 @@ class MatchDTO {
     matchBean.setDireBans(direTeam.bans.map(h => new HeroBean(h.id, h.name)))
     matchBean
   }
+
+  def getDuration() = {
+    val minutes: Int = duration / 60
+    val seconds: Int = duration - minutes * 60
+    minutes + ":" + seconds
+  }
+
 }

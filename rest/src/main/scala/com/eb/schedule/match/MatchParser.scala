@@ -40,7 +40,6 @@ class MatchParser @Inject()(teamCache: TeamCache, leagueCache: LeagueCache, play
         val heroId: Int = pick.get("hero_id").getAsInt
         val isRadiant: Boolean = pick.get("team").getAsInt == 0
         val isPick: Boolean = pick.get("is_pick").getAsBoolean
-        //todo BUG change cached item
         val team = if (isRadiant) matchDetails.radiantTeam else matchDetails.direTeam
         if (isPick) team.picks ::= heroCache.getHero(heroId) else team.bans ::= heroCache.getHero(heroId)
       }
@@ -62,7 +61,7 @@ class MatchParser @Inject()(teamCache: TeamCache, leagueCache: LeagueCache, play
         parseKDA(player, playerDTO)
         parseItem(player, playerDTO)
 
-        val isRadiant = player.get("player_slot").getAsInt == 0
+        val isRadiant = player.get("player_slot").getAsInt < 5
         if (isRadiant) matchDetails.radiantTeam.players ::= playerDTO else matchDetails.direTeam.players ::= playerDTO
       }
       this
@@ -78,9 +77,12 @@ class MatchParser @Inject()(teamCache: TeamCache, leagueCache: LeagueCache, play
 
     def addBasicInfo() = {
       matchDetails.matchId = json.get("match_id").getAsLong
-      matchDetails.duration = json.get("duration").getAsDouble
+      matchDetails.duration = json.get("duration").getAsInt
       matchDetails.radiantWin = json.get("radiant_win").getAsBoolean
       matchDetails.startTime = json.get("start_time").getAsLong
+      matchDetails.radiantScore = json.get("radiant_score").getAsByte
+      matchDetails.direScore = json.get("dire_score").getAsByte
+
       matchDetails.league = leagueCache.getLeague(json.get("leagueid").getAsInt)
       this
     }

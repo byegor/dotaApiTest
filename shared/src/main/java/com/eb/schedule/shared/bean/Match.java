@@ -17,7 +17,7 @@ public class Match implements Serializable {
     @SerializedName("bo")
     private String seriesType;
     @SerializedName("d")
-    private Double duration;
+    private String duration;
     @SerializedName("win")
     private Boolean radiantWin;
 
@@ -28,10 +28,8 @@ public class Match implements Serializable {
     @SerializedName("l")
     private LeagueBean league;
 
-    @SerializedName("rs")
-    private int radiantScore;
-    @SerializedName("ds")
-    private int direScore;
+    @SerializedName("msc")
+    private String matchScore;
     @SerializedName("nw")
     private List<Double> networth;
 
@@ -75,11 +73,11 @@ public class Match implements Serializable {
         this.seriesType = seriesType;
     }
 
-    public Double getDuration() {
+    public String getDuration() {
         return duration;
     }
 
-    public void setDuration(Double duration) {
+    public void setDuration(String duration) {
         this.duration = duration;
     }
 
@@ -115,20 +113,12 @@ public class Match implements Serializable {
         this.league = league;
     }
 
-    public int getRadiantScore() {
-        return radiantScore;
+    public String getMatchScore() {
+        return matchScore;
     }
 
-    public void setRadiantScore(int radiantScore) {
-        this.radiantScore = radiantScore;
-    }
-
-    public int getDireScore() {
-        return direScore;
-    }
-
-    public void setDireScore(int direScore) {
-        this.direScore = direScore;
+    public void setMatchScore(String matchScore) {
+        this.matchScore = matchScore;
     }
 
     public List<Double> getNetworth() {
