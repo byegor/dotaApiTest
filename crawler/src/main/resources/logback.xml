@@ -9,11 +9,11 @@
     </appender>
 
     <appender name="FILE" class="ch.qos.logback.core.rolling.RollingFileAppender">
-        <file>./logs/rest.log</file>
+        <file>./logs/crawler.log</file>
         <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
             <!-- daily rollover. Make sure the path matches the one in the file element or else
              the rollover logs are placed in the working directory. -->
-            <fileNamePattern>./logs/rest_%d{yyyy-MM-dd}.%i.log</fileNamePattern>
+            <fileNamePattern>./logs/crawler_%d{yyyy-MM-dd}.%i.log</fileNamePattern>
 
             <timeBasedFileNamingAndTriggeringPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedFNATP">
                 <maxFileSize>20MB</maxFileSize>
@@ -29,7 +29,7 @@
 
     <logger name="com.eb" level="debug"
             additivity="false">
-        <appender-ref ref="STDOUT"/>
+        <!--<appender-ref ref="STDOUT"/>-->
         <appender-ref ref="FILE"/>
     </logger>
 
@@ -39,7 +39,7 @@
     </logger>
 
     <root level="info">
-        <appender-ref ref="STDOUT"/>
+        <!--<appender-ref ref="STDOUT"/>-->
         <appender-ref ref="FILE"/>
     </root>
 

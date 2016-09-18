@@ -18,13 +18,12 @@ class CurrentGameDTO(val matchId: Long) {
   def toMatch(): Match = {
     val matchBean = new Match
     matchBean.setMatchId(basicInfo.matchId)
-    matchBean.setDuration(basicInfo.duration)
+    matchBean.setDuration(basicInfo.getDuration())
     matchBean.setSeriesType(basicInfo.seriesType.name())
     matchBean.setDireTeam(direTeam.toTeamBean())
     matchBean.setRadiantTeam(radiantTeam.toTeamBean())
     matchBean.setLeague(new LeagueBean(basicInfo.league.leagueId, basicInfo.league.name))
-    matchBean.setRadiantScore(basicInfo.radiantScore)
-    matchBean.setDireScore(basicInfo.direScore)
+    matchBean.setMatchScore(basicInfo.getMatchScore())
     matchBean.setNetworth(scala.collection.JavaConversions.seqAsJavaList(netWorth.netWorth.map(new Double(_))))
     matchBean.setGameNumber(basicInfo.radiantWin + basicInfo.direWin + 1)
     matchBean.setRadianBans(radiantTeam.bans.map(h => new HeroBean(h.id, h.name)))

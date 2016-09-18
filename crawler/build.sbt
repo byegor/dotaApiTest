@@ -11,6 +11,4 @@ libraryDependencies ++= Seq(
 )
 
 
-assemblyJarName in assembly := "crawler.jar"
-
-//mainClass in assembly := Some("egor.dota.harvester.HarvesterStarter") project crawler
+mainClass in assembly := Some("com.eb.schedule.CrawlerStarter")

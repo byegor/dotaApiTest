@@ -42,8 +42,7 @@ class LeagueCrawler @Inject()(leagueService: LeagueService, taskService: UpdateT
 
 
   def parseName(name: String): String = {
-    name
-    //    name.replace("item_", "").replace("_", " ")
+        name.replace("#DOTA_Item_", "").replace("_", " ")
   }
 
 
