@@ -22,7 +22,7 @@ object ItemImageGrabber extends App {
   private val itemServiceImpl: ItemService = injector.getInstance(classOf[ItemService])
   private val items: Seq[ItemDTO] = Await.result(itemServiceImpl.findAll(), Duration.Inf).filter(_.itemId != 0).filter(!_.name.contains("recipe"))
   for (item <- items) {
-    fileDownloader("http://media.steampowered.com/apps/dota2/images/items/" + item.name.replace("item_","") + "_eg.png", "i_" + item.itemId + ".png")
+    fileDownloader("http://media.steampowered.com/apps/dota2/images/items/" + item.name.replace("item_","") + "_lg.png", "i_" + item.itemId + ".png")
   }
 
   def fileDownloader(url: String, filename: String) = {

@@ -1,5 +1,6 @@
-package com.eb.schedule;
+package com.eb.schedule.rest;
 
+import com.eb.schedule.TeamImageUtils;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -14,21 +15,21 @@ import java.io.IOException;
  * Created by Egor on 14.06.2016.
  */
 @RestController
-public class ImageController {
+public class TeamImageController {
 
-    @Value("${imageFolder:f:/nginx-1.11.1/image}")
+    @Value("${teamImageFolder:f:/nginx-1.11.1/image/team}")
     String imageFolder;
 
-    private ImageUtils imageUtils;
+    private TeamImageUtils teamImageUtils;
 
 
     @PostConstruct
     public void init() throws IOException {
-        imageUtils = new ImageUtils(imageFolder);
+        teamImageUtils = new TeamImageUtils(imageFolder);
     }
 
-    @RequestMapping(value = "/image/{id}", method = RequestMethod.GET, produces = MediaType.IMAGE_JPEG_VALUE)
+    @RequestMapping(value = "/image/team/{id}.png", method = RequestMethod.GET, produces = MediaType.IMAGE_JPEG_VALUE)
     public byte[] image(@PathVariable("id") String id) {
-        return imageUtils.getImage(id);
+        return teamImageUtils.getImage(id);
     }
 }

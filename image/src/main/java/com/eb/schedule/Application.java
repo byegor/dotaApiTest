@@ -16,6 +16,8 @@ import java.util.concurrent.TimeUnit;
  * Created by Egor on 14.06.2016.
  */
 //todo logback via maven
+    //todo duplicates in image service
+    //todo support hero
 @SpringBootApplication
 public class Application {
 

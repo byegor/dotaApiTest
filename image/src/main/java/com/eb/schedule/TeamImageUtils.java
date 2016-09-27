@@ -20,9 +20,9 @@ import java.util.concurrent.TimeUnit;
 /**
  * Created by Egor on 14.06.2016.
  */
-public class ImageUtils {
+public class TeamImageUtils {
 
-    private final Logger logger = LoggerFactory.getLogger(ImageUtils.class);
+    private final Logger logger = LoggerFactory.getLogger(TeamImageUtils.class);
 
     private static final String GET_TEAM_LOGO = "http://api.steampowered.com/ISteamRemoteStorage/GetUGCFileDetails/v1/?key=9EBD51CD27F27324F1554C53BEDA17C3&appid=570&ugcid=";
 
@@ -39,7 +39,7 @@ public class ImageUtils {
                         }
                     });
 
-    public ImageUtils(String dataFolder) throws IOException {
+    public TeamImageUtils(String dataFolder) throws IOException {
         this.dataFolder = dataFolder;
         this.defaultImage = getDefaultImage(dataFolder);
     }

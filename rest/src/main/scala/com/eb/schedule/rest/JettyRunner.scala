@@ -19,6 +19,8 @@ object JettyRunner extends App {
   val context = new WebAppContext()
   context setContextPath "/"
   context.setInitParameter(ScalatraListener.LifeCycleKey, "com.eb.schedule.rest.ScalatraBootstrap")
+
+  val webDir = getClass.getClassLoader.getResource("src/main/webapp").toExternalForm
   context.setResourceBase("src/main/webapp")
   context.addEventListener(new ScalatraListener)
   context.addServlet(classOf[DefaultServlet], "/")
