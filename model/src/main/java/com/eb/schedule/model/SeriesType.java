@@ -4,7 +4,7 @@ package com.eb.schedule.model;
  * Created by Egor on 13.02.2016.
  */
 public enum SeriesType {
-    NO_SERIES((byte) 0, 1),
+    BO1((byte) 0, 1),
     BO2((byte) 11, 2),
     BO3((byte) 1, 3),
     BO5((byte) 2, 5);
@@ -27,7 +27,7 @@ public enum SeriesType {
             case 11:
                 return BO2;
             default:
-                return NO_SERIES;
+                return BO1;
         }
     }
 }

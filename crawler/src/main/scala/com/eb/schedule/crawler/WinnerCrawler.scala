@@ -32,7 +32,7 @@ class WinnerCrawler @Inject()(seriesService: SeriesService, scheduledGameService
       val result: JsonObject = response.getAsJsonObject("result")
       if (result != null && !result.has("error")) {
         val radiantWin: Boolean = result.get("radiant_win").getAsBoolean
-        if (SeriesType.NO_SERIES == game.seriesType) {
+        if (SeriesType.BO1 == game.seriesType) {
           series.radiantWin = Some(radiantWin)
         } else {
           if (result.has("radiant_team_id")) {

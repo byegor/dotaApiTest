@@ -53,7 +53,7 @@ class MatchDTO {
   def getDuration() = {
     val minutes: Int = duration / 60
     val seconds: Int = duration - minutes * 60
-    minutes + ":" + seconds
+    minutes + ":" + String.format("%02d", seconds)
   }
 
 }
