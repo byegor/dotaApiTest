@@ -1,17 +1,26 @@
 package com.eb.schedule
 
+import javax.xml.datatype.DatatypeConstants
+
 import com.eb.schedule.cache._
-import com.eb.schedule.dto.{PlayerDTO, TeamDTO}
+import com.eb.schedule.dto.{NetWorthDTO, PlayerDTO, TeamDTO}
 import com.eb.schedule.model.SeriesType
 import com.eb.schedule.model.slick.MatchSeries
+import com.eb.schedule.services.NetWorthService
 import com.google.gson.{JsonArray, JsonObject}
 import com.google.inject.Inject
+
+import scala.concurrent.duration.Duration
+import scala.concurrent.{Await, Future}
 
 
 /**
   * Created by Egor on 02.05.2016.
   */
-class MatchParser @Inject()(teamCache: TeamCache, leagueCache: LeagueCache, playerCache: PlayerCache, heroCache: HeroCache, itemCache: ItemCache) {
+//todo add series type
+//todo net worth
+//todo correct player names
+class MatchParser @Inject()(teamCache: TeamCache, leagueCache: LeagueCache, playerCache: PlayerCache, heroCache: HeroCache, itemCache: ItemCache, netWorthService: NetWorthService) {
 
 
   def parseMatch(jsonObject: JsonObject): MatchDTO = {
@@ -84,6 +93,11 @@ class MatchParser @Inject()(teamCache: TeamCache, leagueCache: LeagueCache, play
       matchDetails.direScore = json.get("dire_score").getAsByte
 
       matchDetails.league = leagueCache.getLeague(json.get("leagueid").getAsInt)
+      val netWorthFuture: Future[Option[NetWorthDTO]] = netWorthService.findByMatchId(matchDetails.matchId)
+      val result: Option[NetWorthDTO] = Await.result(netWorthFuture, Duration.apply(5, "second"))
+      if(result.isDefined){
+        matchDetails.netWorth = result.get
+      }
       this
     }
 

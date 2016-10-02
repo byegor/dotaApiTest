@@ -1,9 +1,11 @@
 package com.eb.schedule.shared.bean;
 
+import java.io.Serializable;
+
 /**
  * Created by Egor on 07.07.2016.
  */
-public class Item {
+public class Item  implements Serializable {
 
     private int id;
     private String name;

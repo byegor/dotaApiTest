@@ -1,11 +1,12 @@
 package com.eb.schedule.shared.bean;
 
+import java.io.Serializable;
 import java.util.List;
 
 /**
  * Created by Egor on 06.07.2016.
  */
-public class Player {
+public class Player implements Serializable{
     int accountId;
     String name;
     HeroBean hero;

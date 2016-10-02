@@ -141,10 +141,12 @@ class LiveGameHelper @Inject()(val heroCache: HeroCache, val itemCache: ItemCach
         team.picks ::= heroCache.getHero(heroId)
       }
       val bans: JsonArray = scoreboard.getAsJsonArray("bans")
-      for (i <- 0 until bans.size()) {
-        val ban: JsonObject = bans.get(i).getAsJsonObject
-        val heroId: Int = ban.get("hero_id").getAsInt
-        team.picks ::= heroCache.getHero(heroId)
+      if (bans != null) {
+        for (i <- 0 until bans.size()) {
+          val ban: JsonObject = bans.get(i).getAsJsonObject
+          val heroId: Int = ban.get("hero_id").getAsInt
+          team.bans ::= heroCache.getHero(heroId)
+        }
       }
     }
   }
