@@ -16,6 +16,7 @@ import scala.sys.process._
 /**
   * Created by Egor on 24.06.2016.
   */
+  //todo get hero instane
 object HeroImageGrabber extends App {
 
 
