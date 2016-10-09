@@ -15,6 +15,7 @@ import scala.concurrent.duration.Duration
 /**
   * Created by Egor on 04.06.2016.
   */
+//sort games by date and league tier
 trait ScheduleRestService {
   def getGameByDate(milliseconds: Long): List[GameBean]
 

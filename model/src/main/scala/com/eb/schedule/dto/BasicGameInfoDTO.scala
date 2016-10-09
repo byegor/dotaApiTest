@@ -20,8 +20,9 @@ case class BasicGameInfoDTO(matchId: Long) {
   var direWin: Byte = 0
 
   def getDuration() = {
-    val minutes: Long = TimeUnit.SECONDS.toMinutes(duration.toLong)
-    minutes + ":" + (duration % minutes)
+    val minutes: Int = duration.toInt / 60
+    val seconds: Int = duration.toInt - minutes * 60
+    minutes + ":" + "%02d".format(seconds)
   }
 
   def getMatchScore() = {
