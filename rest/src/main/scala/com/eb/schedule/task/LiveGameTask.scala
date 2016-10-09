@@ -52,10 +52,12 @@ class LiveGameTask @Inject()(val liveGameHelper: LiveGameHelper, val netWorthSer
           gameService.insertAndGet(scheduledGameDTO).onSuccess {
             case gameId =>
               seriesService.insertOrUpdate(new SeriesDTO(gameId, current.matchId, (current.basicInfo.radiantWin + current.basicInfo.direWin + 1).toByte, None, false, scheduledGameDTO.radiantTeam.id))
+              current.scheduledGameId = gameId;
           }
           log.debug("creating new scheduled game: " + scheduledGameDTO)
         } else {
           val gameDTO: ScheduledGameDTO = scheduledGame.get
+          current.scheduledGameId = gameDTO.id
           gameDTO.matchStatus = MatchStatus.LIVE
           gameService.update(gameDTO).onSuccess {
             case i => seriesService.insertOrUpdate(new SeriesDTO(gameDTO.id, current.matchId, (current.basicInfo.radiantWin + current.basicInfo.direWin + 1).toByte, None, false, gameDTO.radiantTeam.id))

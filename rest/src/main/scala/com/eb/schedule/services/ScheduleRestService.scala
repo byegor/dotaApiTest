@@ -44,18 +44,17 @@ class ScheduledRestServiceImpl @Inject()(scheduledGameService: ScheduledGameServ
   }
 
   override def getGameMatchesById(gameId: Int): Seq[Match] = {
+    val finishedMatches: Seq[Match] = getGamesMatches(gameId)
+
     val matchId: Option[Long] = GameContainer.getLiveMatchIdByScheduledGameId(gameId)
     if (matchId.isDefined) {
       val game: Option[CurrentGameDTO] = GameContainer.getLiveGame(matchId.get)
       if (game.isDefined) {
         val liveMatch: CurrentGameDTO = game.get
-        List(liveMatch.toMatch())
-      } else {
-        getGamesMatches(gameId)
+        return finishedMatches.toList ::: List(liveMatch.toMatch())
       }
-    } else {
-      getGamesMatches(gameId)
     }
+    finishedMatches
   }
 
   def getGamesMatches(gameId: Int): Seq[Match] = {
