@@ -9,11 +9,15 @@
     <version>0.1</version>
 
     <dependencies>
-        <!-- http://mvnrepository.com/artifact/com.google.code.gson/gson -->
         <dependency>
-            <groupId>com.google.code.gson</groupId>
-            <artifactId>gson</artifactId>
-            <version>2.6.2</version>
+            <groupId>com.fasterxml.jackson.core</groupId>
+            <artifactId>jackson-annotations</artifactId>
+            <version>2.8.3</version>
+        </dependency>
+        <dependency>
+            <groupId>com.fasterxml.jackson.core</groupId>
+            <artifactId>jackson-annotations</artifactId>
+            <version>2.6.6</version>
         </dependency>
     </dependencies>
 
