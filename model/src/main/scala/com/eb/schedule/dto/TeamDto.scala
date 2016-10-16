@@ -29,10 +29,6 @@ class TeamDTO(val id: Int) {
 
   override def toString = s"TeamDTO($id, $name)"
 
-  def toTeamBean(): TeamBean = {
-    val team: TeamBean = new TeamBean(id, name, tag, logo)
-    team.setPlayers(players.map(p => p.toPlayer()))
-    team
-  }
+  def toTeamBean: TeamBean = new TeamBean(id, name, tag, logo)
 
 }

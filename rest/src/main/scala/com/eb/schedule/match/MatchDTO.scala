@@ -1,8 +1,8 @@
 package com.eb.schedule
 
 import com.eb.schedule.dto.{LeagueDTO, NetWorthDTO, TeamDTO}
-import com.eb.schedule.model.SeriesType
-import com.eb.schedule.shared.bean.{HeroBean, LeagueBean, Match}
+import com.eb.schedule.shared.bean.{HeroBean, Match}
+
 import scala.collection.JavaConversions._
 
 /**
@@ -11,7 +11,6 @@ import scala.collection.JavaConversions._
 class MatchDTO {
   var matchId: Long = _
   var startTime: Long = _
-  //  var seriesType: SeriesType = _
   var duration: Int = 0
   var radiantWin: Boolean = _
 
@@ -31,16 +30,14 @@ class MatchDTO {
     val matchBean = new Match()
     matchBean.setMatchId(matchId)
     matchBean.setStartTime(startTime)
-    //    matchBean.setSeriesType(seriesType.name())
     matchBean.setDuration(getDuration())
-    matchBean.setRadiantWin(radiantWin)
-    matchBean.setRadiantTeam(radiantTeam.toTeamBean())
-    matchBean.setDireTeam(direTeam.toTeamBean())
-    matchBean.setLeague(new LeagueBean(league.leagueId, league.name))
+    matchBean.setMatchStatus(if (radiantWin) 1 else 2)
+    matchBean.setRadiantTeam(radiantTeam.toTeamBean)
+    matchBean.setDireTeam(direTeam.toTeamBean)
     matchBean.setMatchScore(radiantScore + " - " + direScore)
 
     if (netWorth != null) {
-      matchBean.setNetworth(scala.collection.JavaConversions.seqAsJavaList(netWorth.netWorth.map(new java.lang.Double(_))))
+      matchBean.setNetworth(scala.collection.JavaConversions.seqAsJavaList(netWorth.netWorth.map(new java.lang.Integer(_))))
     }
     matchBean.setGameNumber(gameNumber)
     matchBean.setRadianBans(radiantTeam.bans.map(h => new HeroBean(h.id, h.name)))

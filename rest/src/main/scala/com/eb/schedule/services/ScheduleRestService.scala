@@ -1,11 +1,18 @@
 package com.eb.schedule.services
 
+import java.text.SimpleDateFormat
+import java.time.LocalDate
+import java.time.temporal.TemporalField
+import java.util.Date
+
 import com.eb.schedule.cache.{CacheHelper, CachedTeam}
 import com.eb.schedule.dto._
 import com.eb.schedule.live.GameContainer
 import com.eb.schedule.model.services.ScheduledGameService
 import com.eb.schedule.shared.bean.{GameBean, LeagueBean, Match, TeamBean}
 import com.google.inject.Inject
+import org.joda.time.format.{DateTimeFormat, DateTimeFormatter}
+import org.joda.time.{DateTime, DateTimeZone}
 import org.slf4j.LoggerFactory
 
 import scala.collection.mutable.ListBuffer
@@ -17,7 +24,7 @@ import scala.concurrent.duration.Duration
   */
 //sort games by date and league tier
 trait ScheduleRestService {
-  def getGameByDate(milliseconds: Long): List[GameBean]
+  def getGameByDate(milliseconds: Long): Map[Long, Seq[GameBean]]
 
   def getGameMatchesById(gameId: Int): Seq[Match]
 
@@ -27,10 +34,13 @@ trait ScheduleRestService {
 class ScheduledRestServiceImpl @Inject()(scheduledGameService: ScheduledGameService, seriesService: SeriesService, cacheHelper: CacheHelper) extends ScheduleRestService {
 
   private val log = LoggerFactory.getLogger(this.getClass)
+  private val formatter = new SimpleDateFormat("EEE, d MMM")
+  val dtf = DateTimeFormat.forPattern("MM/dd/yyyy HH:mm:ss");
 
-  def getGameByDate(milliseconds: Long): List[GameBean] = {
-    val games: ListBuffer[GameBean] = new ListBuffer[GameBean];
-    val gamesBetweenDate: Map[ScheduledGameDTO, Seq[Option[SeriesDTO]]] = Await.result(scheduledGameService.getGamesBetweenDate(milliseconds), Duration.Inf)
+
+  def getGameByDate(milliseconds: Long): Map[Long, Seq[GameBean]] = {
+    val games: ListBuffer[GameBean] = new ListBuffer[GameBean]
+    val gamesBetweenDate: Map[ScheduledGameDTO, Seq[Option[SeriesDTO]]] = Await.result(scheduledGameService.getGamesForLastTwoDays(milliseconds), Duration.Inf)
     for ((game, matches) <- gamesBetweenDate) {
       val radiantTeam: CachedTeam = cacheHelper.getTeam(game.radiantTeam.id)
       val direTeam: CachedTeam = cacheHelper.getTeam(game.direTeam.id)
@@ -38,10 +48,18 @@ class ScheduledRestServiceImpl @Inject()(scheduledGameService: ScheduledGameServ
       val gameBean = new GameBean(game.id, game.startDate.getTime, new TeamBean(radiantTeam.id, radiantTeam.name, radiantTeam.tag, radiantTeam.logo),
         new TeamBean(direTeam.id, direTeam.name, direTeam.tag, direTeam.logo), new LeagueBean(league.leagueId, league.leagueName), game.seriesType.name(), 0, 0, game.matchStatus.status)
       matches.filter(option => option.isDefined).map(option => option.get)
-        .filter(matches => matches.radiantWin.isDefined).foreach(matches => if (matches.radiantWin.get) gameBean.radiantWin = gameBean.radiantWin + 1 else gameBean.direWin = gameBean.direWin + 1)
+        .filter(matches => matches.radiantWin.isDefined).foreach(matches =>
+        if (matches.radiantWin.get) gameBean.setRadiantWin(gameBean.radiantWin + 1) else gameBean.setDireWin(gameBean.direWin + 1)
+      )
       games += gameBean
     }
-    games.toList
+
+    val by: Map[Long, ListBuffer[GameBean]] = games.groupBy(g => getMillisInUTC(g.startTime))
+    by
+  }
+
+  def getMillisInUTC(mil: Long): Long = {
+    new DateTime().withMillis(mil).withZone(DateTimeZone.UTC).withTimeAtStartOfDay().getMillis
   }
 
   override def getGameMatchesById(gameId: Int): Seq[Match] = {

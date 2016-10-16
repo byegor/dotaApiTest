@@ -1,6 +1,7 @@
 package com.eb.schedule.model.services
 
 import java.sql.Timestamp
+import java.text.SimpleDateFormat
 import java.util.concurrent.TimeUnit
 import java.util.{Calendar, Date}
 
@@ -44,7 +45,7 @@ trait ScheduledGameService {
 
   def getScheduledGamesByStatus(matchStatus: MatchStatus): Future[Seq[ScheduledGameDTO]]
 
-  def getGamesBetweenDate(millis: Long): Future[Map[ScheduledGameDTO, Seq[Option[SeriesDTO]]]]
+  def getGamesForLastTwoDays(millis: Long): Future[Map[ScheduledGameDTO, Seq[Option[SeriesDTO]]]]
 }
 
 
@@ -110,13 +111,14 @@ class ScheduledGameServiceImpl @Inject()(repository: ScheduledGameRepository) ex
     repository.getScheduledGamesByStatus(matchStatus).map(f => f.map(game => DTOUtils.crateDTO(game)))
   }
 
-  def getGamesBetweenDate(millis: Long): Future[Map[ScheduledGameDTO, Seq[Option[SeriesDTO]]]] = {
+  def getGamesForLastTwoDays(millis: Long): Future[Map[ScheduledGameDTO, Seq[Option[SeriesDTO]]]] = {
     val c = Calendar.getInstance()
     c.setTimeInMillis(millis)
     c.set(Calendar.HOUR_OF_DAY, 0)
     c.set(Calendar.MINUTE, 0)
+    c.add(Calendar.DAY_OF_YEAR, -1)
     val start = c.getTimeInMillis
-    c.add(Calendar.DAY_OF_YEAR, 1)
+    c.add(Calendar.DAY_OF_YEAR, 2)
     val end = c.getTimeInMillis
 
 

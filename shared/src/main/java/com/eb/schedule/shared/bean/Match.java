@@ -27,7 +27,7 @@ public class Match implements Serializable {
     @JsonProperty("msc")
     private String matchScore;
     @JsonProperty("nw")
-    private List<Double> networth;
+    private List<Integer> networth;
 
     @JsonProperty("gn")
     private int gameNumber;
@@ -101,11 +101,11 @@ public class Match implements Serializable {
         this.matchScore = matchScore;
     }
 
-    public List<Double> getNetworth() {
+    public List<Integer> getNetworth() {
         return networth;
     }
 
-    public void setNetworth(List<Double> networth) {
+    public void setNetworth(List<Integer> networth) {
         this.networth = networth;
     }
 

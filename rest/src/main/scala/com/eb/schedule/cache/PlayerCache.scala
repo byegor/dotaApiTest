@@ -18,7 +18,6 @@ import scala.concurrent.duration.Duration
 /**
   * Created by Egor on 26.03.2016.
   */
-//todo set player name
 class PlayerCache @Inject()(val teamService: TeamService, taskService: UpdateTaskService, httpUtils: HttpUtils) {
 
   private val log = LoggerFactory.getLogger(this.getClass)
@@ -29,7 +28,7 @@ class PlayerCache @Inject()(val teamService: TeamService, taskService: UpdateTas
 
 
   private val cache: LoadingCache[Int, String] = CacheBuilder.newBuilder()
-    .expireAfterAccess(4, TimeUnit.HOURS)
+    .expireAfterAccess(6, TimeUnit.HOURS)
     .maximumSize(2000)
     .build(new CacheLoader[Int, String]() {
       def load(id: Int): String = {

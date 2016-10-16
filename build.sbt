@@ -1,5 +1,5 @@
 
-scalaVersion in ThisBuild := "2.11.7"
+scalaVersion in ThisBuild := "2.11.8"
 
 scalacOptions in ThisBuild ++= Seq(
   "-deprecation",
@@ -21,6 +21,7 @@ libraryDependencies in ThisBuild ++= Seq(
   "ch.qos.logback" % "logback-core" % "1.1.3",
   "ch.qos.logback" % "logback-classic" % "1.1.3",
 
+  "com.fasterxml.jackson.core" % "jackson-annotations" % "2.8.3",
   "com.eb.schedule" % "shared" % "0.1"
 )
 

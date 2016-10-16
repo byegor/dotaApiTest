@@ -17,9 +17,6 @@ import scala.concurrent.{Await, Future}
 /**
   * Created by Egor on 02.05.2016.
   */
-//todo add series type
-//todo net worth
-//todo correct player names
 class MatchParser @Inject()(teamCache: TeamCache, leagueCache: LeagueCache, playerCache: PlayerCache, heroCache: HeroCache, itemCache: ItemCache, netWorthService: NetWorthService) {
 
 
