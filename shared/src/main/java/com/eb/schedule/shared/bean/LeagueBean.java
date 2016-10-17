@@ -15,6 +15,9 @@ public class LeagueBean implements Serializable {
     @JsonProperty("n")
     public String name;
 
+    public LeagueBean() {
+    }
+
     public LeagueBean(int id, String name) {
         this.id = id;
         this.name = name;

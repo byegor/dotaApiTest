@@ -37,6 +37,9 @@ public class GameBean implements Serializable {
     @JsonProperty("gs")
     public int gameStatus;
 
+    public GameBean() {
+    }
+
     public GameBean(int id, Long startTime, TeamBean radiant, TeamBean dire, LeagueBean league, String seriesType, int radiantWin, int direWin, int gameStatus) {
         this.id = id;
         this.startTime = startTime;

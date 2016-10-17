@@ -15,6 +15,9 @@ public class HeroBean implements Serializable{
     @JsonProperty("n")
     private String name;
 
+    public HeroBean() {
+    }
+
     public HeroBean(int id, String name) {
         this.id = id;
         this.name = name;

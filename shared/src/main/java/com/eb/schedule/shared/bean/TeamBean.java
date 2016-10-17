@@ -25,6 +25,9 @@ public class TeamBean implements Serializable {
     @JsonProperty("p")
     private List<Player> players;
 
+    public TeamBean() {
+    }
+
     public TeamBean(int id, String name, String tag, long logo) {
         this.id = id;
         this.name = name;
