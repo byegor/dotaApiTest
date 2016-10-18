@@ -35,6 +35,14 @@ public class TeamBean implements Serializable {
         this.logo = "" + logo;
     }
 
+    public TeamBean(int id, String name, String tag, long logo, List<Player> players) {
+        this.id = id;
+        this.name = name;
+        this.tag = tag;
+        this.logo = "" + logo;
+        this.players = players;
+    }
+
     @Override
     public String toString() {
         final StringBuffer sb = new StringBuffer("TeamBean{");
