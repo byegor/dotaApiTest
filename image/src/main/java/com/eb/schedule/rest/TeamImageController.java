@@ -28,7 +28,7 @@ public class TeamImageController {
         teamImageUtils = new TeamImageUtils(imageFolder);
     }
 
-    @RequestMapping(value = "/image/team/{id}.png", method = RequestMethod.GET, produces = MediaType.IMAGE_JPEG_VALUE)
+    @RequestMapping(value = "/image/team/{id}", method = RequestMethod.GET, produces = MediaType.IMAGE_JPEG_VALUE)
     public byte[] image(@PathVariable("id") String id) {
         return teamImageUtils.getImage(id);
     }
