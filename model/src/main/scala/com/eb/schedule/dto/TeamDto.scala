@@ -29,6 +29,6 @@ class TeamDTO(val id: Int) {
 
   override def toString = s"TeamDTO($id, $name)"
 
-  def toTeamBean: TeamBean = new TeamBean(id, name, tag, logo)
+  def toTeamBean: TeamBean = new TeamBean(id, name, tag, logo, seqAsJavaList(players.map(p => p.toPlayer())))
 
 }
