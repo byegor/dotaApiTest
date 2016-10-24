@@ -10,8 +10,9 @@ import com.eb.schedule.services.NetWorthService
 import com.google.gson.{JsonArray, JsonObject}
 import com.google.inject.Inject
 
-import scala.concurrent.duration.Duration
+import scala.concurrent.duration.DurationInt
 import scala.concurrent.{Await, Future}
+import scala.concurrent.ExecutionContext.Implicits.global
 
 
 /**
@@ -27,9 +28,10 @@ class MatchParser @Inject()(teamCache: TeamCache, leagueCache: LeagueCache, play
 
   private class MatchBuilder(json: JsonObject) {
     val matchDetails = new MatchDTO()
-
+    var playerFuture: Future[Unit] = _
 
     def buildMatch(): MatchDTO = {
+      Await.result(playerFuture, 5 second)
       matchDetails
     }
 
@@ -55,20 +57,24 @@ class MatchParser @Inject()(teamCache: TeamCache, leagueCache: LeagueCache, play
 
     def addMatchPlayers() = {
       val playersList: JsonArray = json.get("players").getAsJsonArray
-      for (i <- 0 until playersList.size()) {
-        val player: JsonObject = playersList.get(i).getAsJsonObject
-        val accountId: Int = player.get("account_id").getAsInt
-        val playerDTO = new PlayerDTO(accountId)
-        playerDTO.name = playerCache.getPlayerName(accountId)
+      playerFuture = Future {
+        for (i <- 0 until playersList.size()) {
+          Future {
+            val player: JsonObject = playersList.get(i).getAsJsonObject
+            val accountId: Int = player.get("account_id").getAsInt
+            val playerDTO = new PlayerDTO(accountId)
+            playerDTO.name = playerCache.getPlayerName(accountId)
 
-        val heroId: Int = player.get("hero_id").getAsInt
-        playerDTO.hero = heroCache.getHero(heroId)
+            val heroId: Int = player.get("hero_id").getAsInt
+            playerDTO.hero = heroCache.getHero(heroId)
 
-        parseKDA(player, playerDTO)
-        parseItem(player, playerDTO)
+            parseKDA(player, playerDTO)
+            parseItem(player, playerDTO)
 
-        val isRadiant = player.get("player_slot").getAsInt < 5
-        if (isRadiant) matchDetails.radiantTeam.players ::= playerDTO else matchDetails.direTeam.players ::= playerDTO
+            val isRadiant = player.get("player_slot").getAsInt < 5
+            if (isRadiant) matchDetails.radiantTeam.players ::= playerDTO else matchDetails.direTeam.players ::= playerDTO
+          }
+        }
       }
       this
     }
@@ -91,8 +97,8 @@ class MatchParser @Inject()(teamCache: TeamCache, leagueCache: LeagueCache, play
 
       matchDetails.league = leagueCache.getLeague(json.get("leagueid").getAsInt)
       val netWorthFuture: Future[Option[NetWorthDTO]] = netWorthService.findByMatchId(matchDetails.matchId)
-      val result: Option[NetWorthDTO] = Await.result(netWorthFuture, Duration.apply(5, "second"))
-      if(result.isDefined){
+      val result: Option[NetWorthDTO] = Await.result(netWorthFuture, 5 second)
+      if (result.isDefined) {
         matchDetails.netWorth = result.get
       }
       this

@@ -29,7 +29,7 @@ class ScheduledGameServiceImplTest extends RestBasicTest {
       scheduledGameService.insert(game2)
     }
     whenReady(precondition) { result =>
-      val games: Map[Long, Seq[GameBean]] = scheduledService.getGameByDate(now)
+      val games: Map[String, Seq[GameBean]] = scheduledService.getGameByDate(now)
       assert(1 == games.size)
       assert(1 == games.head._2.head.getId)
       assert(0 == games.head._2.head.radiantWin)
@@ -41,21 +41,21 @@ class ScheduledGameServiceImplTest extends RestBasicTest {
       seriesService.insert(new SeriesDTO(1, 100, 1, None, false, 36))
     }
     whenReady(startGame) { result =>
-      val games: Map[Long, Seq[GameBean]] = scheduledService.getGameByDate(now)
+      val games: Map[String, Seq[GameBean]] = scheduledService.getGameByDate(now)
       val seqGames: Seq[GameBean] = games.head._2
       assert(0 == seqGames.head.radiantWin)
       assert(0 == seqGames.head.direWin)
     }
 
     whenReady(seriesService.insert(new SeriesDTO(1, 200, 1, Some(true), true, 36))) { result =>
-      val games: Map[Long, Seq[GameBean]] = scheduledService.getGameByDate(now)
+      val games: Map[String, Seq[GameBean]] = scheduledService.getGameByDate(now)
       val seqGames: Seq[GameBean] = games.head._2
       assert(1 == seqGames.head.radiantWin)
       assert(0 == seqGames.head.direWin)
     }
 
     whenReady(seriesService.insert(new SeriesDTO(1, 300, 1, Some(false), true, 36))) { result =>
-      val games: Map[Long, Seq[GameBean]] = scheduledService.getGameByDate(now)
+      val games: Map[String, Seq[GameBean]] = scheduledService.getGameByDate(now)
       val seqGames: Seq[GameBean] = games.head._2
       assert(1 == seqGames.head.radiantWin)
       assert(1 == seqGames.head.direWin)
@@ -67,7 +67,7 @@ class ScheduledGameServiceImplTest extends RestBasicTest {
     }
 
     whenReady(finished) { result =>
-      val games: Map[Long, Seq[GameBean]] = scheduledService.getGameByDate(now)
+      val games: Map[String, Seq[GameBean]] = scheduledService.getGameByDate(now)
       val seqGames: Seq[GameBean] = games.head._2
       assert(2 == seqGames.head.radiantWin)
       assert(1 == seqGames.head.direWin)

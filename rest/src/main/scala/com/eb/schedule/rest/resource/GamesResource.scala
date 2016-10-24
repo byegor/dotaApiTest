@@ -21,7 +21,7 @@ class GamesResource(scheduleRestService: ScheduleRestService) extends ScalatraSe
   mapper.registerModule(DefaultScalaModule)
 
   get("/current") {
-    val games: Map[Long, Seq[GameBean]] = scheduleRestService.getGameByDate(new DateTime().getMillis)
+    val games: Map[String, Seq[GameBean]] = scheduleRestService.getGameByDate(new DateTime().getMillis)
     games.foreach(entry => entry._2.sortWith(_.gameStatus > _.gameStatus))
     mapper.writeValueAsString(games)
 

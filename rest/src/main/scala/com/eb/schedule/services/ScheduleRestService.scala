@@ -24,7 +24,7 @@ import scala.concurrent.duration.Duration
   */
 //sort games by date and league tier
 trait ScheduleRestService {
-  def getGameByDate(milliseconds: Long): Map[Long, Seq[GameBean]]
+  def getGameByDate(milliseconds: Long): Map[String, Seq[GameBean]]
 
   def getGameMatchesById(gameId: Int): Seq[Match]
 
@@ -34,13 +34,12 @@ trait ScheduleRestService {
 class ScheduledRestServiceImpl @Inject()(scheduledGameService: ScheduledGameService, seriesService: SeriesService, cacheHelper: CacheHelper) extends ScheduleRestService {
 
   private val log = LoggerFactory.getLogger(this.getClass)
-  private val formatter = new SimpleDateFormat("EEE, d MMM")
-  val dtf = DateTimeFormat.forPattern("MM/dd/yyyy HH:mm:ss");
+  val formatter = DateTimeFormat.forPattern("EEEE, d MMM")
 
 
-  def getGameByDate(milliseconds: Long): Map[Long, Seq[GameBean]] = {
+  def getGameByDate(milliseconds: Long): Map[String, Seq[GameBean]] = {
     val games: ListBuffer[GameBean] = new ListBuffer[GameBean]
-    val gamesBetweenDate: Map[ScheduledGameDTO, Seq[Option[SeriesDTO]]] = Await.result(scheduledGameService.getGamesForLastTwoDays(milliseconds), Duration.Inf)
+    val gamesBetweenDate: Map[ScheduledGameDTO, Seq[Option[SeriesDTO]]] = Await.result(scheduledGameService.getRecentGames(milliseconds), Duration.Inf)
     for ((game, matches) <- gamesBetweenDate) {
       val radiantTeam: CachedTeam = cacheHelper.getTeam(game.radiantTeam.id)
       val direTeam: CachedTeam = cacheHelper.getTeam(game.direTeam.id)
@@ -54,12 +53,12 @@ class ScheduledRestServiceImpl @Inject()(scheduledGameService: ScheduledGameServ
       games += gameBean
     }
 
-    val by: Map[Long, ListBuffer[GameBean]] = games.groupBy(g => getMillisInUTC(g.startTime))
+    val by: Map[String, ListBuffer[GameBean]] = games.groupBy(g => getMillisInUTC(g.startTime))
     by
   }
 
-  def getMillisInUTC(mil: Long): Long = {
-    new DateTime().withMillis(mil).withZone(DateTimeZone.UTC).withTimeAtStartOfDay().getMillis
+  def getMillisInUTC(mil: Long): String = {
+    formatter.print(new DateTime().withMillis(mil).withZone(DateTimeZone.UTC).withTimeAtStartOfDay().getMillis)
   }
 
   override def getGameMatchesById(gameId: Int): Seq[Match] = {

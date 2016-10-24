@@ -45,7 +45,7 @@ trait ScheduledGameService {
 
   def getScheduledGamesByStatus(matchStatus: MatchStatus): Future[Seq[ScheduledGameDTO]]
 
-  def getGamesForLastTwoDays(millis: Long): Future[Map[ScheduledGameDTO, Seq[Option[SeriesDTO]]]]
+  def getRecentGames(millis: Long): Future[Map[ScheduledGameDTO, Seq[Option[SeriesDTO]]]]
 }
 
 
@@ -111,15 +111,12 @@ class ScheduledGameServiceImpl @Inject()(repository: ScheduledGameRepository) ex
     repository.getScheduledGamesByStatus(matchStatus).map(f => f.map(game => DTOUtils.crateDTO(game)))
   }
 
-  def getGamesForLastTwoDays(millis: Long): Future[Map[ScheduledGameDTO, Seq[Option[SeriesDTO]]]] = {
+  def getRecentGames(millis: Long): Future[Map[ScheduledGameDTO, Seq[Option[SeriesDTO]]]] = {
     val c = Calendar.getInstance()
     c.setTimeInMillis(millis)
-    c.set(Calendar.HOUR_OF_DAY, 0)
-    c.set(Calendar.MINUTE, 0)
-    c.add(Calendar.DAY_OF_YEAR, -1)
+    c.add(Calendar.HOUR_OF_DAY, -24)
     val start = c.getTimeInMillis
-    c.add(Calendar.DAY_OF_YEAR, 2)
-    val end = c.getTimeInMillis
+    val end = millis + TimeUnit.SECONDS.toMillis(10)
 
 
     val gamesByDate: Future[Seq[(ScheduledGame, Option[MatchSeries])]] = repository.getGamesBetweenDate(new Timestamp(start), new Timestamp(end))

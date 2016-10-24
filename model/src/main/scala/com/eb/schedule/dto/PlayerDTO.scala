@@ -18,6 +18,7 @@ class PlayerDTO(val accountId: Int) {
 
   def toPlayer(): Player = {
     val player = new Player
+    player.setAccountId(accountId)
     player.setName(name)
     player.setHero(new HeroBean(hero.id, hero.name))
 
