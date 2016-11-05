@@ -23,7 +23,6 @@ import scala.concurrent.duration.Duration
 /**
   * Created by Egor on 04.06.2016.
   */
-//todo sort games by date and league tier
 //todo add endpoint to display all maps
 //todo don't include games in LiveGameContainer if there is no pick
 

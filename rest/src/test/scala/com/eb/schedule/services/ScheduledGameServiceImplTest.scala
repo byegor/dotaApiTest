@@ -6,15 +6,13 @@ import java.time.temporal.ChronoUnit
 
 import com.eb.schedule.RestBasicTest
 import com.eb.schedule.dto.{LeagueDTO, ScheduledGameDTO, SeriesDTO, TeamDTO}
-import com.eb.schedule.model.slick.ScheduledGame
 import com.eb.schedule.model.{MatchStatus, SeriesType}
 import com.eb.schedule.shared.bean.GameBean
 import org.joda.time.DateTime
-import org.scalatest.Ignore
 
-import scala.concurrent.{Await, Future}
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.duration.Duration
+import scala.concurrent.{Await, Future}
 
 /**
   * Created by Egor on 04.06.2016.
