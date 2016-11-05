@@ -14,7 +14,7 @@ import com.eb.schedule.services.{HeroService, NetWorthService, SeriesService}
 import com.google.inject.Guice
 import org.h2.jdbc.JdbcSQLException
 import org.scalatest.concurrent.ScalaFutures
-import org.scalatest.{BeforeAndAfter, FunSuite}
+import org.scalatest.{BeforeAndAfter, BeforeAndAfterEach, FunSuite}
 import org.slf4j.LoggerFactory
 
 import scala.concurrent.Await
@@ -25,7 +25,7 @@ import scala.concurrent.ExecutionContext.Implicits.global
 /**
   * Created by Egor on 20.02.2016.
   */
-abstract class BasicTest extends FunSuite with BeforeAndAfter with ScalaFutures {
+abstract class BasicTest extends FunSuite with BeforeAndAfterEach with ScalaFutures {
   private val log = LoggerFactory.getLogger(this.getClass)
   val injector = Guice.createInjector(new H2Module, new CoreModule)
   val db = injector.getInstance(classOf[DB]).db
@@ -55,20 +55,7 @@ abstract class BasicTest extends FunSuite with BeforeAndAfter with ScalaFutures 
     }
   }
 
-//  before {
-//    try {
-//      Await.result(db.run(DBIO.seq(
-//        League.table += new League(4210, ""),
-//        Team.table += new Team(36, "", "", -1),
-//        Team.table += new Team(1838315, "", "", -1)
-//      ).transactionally
-//      ), Duration.Inf)
-//    } catch {
-//      case e: JdbcSQLException => println("ignore: " + e.getMessage)
-//    }
-//  }
-
-  after {
+  override def beforeEach() {
     Await.result(db.run(DBIO.seq(
       NetWorth.table.delete,
       MatchSeries.table.delete,

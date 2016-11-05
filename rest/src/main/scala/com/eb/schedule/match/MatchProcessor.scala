@@ -31,10 +31,7 @@ class MatchProcessor @Inject()(matchParser: MatchParser, val httpUtils: HttpUtil
     if (result.has("error")) {
       None
     } else {
-      log.info("parse:" + System.currentTimeMillis())
-      val someO: Some[MatchDTO] = Some(matchParser.parseMatch(result))
-      log.info("endparse:" + System.currentTimeMillis())
-      someO
+      Some(matchParser.parseMatch(result))
     }
   }
 

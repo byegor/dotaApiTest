@@ -1,37 +1,35 @@
 package com.eb.schedule
 
-import javax.xml.datatype.DatatypeConstants
-
 import com.eb.schedule.cache._
 import com.eb.schedule.dto.{NetWorthDTO, PlayerDTO, TeamDTO}
-import com.eb.schedule.model.SeriesType
-import com.eb.schedule.model.slick.MatchSeries
 import com.eb.schedule.services.NetWorthService
 import com.google.gson.{JsonArray, JsonObject}
 import com.google.inject.Inject
+import org.slf4j.LoggerFactory
 
+import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.duration.DurationInt
 import scala.concurrent.{Await, Future}
-import scala.concurrent.ExecutionContext.Implicits.global
 
 
 /**
   * Created by Egor on 02.05.2016.
   */
 class MatchParser @Inject()(teamCache: TeamCache, leagueCache: LeagueCache, playerCache: PlayerCache, heroCache: HeroCache, itemCache: ItemCache, netWorthService: NetWorthService) {
+  private val log = LoggerFactory.getLogger(this.getClass)
 
 
   def parseMatch(jsonObject: JsonObject): MatchDTO = {
-    new MatchBuilder(jsonObject).addBasicInfo().parseTeams().addBuildingStatus().addMatchPicks().addMatchPlayers().buildMatch()
+    new MatchBuilder(jsonObject).parseTeams().addMatchPlayers().addBasicInfo().addBuildingStatus().addMatchPicks().buildMatch()
   }
 
 
   private class MatchBuilder(json: JsonObject) {
     val matchDetails = new MatchDTO()
-    var playerFuture: Future[Unit] = _
+    var playerFuture: List[Future[Unit]] = Nil
 
     def buildMatch(): MatchDTO = {
-      Await.result(playerFuture, 5 second)
+      Await.result(Future.sequence(playerFuture), 10 second)
       matchDetails
     }
 
@@ -57,9 +55,9 @@ class MatchParser @Inject()(teamCache: TeamCache, leagueCache: LeagueCache, play
 
     def addMatchPlayers() = {
       val playersList: JsonArray = json.get("players").getAsJsonArray
-      playerFuture = Future {
+
         for (i <- 0 until playersList.size()) {
-          Future {
+          playerFuture ::= Future {
             val player: JsonObject = playersList.get(i).getAsJsonObject
             val accountId: Int = player.get("account_id").getAsInt
             val playerDTO = new PlayerDTO(accountId)
@@ -74,7 +72,6 @@ class MatchParser @Inject()(teamCache: TeamCache, leagueCache: LeagueCache, play
             val isRadiant = player.get("player_slot").getAsInt < 5
             if (isRadiant) matchDetails.radiantTeam.players ::= playerDTO else matchDetails.direTeam.players ::= playerDTO
           }
-        }
       }
       this
     }
@@ -122,6 +119,7 @@ class MatchParser @Inject()(teamCache: TeamCache, leagueCache: LeagueCache, play
     }
 
     def parseTeam(id: String, teamName: String, teamLogo: String) = {
+      try{
       val teamId: Int = json.get(id).getAsInt
       val cachedTeam: CachedTeam = teamCache.getTeam(teamId)
       if (cachedTeam.name != "") {
@@ -135,6 +133,10 @@ class MatchParser @Inject()(teamCache: TeamCache, leagueCache: LeagueCache, play
         team.name = json.get(teamName).getAsString
         team.logo = json.get(teamLogo).getAsLong
         team
+      }
+    }catch {
+        case e: Throwable => log.error("Couldn't parse team, e")
+          new TeamDTO(-1)
       }
     }
   }

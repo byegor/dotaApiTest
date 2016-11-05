@@ -15,6 +15,7 @@ import org.joda.time.format.{DateTimeFormat, DateTimeFormatter}
 import org.joda.time.{DateTime, DateTimeZone}
 import org.slf4j.LoggerFactory
 
+import scala.collection.immutable.ListMap
 import scala.collection.mutable.ListBuffer
 import scala.concurrent.Await
 import scala.concurrent.duration.Duration
@@ -22,7 +23,10 @@ import scala.concurrent.duration.Duration
 /**
   * Created by Egor on 04.06.2016.
   */
-//sort games by date and league tier
+//todo sort games by date and league tier
+//todo add endpoint to display all maps
+//todo don't include games in LiveGameContainer if there is no pick
+
 trait ScheduleRestService {
   def getGameByDate(milliseconds: Long): Map[String, Seq[GameBean]]
 
@@ -53,12 +57,18 @@ class ScheduledRestServiceImpl @Inject()(scheduledGameService: ScheduledGameServ
       games += gameBean
     }
 
-    val by: Map[String, ListBuffer[GameBean]] = games.groupBy(g => getMillisInUTC(g.startTime))
-    by
+    val by: Map[Long, ListBuffer[GameBean]] = games.groupBy(g => getMillisInUTC(g.startTime))
+    val sortedByDays: ListMap[Long, ListBuffer[GameBean]] = ListMap(by.toSeq.sortWith(_._1 > _._1): _*)
+    sortedByDays.map { case (k, v) => formatter.print(k) -> v.sortBy(g =>  (g.gameStatus, -g.startTime)) }
   }
 
-  def getMillisInUTC(mil: Long): String = {
-    formatter.print(new DateTime().withMillis(mil).withZone(DateTimeZone.UTC).withTimeAtStartOfDay().getMillis)
+  def sortByStartDateAndMatchStatus(g1: GameBean, g2: GameBean) = {
+    g1.gameStatus < g2.gameStatus && g1.startTime < g2.startTime
+
+  }
+
+  def getMillisInUTC(mil: Long): Long = {
+    new DateTime().withMillis(mil).withZone(DateTimeZone.UTC).withTimeAtStartOfDay().getMillis
   }
 
   override def getGameMatchesById(gameId: Int): Seq[Match] = {
