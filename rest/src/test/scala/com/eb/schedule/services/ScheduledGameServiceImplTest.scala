@@ -9,6 +9,7 @@ import com.eb.schedule.dto.{LeagueDTO, ScheduledGameDTO, SeriesDTO, TeamDTO}
 import com.eb.schedule.model.{MatchStatus, SeriesType}
 import com.eb.schedule.shared.bean.GameBean
 import org.joda.time.DateTime
+import org.scalatest.Ignore
 
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.duration.Duration

@@ -60,9 +60,13 @@ class LiveGameHelper @Inject()(val heroCache: HeroCache, val itemCache: ItemCach
     currentGame.basicInfo.duration = scoreBoard.get("duration").getAsDouble
 
     val radiantScoreBoard: JsonObject = scoreBoard.get("radiant").getAsJsonObject
+    val radiantScore: Byte = radiantScoreBoard.get("score").getAsByte
+    currentGame.basicInfo.radiantScore = radiantScore
     currentGame.radiantTeam.players = parseDeepPlayerInfo(radiantScoreBoard.get("players").getAsJsonArray, playerInfo._1)
     fillWithPicks(radiantScoreBoard, currentGame.radiantTeam)
     val direScoreBoard: JsonObject = scoreBoard.get("dire").getAsJsonObject
+    val direScore: Byte = direScoreBoard.get("score").getAsByte
+    currentGame.basicInfo.direScore = direScore
     currentGame.direTeam.players = parseDeepPlayerInfo(direScoreBoard.get("players").getAsJsonArray, playerInfo._2)
     fillWithPicks(direScoreBoard, currentGame.direTeam)
   }
