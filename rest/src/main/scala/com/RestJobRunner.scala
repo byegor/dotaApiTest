@@ -2,14 +2,7 @@ package com
 
 import java.util.concurrent.{Executors, ScheduledExecutorService, TimeUnit}
 
-import com.eb.schedule.config.RestModule
-import com.eb.schedule.configure.{CoreModule, MysqlModule}
-import com.eb.schedule.task.LiveGameTask
-import com.eb.schedule.live.{LiveGameHelper, RestartProcessor}
-import com.eb.schedule.model.services.{LeagueService, ScheduledGameService, TeamService, UpdateTaskService}
-import com.eb.schedule.services.{ItemService, NetWorthService, SeriesService}
-import com.eb.schedule.utils.HttpUtils
-import com.google.inject.Guice
+import com.eb.schedule.config.RestLookup
 
 /**
   * Created by Egor on 18.04.2016.
@@ -18,12 +11,9 @@ object RestJobRunner {
   val executor: ScheduledExecutorService = Executors.newScheduledThreadPool(2)
 
   def start() = {
-    val injector = Guice.createInjector(new MysqlModule, new CoreModule, new RestModule)
-    Thread.sleep(2000)//have no idea now why it helps to start
-    val liveGameProcessor: LiveGameTask = injector.getInstance(classOf[LiveGameTask])
-    val restartProcessor: RestartProcessor = injector.getInstance(classOf[RestartProcessor])
-    restartProcessor.process()
-    executor.scheduleAtFixedRate(liveGameProcessor, 0, 60, TimeUnit.SECONDS)
+    Thread.sleep(2000) //have no idea now why it helps to start
+    RestLookup.restartProcessor.process()
+    executor.scheduleAtFixedRate(RestLookup.liveGameProcessor, 0, 60, TimeUnit.SECONDS)
   }
 
 

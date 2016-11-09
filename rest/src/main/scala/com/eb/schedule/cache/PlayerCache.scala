@@ -2,22 +2,18 @@ package com.eb.schedule.cache
 
 import java.util.concurrent.TimeUnit
 
-import com.eb.schedule.dto.TeamDTO
 import com.eb.schedule.exception.CacheItemNotFound
 import com.eb.schedule.model.services.{TeamService, UpdateTaskService}
-import com.eb.schedule.model.slick.{Team, UpdateTask}
 import com.eb.schedule.utils.HttpUtils
 import com.google.common.cache.{CacheBuilder, CacheLoader, LoadingCache}
 import com.google.gson.{JsonArray, JsonObject}
-import com.google.inject.Inject
+import com.google.inject.{Inject, Singleton}
 import org.slf4j.LoggerFactory
-
-import scala.concurrent.Await
-import scala.concurrent.duration.Duration
 
 /**
   * Created by Egor on 26.03.2016.
   */
+@Singleton
 class PlayerCache @Inject()(val teamService: TeamService, taskService: UpdateTaskService, httpUtils: HttpUtils) {
 
   private val log = LoggerFactory.getLogger(this.getClass)
@@ -27,7 +23,7 @@ class PlayerCache @Inject()(val teamService: TeamService, taskService: UpdateTas
   val unknownUser: String = "Unknown"
 
 
-  private val cache: LoadingCache[Int, String] = CacheBuilder.newBuilder()
+  val cache: LoadingCache[Int, String] = CacheBuilder.newBuilder()
     .expireAfterAccess(6, TimeUnit.HOURS)
     .maximumSize(2000)
     .build(new CacheLoader[Int, String]() {

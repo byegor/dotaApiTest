@@ -25,12 +25,12 @@ class RestModule extends AbstractModule {
     bind(classOf[MatchCache]).in(classOf[com.google.inject.Singleton])
 
     //helpers
-    bind(classOf[LiveGameHelper])
+    bind(classOf[LiveGameHelper]).in(classOf[com.google.inject.Singleton])
     bind(classOf[CacheHelper])
 
     //hilevel
     bind(classOf[RestartProcessor])
-    bind(classOf[LiveGameTask])
+    bind(classOf[LiveGameTask]).in(classOf[com.google.inject.Singleton])
 
   }
 

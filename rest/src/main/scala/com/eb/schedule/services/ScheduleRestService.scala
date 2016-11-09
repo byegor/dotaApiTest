@@ -23,9 +23,8 @@ import scala.concurrent.duration.Duration
 /**
   * Created by Egor on 04.06.2016.
   */
-//todo add endpoint to display all maps
 //todo don't include games in LiveGameContainer if there is no pick
-
+//todo rehost
 trait ScheduleRestService {
   def getGameByDate(milliseconds: Long): Map[String, Seq[GameBean]]
 
