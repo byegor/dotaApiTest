@@ -1,8 +1,5 @@
 package com.eb.schedule.dto
 
-import java.sql.Timestamp
-import java.util.concurrent.TimeUnit
-
 import com.eb.schedule.model.SeriesType
 
 /**
@@ -26,6 +23,6 @@ case class BasicGameInfoDTO(matchId: Long) {
   }
 
   def getMatchScore() = {
-    radiantScore + ":" + direScore
+    radiantScore + " - " + direScore
   }
 }
