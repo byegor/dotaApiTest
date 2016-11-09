@@ -1,14 +1,9 @@
 package com.eb.schedule.cache
 
-import com.eb.schedule.dto.{HeroDTO, ItemDTO, LeagueDTO, TeamDTO}
-import com.eb.schedule.services.HeroService
+import com.eb.schedule.dto.{HeroDTO, ItemDTO, LeagueDTO}
 import com.eb.schedule.shared.bean.Match
 import com.google.inject.{Inject, Singleton}
 import org.slf4j.LoggerFactory
-
-import scala.collection.mutable
-import scala.concurrent.Await
-import scala.concurrent.duration.Duration
 
 /**
   * Created by Egor on 26.03.2016.
