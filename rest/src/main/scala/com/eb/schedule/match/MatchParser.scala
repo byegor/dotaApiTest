@@ -40,14 +40,16 @@ class MatchParser @Inject()(teamCache: TeamCache, leagueCache: LeagueCache, play
     }
 
     def addMatchPicks() = {
-      val pickAndBans: JsonArray = json.get("picks_bans").getAsJsonArray
-      for (i <- 0 until pickAndBans.size()) {
-        val pick: JsonObject = pickAndBans.get(i).getAsJsonObject
-        val heroId: Int = pick.get("hero_id").getAsInt
-        val isRadiant: Boolean = pick.get("team").getAsInt == 0
-        val isPick: Boolean = pick.get("is_pick").getAsBoolean
-        val team = if (isRadiant) matchDetails.radiantTeam else matchDetails.direTeam
-        if (isPick) team.picks ::= heroCache.getHero(heroId) else team.bans ::= heroCache.getHero(heroId)
+      if(json.has("picks_bans")) {
+        val pickAndBans: JsonArray = json.get("picks_bans").getAsJsonArray
+        for (i <- 0 until pickAndBans.size()) {
+          val pick: JsonObject = pickAndBans.get(i).getAsJsonObject
+          val heroId: Int = pick.get("hero_id").getAsInt
+          val isRadiant: Boolean = pick.get("team").getAsInt == 0
+          val isPick: Boolean = pick.get("is_pick").getAsBoolean
+          val team = if (isRadiant) matchDetails.radiantTeam else matchDetails.direTeam
+          if (isPick) team.picks ::= heroCache.getHero(heroId) else team.bans ::= heroCache.getHero(heroId)
+        }
       }
       this
     }
