@@ -40,7 +40,7 @@ class MatchParser @Inject()(teamCache: TeamCache, leagueCache: LeagueCache, play
     }
 
     def addMatchPicks() = {
-      if(json.has("picks_bans")) {
+      if (json.has("picks_bans")) {
         val pickAndBans: JsonArray = json.get("picks_bans").getAsJsonArray
         for (i <- 0 until pickAndBans.size()) {
           val pick: JsonObject = pickAndBans.get(i).getAsJsonObject
@@ -58,8 +58,9 @@ class MatchParser @Inject()(teamCache: TeamCache, leagueCache: LeagueCache, play
     def addMatchPlayers() = {
       val playersList: JsonArray = json.get("players").getAsJsonArray
 
-        for (i <- 0 until playersList.size()) {
-          playerFuture ::= Future {
+      for (i <- 0 until playersList.size()) {
+        playerFuture ::= Future {
+          try {
             val player: JsonObject = playersList.get(i).getAsJsonObject
             val accountId: Int = player.get("account_id").getAsInt
             val playerDTO = new PlayerDTO(accountId)
@@ -73,7 +74,10 @@ class MatchParser @Inject()(teamCache: TeamCache, leagueCache: LeagueCache, play
 
             val isRadiant = player.get("player_slot").getAsInt < 5
             if (isRadiant) matchDetails.radiantTeam.players ::= playerDTO else matchDetails.direTeam.players ::= playerDTO
+          } catch {
+            case e: Exception => log.error("couldn't parse player", e )
           }
+        }
       }
       this
     }
@@ -121,22 +125,22 @@ class MatchParser @Inject()(teamCache: TeamCache, leagueCache: LeagueCache, play
     }
 
     def parseTeam(id: String, teamName: String, teamLogo: String) = {
-      try{
-      val teamId: Int = json.get(id).getAsInt
-      val cachedTeam: CachedTeam = teamCache.getTeam(teamId)
-      if (cachedTeam.name != "") {
-        val teamDTO: TeamDTO = new TeamDTO(cachedTeam.id)
-        teamDTO.name = cachedTeam.name
-        teamDTO.logo = cachedTeam.logo
-        teamDTO.tag = cachedTeam.tag
-        teamDTO
-      } else {
-        val team: TeamDTO = new TeamDTO(teamId)
-        team.name = json.get(teamName).getAsString
-        team.logo = json.get(teamLogo).getAsLong
-        team
-      }
-    }catch {
+      try {
+        val teamId: Int = json.get(id).getAsInt
+        val cachedTeam: CachedTeam = teamCache.getTeam(teamId)
+        if (cachedTeam.name != "") {
+          val teamDTO: TeamDTO = new TeamDTO(cachedTeam.id)
+          teamDTO.name = cachedTeam.name
+          teamDTO.logo = cachedTeam.logo
+          teamDTO.tag = cachedTeam.tag
+          teamDTO
+        } else {
+          val team: TeamDTO = new TeamDTO(teamId)
+          team.name = json.get(teamName).getAsString
+          team.logo = json.get(teamLogo).getAsLong
+          team
+        }
+      } catch {
         case e: Throwable => log.error("Couldn't parse team, e")
           new TeamDTO(-1)
       }
