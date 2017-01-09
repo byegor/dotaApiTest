@@ -78,24 +78,25 @@ class ScheduledGameServiceImpl @Inject()(repository: ScheduledGameRepository) ex
     repository.updateStatus(id, status.status)
   }
 
-  /*def updateStatusByMatchId(id: Long, status: Byte): Future[Int] = {
-    repository.updateStatusByMatchId(id, status)
-  }*/
-
 
   def delete(id: Int): Future[Int] = {
     repository.delete(id)
   }
 
   def getScheduledGames(liveGameDTO: CurrentGameDTO): Option[ScheduledGameDTO] = {
-    val future: Future[Seq[ScheduledGame]] = repository.getScheduledGames(liveGameDTO.radiantTeam.id, liveGameDTO.direTeam.id, liveGameDTO.basicInfo.league.leagueId)
-    val result: Seq[ScheduledGame] = Await.result(future, Duration.Inf)
-    val now: Long = System.currentTimeMillis()
-    val maybeScheduledGame: Option[ScheduledGame] = result.find(game => (now - game.startDate.getTime) < TEN_HOURS)
-    maybeScheduledGame match {
-      case Some(g) => Some(DTOUtils.crateDTO(g))
-      case None => None
+    if (liveGameDTO.radiantTeam.id == -1 && liveGameDTO.radiantTeam.id == liveGameDTO.direTeam.id) {
+      None
+    } else {
+      val future: Future[Seq[ScheduledGame]] = repository.getScheduledGames(liveGameDTO.radiantTeam.id, liveGameDTO.direTeam.id, liveGameDTO.basicInfo.league.leagueId)
+      val result: Seq[ScheduledGame] = Await.result(future, Duration.Inf)
+      val now: Long = System.currentTimeMillis()
+      val maybeScheduledGame: Option[ScheduledGame] = result.find(game => (now - game.startDate.getTime) < TEN_HOURS)
+      maybeScheduledGame match {
+        case Some(g) => Some(DTOUtils.crateDTO(g))
+        case None => None
+      }
     }
+
   }
 
   def getScheduledGames(liveGameDTO: CurrentGameDTO, matchStatus: MatchStatus): Option[ScheduledGameDTO] = {
