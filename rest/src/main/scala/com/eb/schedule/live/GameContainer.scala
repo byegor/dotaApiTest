@@ -1,12 +1,8 @@
 package com.eb.schedule.live
 
-import java.util.concurrent.{ConcurrentHashMap, TimeUnit}
+import java.util.concurrent.ConcurrentHashMap
 
-import com.eb.schedule.MatchDTO
-import com.eb.schedule.dto.{BasicGameInfoDTO, CurrentGameDTO}
-import com.eb.schedule.exception.CacheItemNotFound
-import com.google.common.cache.{Cache, CacheBuilder, CacheLoader, LoadingCache}
-import com.google.gson.{JsonArray, JsonObject}
+import com.eb.schedule.dto.CurrentGameDTO
 
 import scala.collection.JavaConversions._
 
@@ -21,9 +17,13 @@ object GameContainer {
   private val liveMatchIdByScheduledGameId: scala.collection.concurrent.Map[Int, Long] = new ConcurrentHashMap[Int, Long]
 
 
-  def updateLiveGame(currentGameDTO: CurrentGameDTO): Unit = {
+  def addGameAndMapping(currentGameDTO: CurrentGameDTO): Unit = {
     currentLiveMatches.put(currentGameDTO.matchId, currentGameDTO)
     liveMatchIdByScheduledGameId.put(currentGameDTO.scheduledGameId, currentGameDTO.matchId)
+  }
+
+  def updateJustCurrentGame(currentGameDTO: CurrentGameDTO): Unit = {
+    currentLiveMatches.put(currentGameDTO.matchId, currentGameDTO)
   }
 
   def getLiveGame(matchId: Long): Option[CurrentGameDTO] = {

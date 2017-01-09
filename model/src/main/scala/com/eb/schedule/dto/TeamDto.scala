@@ -29,6 +29,19 @@ class TeamDTO(val id: Int) {
 
   override def toString = s"TeamDTO($id, $name)"
 
+
   def toTeamBean: TeamBean = new TeamBean(id, name, tag, logo, seqAsJavaList(players.map(p => p.toPlayer())))
 
+  def canEqual(other: Any): Boolean = other.isInstanceOf[TeamDTO]
+
+  override def equals(other: Any): Boolean = other match {
+    case that: TeamDTO =>
+      (that canEqual this) &&
+        id == that.id && id != 0
+    case _ => false
+  }
+
+  override def hashCode(): Int = {
+    31 * id
+  }
 }

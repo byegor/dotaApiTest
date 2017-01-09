@@ -10,7 +10,6 @@ import com.google.gson.{JsonObject, JsonParser}
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 import scala.io.BufferedSource
-import scala.util.{Failure, Success}
 
 /**
   * Created by Egor on 14.05.2016.
@@ -29,11 +28,9 @@ class SeriesCrawlerTest extends BasicTest {
     var id: Int = -1
     val precondition: Future[Unit] = Future {
       val game: ScheduledGameDTO = new ScheduledGameDTO(1, new TeamDTO(36), new TeamDTO(1838315), new LeagueDTO(4210), SeriesType.BO3, new Timestamp(0), MatchStatus.LIVE)
-      val gameIdFuture: Future[Int] = scheduledGameService.insertAndGet(game)
-      gameIdFuture.onComplete {
-        case Success(gameId) => seriesService.insert(new SeriesDTO(gameId, 1l, 1, Some(true), true, 36)); id = gameId
-        case Failure(e) => throw e;
-      }
+      val gameId = scheduledGameService.insertAndGet(game)
+      seriesService.insert(new SeriesDTO(gameId, 1l, 1, Some(true), true, 36));
+      id = gameId
     }
 
     whenReady(precondition) { result =>
@@ -49,15 +46,11 @@ class SeriesCrawlerTest extends BasicTest {
     var id: Int = -1
     val precondition: Future[Unit] = Future {
       val game: ScheduledGameDTO = new ScheduledGameDTO(1, new TeamDTO(36), new TeamDTO(1838315), new LeagueDTO(4210), SeriesType.BO3, new Timestamp(0), MatchStatus.LIVE)
-      val gameIdFuture: Future[Int] = scheduledGameService.insertAndGet(game)
-      gameIdFuture.onComplete {
-        case Success(gameId) =>
-          seriesService.insert(new SeriesDTO(gameId, 1l, 1, Some(true), true, 36))
-          seriesService.insert(new SeriesDTO(gameId, 2l, 2, Some(false), true, 36))
-          seriesService.insert(new SeriesDTO(gameId, 3l, 3, Some(false), true, 36))
-          id = gameId
-        case Failure(e) => throw e;
-      }
+      val gameId: Int = scheduledGameService.insertAndGet(game)
+      seriesService.insert(new SeriesDTO(gameId, 1l, 1, Some(true), true, 36))
+      seriesService.insert(new SeriesDTO(gameId, 2l, 2, Some(false), true, 36))
+      seriesService.insert(new SeriesDTO(gameId, 3l, 3, Some(false), true, 36))
+      id = gameId
     }
 
     whenReady(precondition) { result =>

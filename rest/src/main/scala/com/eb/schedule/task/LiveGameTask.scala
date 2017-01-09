@@ -49,11 +49,9 @@ class LiveGameTask @Inject()(val liveGameHelper: LiveGameHelper, val netWorthSer
         if (scheduledGame.isEmpty) {
           val startDate: Timestamp = new Timestamp(System.currentTimeMillis() - current.basicInfo.duration.toLong)
           val scheduledGameDTO: ScheduledGameDTO = new ScheduledGameDTO(-1, current.radiantTeam, current.direTeam, current.basicInfo.league, current.basicInfo.seriesType, startDate, MatchStatus.LIVE)
-          gameService.insertAndGet(scheduledGameDTO).onSuccess {
-            case gameId =>
-              seriesService.insertOrUpdate(new SeriesDTO(gameId, current.matchId, (current.basicInfo.radiantWin + current.basicInfo.direWin + 1).toByte, None, false, scheduledGameDTO.radiantTeam.id))
-              current.scheduledGameId = gameId;
-          }
+          val gameId = gameService.insertAndGet(scheduledGameDTO)
+          current.scheduledGameId = gameId
+          seriesService.insertOrUpdate(new SeriesDTO(gameId, current.matchId, (current.basicInfo.radiantWin + current.basicInfo.direWin + 1).toByte, None, false, scheduledGameDTO.radiantTeam.id))
           log.debug("creating new scheduled game: " + scheduledGameDTO)
         } else {
           val gameDTO: ScheduledGameDTO = scheduledGame.get
@@ -64,8 +62,11 @@ class LiveGameTask @Inject()(val liveGameHelper: LiveGameHelper, val netWorthSer
           }
           log.debug("found game: " + current.matchId + " for series: " + gameDTO.id)
         }
+        addLiveGameContainer(current)
+      } else {
+        GameContainer.updateJustCurrentGame(current)
       }
-      updateLiveGameContainer(current)
+
       if (current.basicInfo.duration > 0) {
         insertNetWorth(current.netWorth)
       }
@@ -90,8 +91,8 @@ class LiveGameTask @Inject()(val liveGameHelper: LiveGameHelper, val netWorthSer
     netWorthService.insertOrUpdate(netWorth)
   }
 
-  def updateLiveGameContainer(currentGameDTO: CurrentGameDTO) = {
-    GameContainer.updateLiveGame(currentGameDTO)
+  def addLiveGameContainer(currentGameDTO: CurrentGameDTO) = {
+    GameContainer.addGameAndMapping(currentGameDTO)
   }
 
   def findFinishedMatches(liveGames: Seq[Option[CurrentGameDTO]]): Seq[Long] = {

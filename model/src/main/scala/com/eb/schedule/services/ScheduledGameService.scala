@@ -1,7 +1,6 @@
 package com.eb.schedule.model.services
 
 import java.sql.Timestamp
-import java.text.SimpleDateFormat
 import java.util.concurrent.TimeUnit
 import java.util.{Calendar, Date}
 
@@ -29,7 +28,7 @@ trait ScheduledGameService {
 
   def insert(game: ScheduledGameDTO): Future[Int]
 
-  def insertAndGet(game: ScheduledGameDTO): Future[Int]
+  def insertAndGet(game: ScheduledGameDTO): Int
 
   def update(game: ScheduledGameDTO): Future[Int]
 
@@ -66,8 +65,9 @@ class ScheduledGameServiceImpl @Inject()(repository: ScheduledGameRepository) ex
     repository.insert(DTOUtils.transformScheduledGameFromDTO(game))
   }
 
-  def insertAndGet(game: ScheduledGameDTO): Future[Int] = {
-    repository.insertAndGet(DTOUtils.transformScheduledGameFromDTO(game))
+  def insertAndGet(game: ScheduledGameDTO): Int = {
+    val id = Await.result(repository.insertAndGet(DTOUtils.transformScheduledGameFromDTO(game)), Duration.Inf)
+    id
   }
 
   def update(game: ScheduledGameDTO): Future[Int] = {

@@ -9,11 +9,9 @@ import com.eb.schedule.dto.{LeagueDTO, ScheduledGameDTO, SeriesDTO, TeamDTO}
 import com.eb.schedule.model.{MatchStatus, SeriesType}
 import com.eb.schedule.shared.bean.GameBean
 import org.joda.time.DateTime
-import org.scalatest.Ignore
 
 import scala.concurrent.ExecutionContext.Implicits.global
-import scala.concurrent.duration.Duration
-import scala.concurrent.{Await, Future}
+import scala.concurrent.Future
 
 /**
   * Created by Egor on 04.06.2016.
@@ -82,10 +80,10 @@ class ScheduledGameServiceImplTest extends RestBasicTest {
     var newGameId: Int = 0
     var oldGameId: Int = 0
     val precondition = Future {
-      newGameId = Await.result(scheduledGameService.insertAndGet(gameDTO), Duration.Inf)
+      newGameId = scheduledGameService.insertAndGet(gameDTO)
       val beforeYesterday: DateTime = new DateTime().minusDays(2).plusHours(1)
       val game2: ScheduledGameDTO = new ScheduledGameDTO(22, new TeamDTO(22), new TeamDTO(35), new LeagueDTO(1), SeriesType.BO3, new Timestamp(beforeYesterday.getMillis), MatchStatus.LIVE)
-      oldGameId = Await.result(scheduledGameService.insertAndGet(game2), Duration.Inf)
+      oldGameId = scheduledGameService.insertAndGet(game2)
     }
 
     whenReady(precondition) { result =>
@@ -107,9 +105,9 @@ class ScheduledGameServiceImplTest extends RestBasicTest {
     var id3: Int = 0
 
     val precondition = Future {
-      id1 = Await.result(scheduledGameService.insertAndGet(game1), Duration.Inf)
-      id2 = Await.result(scheduledGameService.insertAndGet(game2), Duration.Inf)
-      id3 = Await.result(scheduledGameService.insertAndGet(game3), Duration.Inf)
+      id1 = scheduledGameService.insertAndGet(game1)
+      id2 = scheduledGameService.insertAndGet(game2)
+      id3 = scheduledGameService.insertAndGet(game3)
     }
 
     whenReady(precondition) { result =>

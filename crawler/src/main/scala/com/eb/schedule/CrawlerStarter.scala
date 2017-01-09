@@ -25,7 +25,6 @@ object CrawlerStarter extends App {
   val itemService = injector.getInstance(classOf[ItemService])
   val httpUtils = injector.getInstance(classOf[HttpUtils])
 
-  private val teamCrawler: TeamCrawlerRunner = new TeamCrawlerRunner(teamService, taskService, httpUtils)
   private val leagueCrawler: LeagueCrawler = new LeagueCrawler(leagueService, taskService, httpUtils)
   private val seriesCrawler: SeriesCrawler = new SeriesCrawler(seriesService, scheduledGameService, httpUtils)
   private val winnerCrawler: WinnerCrawler = new WinnerCrawler(seriesService, scheduledGameService, httpUtils)
@@ -33,9 +32,8 @@ object CrawlerStarter extends App {
   //  private val itemsCrawler: ItemsCrawler = new ItemsCrawler(itemService, httpUtils)
 
 
-  executor.scheduleAtFixedRate(teamCrawler, 0, 60, TimeUnit.SECONDS)
-  executor.scheduleAtFixedRate(leagueCrawler, 10, 60, TimeUnit.SECONDS)
-  executor.scheduleAtFixedRate(winnerCrawler, 20, 60, TimeUnit.SECONDS)
-  executor.scheduleAtFixedRate(seriesCrawler, 30, 60, TimeUnit.SECONDS)
-  executor.scheduleAtFixedRate(longRunningCrawler, 40, 60, TimeUnit.SECONDS)
+  executor.scheduleAtFixedRate(leagueCrawler, 0, 60, TimeUnit.SECONDS)
+  executor.scheduleAtFixedRate(winnerCrawler, 10, 60, TimeUnit.SECONDS)
+  executor.scheduleAtFixedRate(seriesCrawler, 20, 60, TimeUnit.SECONDS)
+  executor.scheduleAtFixedRate(longRunningCrawler, 30, 60, TimeUnit.SECONDS)
 }

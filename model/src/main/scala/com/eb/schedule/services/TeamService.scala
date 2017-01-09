@@ -5,6 +5,7 @@ import com.eb.schedule.model.dao.TeamRepository
 import com.eb.schedule.model.slick.Team
 import com.eb.schedule.utils.DTOUtils
 import com.google.inject.Inject
+
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 
@@ -18,9 +19,7 @@ trait TeamService {
 
   def insert(team: TeamDTO): Future[Int]
 
-  def insertTeamTask(t:TeamDTO):Future[Unit]
-
-  def saveOrUpdateTeamAndTask(team: TeamDTO)
+  def upsert(team: TeamDTO): Future[Unit]
 
   def update(team: Team): Future[Int]
 
@@ -41,12 +40,8 @@ class TeamServiceImpl @Inject()(teamRepository: TeamRepository) extends TeamServ
     teamRepository.insert(DTOUtils.transformTeamFromDTO(team))
   }
 
-  def insertTeamTask(t:TeamDTO):Future[Unit] = {
-    teamRepository.insertTeamTask(DTOUtils.transformTeamFromDTO(t))
-  }
-
-  def saveOrUpdateTeamAndTask(team: TeamDTO) = {
-    teamRepository.saveOrUpdateTeamAndTask(DTOUtils.transformTeamFromDTO(team))
+  def upsert(team: TeamDTO): Future[Unit] = {
+    teamRepository.upsert(DTOUtils.transformTeamFromDTO(team))
   }
 
   def update(team: Team): Future[Int] = {

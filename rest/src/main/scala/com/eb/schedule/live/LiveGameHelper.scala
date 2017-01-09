@@ -10,6 +10,7 @@ import com.google.inject.Inject
 import org.slf4j.LoggerFactory
 
 import scala.collection.mutable
+import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.duration.Duration
 import scala.concurrent.{Await, Future}
 
@@ -155,25 +156,16 @@ class LiveGameHelper @Inject()(val heroCache: HeroCache, val itemCache: ItemCach
     }
   }
 
-  private def parseTeam(json: JsonObject): TeamDTO = {
+  def parseTeam(json: JsonObject): TeamDTO = {
     if (json == null) {
       new TeamDTO(0)
     } else {
       val teamId: Int = json.get("team_id").getAsInt
-      val cachedTeam: CachedTeam = teamCache.getTeam(teamId)
-      if (cachedTeam.name != "") {
-        val teamDTO: TeamDTO = new TeamDTO(cachedTeam.id)
-        teamDTO.name = cachedTeam.name
-        teamDTO.logo = cachedTeam.logo
-        teamDTO.tag = cachedTeam.tag
-        teamDTO
-      } else {
-        val team: TeamDTO = new TeamDTO(teamId)
-        team.name = json.get("team_name").getAsString
-        team.logo = json.get("team_logo").getAsLong
-        teamService.insert(team)
-        team
-      }
+      val team: TeamDTO = new TeamDTO(teamId)
+      team.name = json.get("team_name").getAsString
+      team.logo = json.get("team_logo").getAsLong
+      teamService.upsert(team).onSuccess { case res => teamCache.invalidateTeam(teamId) }
+      team
     }
   }
 
