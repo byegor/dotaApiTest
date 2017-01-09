@@ -10,10 +10,7 @@ import com.eb.schedule.utils.HttpUtils
 import com.google.gson.JsonObject
 import com.google.inject.Inject
 import org.slf4j.LoggerFactory
-
-import scala.concurrent.ExecutionContext.Implicits.global
-import scala.concurrent.Future
-
+//todo start count time not from starting the series but from the last game. Start from TEST
 class LongRunningGamesCrawler @Inject()(seriesService: SeriesService, scheduledGameService: ScheduledGameService, httpUtils: HttpUtils) extends Runnable {
 
   private val log = LoggerFactory.getLogger(this.getClass)
