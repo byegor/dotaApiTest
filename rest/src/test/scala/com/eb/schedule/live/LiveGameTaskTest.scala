@@ -3,14 +3,14 @@ package com.eb.schedule.live
 import java.sql.Timestamp
 
 import com.eb.schedule.dto._
-import com.eb.schedule.task.LiveGameTask
 import com.eb.schedule.model.{MatchStatus, SeriesType}
+import com.eb.schedule.task.LiveGameTask
 import com.eb.schedule.{HttpUtilsMock, RestBasicTest}
 import com.google.gson.{JsonArray, JsonObject}
 
-import scala.concurrent.{Await, Future}
-import scala.concurrent.duration.Duration
 import scala.concurrent.ExecutionContext.Implicits.global
+import scala.concurrent.duration.Duration
+import scala.concurrent.{Await, Future}
 
 /**
   * Created by Egor on 23.03.2016.
@@ -53,6 +53,26 @@ class LiveGameTaskTest extends RestBasicTest {
     val scheduledGameDTO = scheduledGameService.getScheduledGames(GameContainer.getLiveGame(MATCH_ID).get, MatchStatus.LIVE)
     assert(scheduledGameDTO.isDefined, "seems it couldn't find scheduled game by live game")
     assert(scheduledGameDTO.get.matchStatus == MatchStatus.LIVE, "failed to set LIVE status")
+  }
+
+  test("get scheduled game if there two games between same commands and BO1") {
+    Future {
+      val firstGame = new CurrentGameDTO(123)
+      firstGame.direTeam = new TeamDTO(35)
+      firstGame.radiantTeam = new TeamDTO(36)
+      firstGame.basicInfo.league = new LeagueDTO(10)
+      firstGame.basicInfo.seriesType = SeriesType.BO1
+      processor.processCurrentLiveGame(Some(firstGame))
+    }.futureValue
+
+    val secondGame = new CurrentGameDTO(321)
+    secondGame.direTeam = new TeamDTO(35)
+    secondGame.radiantTeam = new TeamDTO(36)
+    secondGame.basicInfo.league = new LeagueDTO(10)
+    secondGame.basicInfo.seriesType = SeriesType.BO1
+
+    val scheduledGameDTO = scheduledGameService.getScheduledGames(secondGame)
+    assert(scheduledGameDTO.isEmpty, "its BO1 - so past game couldn't be updated, it shouldn't find any similiar game")
   }
 
   test("finish match") {

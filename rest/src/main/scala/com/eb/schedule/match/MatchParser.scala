@@ -124,7 +124,7 @@ class MatchParser @Inject()(teamCache: TeamCache, leagueCache: LeagueCache, play
 
     }
 
-    def parseTeam(id: String, teamName: String, teamLogo: String) = {
+    def parseTeam(id: String, teamName: String, teamLogo: String): TeamDTO = {
       try {
         val teamId: Int = json.get(id).getAsInt
         val cachedTeam: CachedTeam = teamCache.getTeam(teamId)
@@ -141,7 +141,7 @@ class MatchParser @Inject()(teamCache: TeamCache, leagueCache: LeagueCache, play
           team
         }
       } catch {
-        case e: Throwable => log.error("Couldn't parse team, e")
+        case e: Throwable => log.error("Couldn't parse team", e)
           new TeamDTO(-1)
       }
     }

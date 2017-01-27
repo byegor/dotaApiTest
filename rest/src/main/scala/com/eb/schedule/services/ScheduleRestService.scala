@@ -1,17 +1,12 @@
 package com.eb.schedule.services
 
-import java.text.SimpleDateFormat
-import java.time.LocalDate
-import java.time.temporal.TemporalField
-import java.util.Date
-
 import com.eb.schedule.cache.{CacheHelper, CachedTeam}
 import com.eb.schedule.dto._
 import com.eb.schedule.live.GameContainer
 import com.eb.schedule.model.services.ScheduledGameService
 import com.eb.schedule.shared.bean.{GameBean, LeagueBean, Match, TeamBean}
 import com.google.inject.Inject
-import org.joda.time.format.{DateTimeFormat, DateTimeFormatter}
+import org.joda.time.format.DateTimeFormat
 import org.joda.time.{DateTime, DateTimeZone}
 import org.slf4j.LoggerFactory
 
@@ -25,6 +20,7 @@ import scala.concurrent.duration.Duration
   */
 //todo don't include games in LiveGameContainer if there is no pick
 //todo rehost
+//todo cache results for 1 min
 trait ScheduleRestService {
   def getGameByDate(milliseconds: Long): Map[String, Seq[GameBean]]
 
@@ -37,7 +33,6 @@ class ScheduledRestServiceImpl @Inject()(scheduledGameService: ScheduledGameServ
 
   private val log = LoggerFactory.getLogger(this.getClass)
   val formatter = DateTimeFormat.forPattern("EEEE, d MMM")
-
 
   def getGameByDate(milliseconds: Long): Map[String, Seq[GameBean]] = {
     val games: ListBuffer[GameBean] = new ListBuffer[GameBean]

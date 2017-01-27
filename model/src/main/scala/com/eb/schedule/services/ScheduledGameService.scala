@@ -8,6 +8,7 @@ import com.eb.schedule.dto.{CurrentGameDTO, ScheduledGameDTO, SeriesDTO}
 import com.eb.schedule.model.MatchStatus
 import com.eb.schedule.model.dao.ScheduledGameRepository
 import com.eb.schedule.model.slick.{MatchSeries, ScheduledGame}
+import com.eb.schedule.services.SeriesService
 import com.eb.schedule.utils.DTOUtils
 import com.google.inject.Inject
 import org.slf4j.LoggerFactory
@@ -48,7 +49,7 @@ trait ScheduledGameService {
 }
 
 
-class ScheduledGameServiceImpl @Inject()(repository: ScheduledGameRepository) extends ScheduledGameService {
+class ScheduledGameServiceImpl @Inject()(repository: ScheduledGameRepository, seriesService: SeriesService) extends ScheduledGameService {
 
   private val log = LoggerFactory.getLogger(this.getClass)
   private val TEN_HOURS: Long = TimeUnit.HOURS.toMillis(10)
@@ -90,13 +91,20 @@ class ScheduledGameServiceImpl @Inject()(repository: ScheduledGameRepository) ex
       val future: Future[Seq[ScheduledGame]] = repository.getScheduledGames(liveGameDTO.radiantTeam.id, liveGameDTO.direTeam.id, liveGameDTO.basicInfo.league.leagueId)
       val result: Seq[ScheduledGame] = Await.result(future, Duration.Inf)
       val now: Long = System.currentTimeMillis()
-      val maybeScheduledGame: Option[ScheduledGame] = result.find(game => (now - game.startDate.getTime) < TEN_HOURS)
-      maybeScheduledGame match {
-        case Some(g) => Some(DTOUtils.crateDTO(g))
-        case None => None
+      val hoursForTheGame = TimeUnit.HOURS.toMillis(liveGameDTO.basicInfo.seriesType.gamesCount + 1)
+      //todo move to enum bo1
+      val maybeScheduledGame: Option[ScheduledGame] = result.find(game => ((now - game.startDate.getTime) < hoursForTheGame) && isGamesNumberMatches(liveGameDTO, game))
+      if (maybeScheduledGame.isDefined) {
+        Some(DTOUtils.crateDTO(maybeScheduledGame.get))
+      } else {
+        None
       }
     }
+  }
 
+  private def isGamesNumberMatches(liveGameDTO: CurrentGameDTO, game: ScheduledGame) = {
+    val seriesId: Seq[SeriesDTO] = Await.result(seriesService.findBySeriesId(game.id), Duration.Inf)
+    seriesId.size < liveGameDTO.basicInfo.seriesType.gamesCount
   }
 
   def getScheduledGames(liveGameDTO: CurrentGameDTO, matchStatus: MatchStatus): Option[ScheduledGameDTO] = {
