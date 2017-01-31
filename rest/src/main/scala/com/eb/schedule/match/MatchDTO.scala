@@ -40,10 +40,10 @@ class MatchDTO {
       matchBean.setNetworth(scala.collection.JavaConversions.seqAsJavaList(netWorth.netWorth.map(new java.lang.Integer(_))))
     }
     matchBean.setGameNumber(gameNumber)
-    matchBean.setRadianBans(radiantTeam.bans.map(h => new HeroBean(h.id, h.name)))
-    matchBean.setRadianPicks(radiantTeam.picks.map(h => new HeroBean(h.id, h.name)))
-    matchBean.setDirePicks(direTeam.picks.map(h => new HeroBean(h.id, h.name)))
-    matchBean.setDireBans(direTeam.bans.map(h => new HeroBean(h.id, h.name)))
+    matchBean.setRadianBans(radiantTeam.bans.reverse.map(h => new HeroBean(h.id, h.name)))
+    matchBean.setRadianPicks(radiantTeam.picks.reverse.map(h => new HeroBean(h.id, h.name)))
+    matchBean.setDirePicks(direTeam.picks.reverse.map(h => new HeroBean(h.id, h.name)))
+    matchBean.setDireBans(direTeam.bans.reverse.map(h => new HeroBean(h.id, h.name)))
     matchBean
   }
 
