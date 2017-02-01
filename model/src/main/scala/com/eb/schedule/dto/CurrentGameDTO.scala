@@ -1,8 +1,8 @@
 package com.eb.schedule.dto
 
-import java.lang.Double
+import com.eb.schedule.shared.bean.{HeroBean, Match}
+
 import scala.collection.JavaConversions._
-import com.eb.schedule.shared.bean.{HeroBean, LeagueBean, Match}
 
 /**
   * Created by Egor on 13.03.2016.
@@ -32,6 +32,8 @@ class CurrentGameDTO(val matchId: Long) {
     matchBean
   }
 
+
+  override def toString = s"CurrentGameDTO($scheduledGameId, $direTeam, $radiantTeam, $matchId)"
 }
 
 

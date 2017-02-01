@@ -44,7 +44,7 @@ class LiveGameTask @Inject()(val liveGameHelper: LiveGameHelper, val netWorthSer
     if (currentOpt.isDefined) {
       val current: CurrentGameDTO = currentOpt.get
       if (!GameContainer.exists(current.matchId)) {
-        log.debug("found new live game with matchId: " + current.matchId)
+        log.debug("found new live game with matchId: " + current)
         val scheduledGame: Option[ScheduledGameDTO] = gameService.getScheduledGames(current)
         if (scheduledGame.isEmpty) {
           val startDate: Timestamp = new Timestamp(System.currentTimeMillis() - current.basicInfo.duration.toLong)
@@ -60,7 +60,7 @@ class LiveGameTask @Inject()(val liveGameHelper: LiveGameHelper, val netWorthSer
           gameService.update(gameDTO).onSuccess {
             case i => seriesService.insertOrUpdate(new SeriesDTO(gameDTO.id, current.matchId, (current.basicInfo.radiantWin + current.basicInfo.direWin + 1).toByte, None, false, gameDTO.radiantTeam.id))
           }
-          log.debug("found game: " + current.matchId + " for series: " + gameDTO.id)
+          log.debug("found game: " + current + " for series: " + gameDTO.id)
         }
         addLiveGameContainer(current)
       } else {

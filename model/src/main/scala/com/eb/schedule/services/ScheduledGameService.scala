@@ -52,7 +52,6 @@ trait ScheduledGameService {
 class ScheduledGameServiceImpl @Inject()(repository: ScheduledGameRepository, seriesService: SeriesService) extends ScheduledGameService {
 
   private val log = LoggerFactory.getLogger(this.getClass)
-  private val TEN_HOURS: Long = TimeUnit.HOURS.toMillis(10)
 
   def findById(id: Int): Future[ScheduledGameDTO] = {
     repository.findById(id).map(DTOUtils.crateDTO)
@@ -88,7 +87,7 @@ class ScheduledGameServiceImpl @Inject()(repository: ScheduledGameRepository, se
     if (liveGameDTO.radiantTeam.id == -1 && liveGameDTO.radiantTeam.id == liveGameDTO.direTeam.id) {
       None
     } else {
-      val future: Future[Seq[ScheduledGame]] = repository.getScheduledGames(liveGameDTO.radiantTeam.id, liveGameDTO.direTeam.id, liveGameDTO.basicInfo.league.leagueId)
+      val future: Future[Seq[ScheduledGame]] = repository.getScheduledGames(liveGameDTO.radiantTeam.id, liveGameDTO.direTeam.id, liveGameDTO.basicInfo.league.leagueId, liveGameDTO.basicInfo.seriesType)
       val result: Seq[ScheduledGame] = Await.result(future, Duration.Inf)
       val now: Long = System.currentTimeMillis()
       val hoursForTheGame = TimeUnit.HOURS.toMillis(liveGameDTO.basicInfo.seriesType.gamesCount + 1)
@@ -104,7 +103,12 @@ class ScheduledGameServiceImpl @Inject()(repository: ScheduledGameRepository, se
 
   private def isGamesNumberMatches(liveGameDTO: CurrentGameDTO, game: ScheduledGame) = {
     val seriesId: Seq[SeriesDTO] = Await.result(seriesService.findBySeriesId(game.id), Duration.Inf)
-    seriesId.size < liveGameDTO.basicInfo.seriesType.gamesCount
+    val lastGame = seriesId.maxBy(series => series.gameNumber)
+    if (lastGame.matchId == liveGameDTO.matchId ) {
+      true
+    } else {
+      lastGame.gameNumber < (liveGameDTO.basicInfo.radiantWin + liveGameDTO.basicInfo.radiantWin + 1)
+    }
   }
 
   def getScheduledGames(liveGameDTO: CurrentGameDTO, matchStatus: MatchStatus): Option[ScheduledGameDTO] = {

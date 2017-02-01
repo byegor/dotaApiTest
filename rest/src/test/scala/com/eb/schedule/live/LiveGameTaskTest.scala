@@ -117,14 +117,16 @@ class LiveGameTaskTest extends RestBasicTest {
         res
       }
     }).run()
+    val secondGame = 2234857741l
+    val lastGame = GameContainer.getLiveGame(secondGame).get
     Future {
       emptyProcessor.run()
     }.futureValue
     Future {
       emptyProcessor.run()
     }.futureValue
-    assert(!GameContainer.exists(2234857741l))
-    val finishedMatch: Option[ScheduledGameDTO] = scheduledGameService.getScheduledGames(currentMatch)
+    assert(!GameContainer.exists(secondGame))
+    val finishedMatch: Option[ScheduledGameDTO] = scheduledGameService.getScheduledGames(lastGame)
     assert(finishedMatch.isDefined)
     assert(MatchStatus.LIVE == finishedMatch.get.matchStatus)
     whenReady(seriesService.findBySeriesId(finishedMatch.get.id)) {
