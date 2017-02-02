@@ -13,6 +13,8 @@ import com.google.inject.Guice
 /**
   * Created by Егор on 08.02.2016.
   */
+//todo remove empty scheduled games without series
+//todo check rehost
 object CrawlerStarter extends App {
 
   private val executor: ScheduledExecutorService = Executors.newScheduledThreadPool(2)

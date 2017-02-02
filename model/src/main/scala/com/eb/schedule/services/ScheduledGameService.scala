@@ -103,11 +103,15 @@ class ScheduledGameServiceImpl @Inject()(repository: ScheduledGameRepository, se
 
   private def isGamesNumberMatches(liveGameDTO: CurrentGameDTO, game: ScheduledGame) = {
     val seriesId: Seq[SeriesDTO] = Await.result(seriesService.findBySeriesId(game.id), Duration.Inf)
-    val lastGame = seriesId.maxBy(series => series.gameNumber)
-    if (lastGame.matchId == liveGameDTO.matchId ) {
+    if (seriesId.isEmpty) {
       true
     } else {
-      lastGame.gameNumber < (liveGameDTO.basicInfo.radiantWin + liveGameDTO.basicInfo.radiantWin + 1)
+      val lastGame = seriesId.maxBy(series => series.gameNumber)
+      if (lastGame.matchId == liveGameDTO.matchId) {
+        true
+      } else {
+        lastGame.gameNumber < (liveGameDTO.basicInfo.radiantWin + liveGameDTO.basicInfo.radiantWin + 1)
+      }
     }
   }
 
