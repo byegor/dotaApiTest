@@ -24,7 +24,7 @@ public class TeamImageUtils {
 
     private final Logger logger = LoggerFactory.getLogger(TeamImageUtils.class);
 
-    private static final String GET_TEAM_LOGO = "http://api.steampowered.com/ISteamRemoteStorage/GetUGCFileDetails/v1/?key=9EBD51CD27F27324F1554C53BEDA17C3&appid=570&ugcid=";
+    private static final String GET_TEAM_LOGO = "http://api.steampowered.com/ISteamRemoteStorage/GetUGCFileDetails/v1/?key=D998B8BDFA96FAA893E52903D6A77EEA&appid=570&ugcid=";
 
     private final String dataFolder;
     private final byte[] defaultImage;

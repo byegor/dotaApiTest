@@ -1,17 +1,14 @@
 package egor.dota.harvester.utils
 
-import com.mashape.unirest.http.{HttpResponse, JsonNode, Unirest}
-import org.json.JSONObject
-
 /**
  * Created by Егор on 13.07.2015.
  */
 object HttpUtils {
-  private val HEROES: String = "https://api.steampowered.com/IEconDOTA2_570/GetHeroes/v0001/?key=9EBD51CD27F27324F1554C53BEDA17C3"
-  val GET_BATCH_OF_MATCHES_BASED_ON_USER: String = "https://api.steampowered.com/IDOTA2Match_570/GetMatchHistory/V001/?min_players=10&key=9EBD51CD27F27324F1554C53BEDA17C3&account_id=%s"
+  private val HEROES: String = "https://api.steampowered.com/IEconDOTA2_570/GetHeroes/v0001/?key=D998B8BDFA96FAA893E52903D6A77EEA"
+  val GET_BATCH_OF_MATCHES_BASED_ON_USER: String = "https://api.steampowered.com/IDOTA2Match_570/GetMatchHistory/V001/?min_players=10&key=D998B8BDFA96FAA893E52903D6A77EEA&account_id=%s"
   val GET_NEXT_PAGE_OF_MATCHES: String = GET_BATCH_OF_MATCHES_BASED_ON_USER + "&start_at_match_id=%s"
-  val GET_MATCH_DETAILS: String = "https://api.steampowered.com/IDOTA2Match_570/GetMatchDetails/v001/?key=9EBD51CD27F27324F1554C53BEDA17C3&match_id="
-  val GET_BATCH_OF_MATCHES_BY_SEQUENCE: String = "https://api.steampowered.com/IDOTA2Match_570/GetMatchHistoryBySequenceNum/v0001/?min_players=10&key=9EBD51CD27F27324F1554C53BEDA17C3&start_at_match_seq_num="
+  val GET_MATCH_DETAILS: String = "https://api.steampowered.com/IDOTA2Match_570/GetMatchDetails/v001/?key=D998B8BDFA96FAA893E52903D6A77EEA&match_id="
+  val GET_BATCH_OF_MATCHES_BY_SEQUENCE: String = "https://api.steampowered.com/IDOTA2Match_570/GetMatchHistoryBySequenceNum/v0001/?min_players=10&key=D998B8BDFA96FAA893E52903D6A77EEA&start_at_match_seq_num="
 
   val lock: AnyRef = new Object()
 

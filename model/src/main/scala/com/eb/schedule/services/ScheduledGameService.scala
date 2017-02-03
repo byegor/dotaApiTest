@@ -92,7 +92,7 @@ class ScheduledGameServiceImpl @Inject()(repository: ScheduledGameRepository, se
       val now: Long = System.currentTimeMillis()
       val hoursForTheGame = TimeUnit.HOURS.toMillis(liveGameDTO.basicInfo.seriesType.gamesCount + 1)
       //todo move to enum bo1
-      val maybeScheduledGame: Option[ScheduledGame] = result.find(game => ((now - game.startDate.getTime) < hoursForTheGame) && isGamesNumberMatches(liveGameDTO, game))
+      val maybeScheduledGame: Option[ScheduledGame] = result.find(game => ((now - game.startDate.getTime) < hoursForTheGame) /*&& isGamesNumberMatches(liveGameDTO, game)*/)
       if (maybeScheduledGame.isDefined) {
         Some(DTOUtils.crateDTO(maybeScheduledGame.get))
       } else {

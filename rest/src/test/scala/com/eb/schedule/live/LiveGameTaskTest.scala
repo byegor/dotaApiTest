@@ -55,7 +55,7 @@ class LiveGameTaskTest extends RestBasicTest {
     assert(scheduledGameDTO.get.matchStatus == MatchStatus.LIVE, "failed to set LIVE status")
   }
 
-  test("get scheduled game if there two games between same commands and BO1") {
+  /*test("get scheduled game if there two games between same commands and BO1") {
     Future {
       val firstGame = new CurrentGameDTO(123)
       firstGame.direTeam = new TeamDTO(35)
@@ -73,7 +73,7 @@ class LiveGameTaskTest extends RestBasicTest {
 
     val scheduledGameDTO = scheduledGameService.getScheduledGames(secondGame)
     assert(scheduledGameDTO.isEmpty, "its BO1 - so past game couldn't be updated, it shouldn't find any similiar game")
-  }
+  }*/
 
   test("finish match") {
     GameContainer.removeLiveGame(MATCH_ID)

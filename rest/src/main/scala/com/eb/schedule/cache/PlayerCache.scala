@@ -17,7 +17,7 @@ import org.slf4j.LoggerFactory
 class PlayerCache @Inject()(val teamService: TeamService, taskService: UpdateTaskService, httpUtils: HttpUtils) {
 
   private val log = LoggerFactory.getLogger(this.getClass)
-  private val URL = "https://api.steampowered.com/ISteamUser/GetPlayerSummaries/v0002/?key=9EBD51CD27F27324F1554C53BEDA17C3&steamids="
+  private val URL = "https://api.steampowered.com/ISteamUser/GetPlayerSummaries/v0002/?key=D998B8BDFA96FAA893E52903D6A77EEA&steamids="
   private val ADDER: Long = 76561197960265728l
 
   val unknownUser: String = "Unknown"

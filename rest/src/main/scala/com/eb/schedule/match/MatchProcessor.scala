@@ -1,6 +1,5 @@
 package com.eb.schedule
 
-import com.eb.schedule.live.GameContainer
 import com.eb.schedule.utils.HttpUtils
 import com.google.gson.JsonObject
 import com.google.inject.Inject
@@ -13,14 +12,14 @@ class MatchProcessor @Inject()(matchParser: MatchParser, val httpUtils: HttpUtil
 
   private val log = LoggerFactory.getLogger(this.getClass)
 
-  val GET_MATCH_DETAILS: String = "https://api.steampowered.com/IDOTA2Match_570/GetMatchDetails/v001/?key=9EBD51CD27F27324F1554C53BEDA17C3&match_id="
+  val GET_MATCH_DETAILS: String = "https://api.steampowered.com/IDOTA2Match_570/GetMatchDetails/v001/?key=D998B8BDFA96FAA893E52903D6A77EEA&match_id="
 
   def findMatch(matchId: Long): Option[MatchDTO] = {
     try {
       val matchDetails: Option[MatchDTO] = getMatchDetails(matchId)
       matchDetails
     } catch {
-      case e: Throwable => log.error("error", e)
+      case e: Throwable => log.error("Error on getting matchId " + matchId, e)
         None
     }
   }

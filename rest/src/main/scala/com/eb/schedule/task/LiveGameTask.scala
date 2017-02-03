@@ -22,7 +22,7 @@ class LiveGameTask @Inject()(val liveGameHelper: LiveGameHelper, val netWorthSer
 
   private val log = LoggerFactory.getLogger(this.getClass)
 
-  val GET_LIVE_LEAGUE_MATCHES: String = "https://api.steampowered.com/IDOTA2Match_570/GetLiveLeagueGames/v0001/?key=9EBD51CD27F27324F1554C53BEDA17C3"
+  val GET_LIVE_LEAGUE_MATCHES: String = "https://api.steampowered.com/IDOTA2Match_570/GetLiveLeagueGames/v0001/?key=D998B8BDFA96FAA893E52903D6A77EEA"
 
   val finished: mutable.HashSet[Long] = new mutable.HashSet[Long]()
 
