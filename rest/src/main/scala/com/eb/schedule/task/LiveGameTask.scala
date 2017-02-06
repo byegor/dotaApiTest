@@ -31,12 +31,22 @@ class LiveGameTask @Inject()(val liveGameHelper: LiveGameHelper, val netWorthSer
       val liveLeagueGames: List[JsonObject] = getLiveLeagueGames()
 
       val currentGames: List[Option[CurrentGameDTO]] = liveLeagueGames.map(liveGameHelper.transformToDTO)
-      currentGames.foreach(current => processCurrentLiveGame(current))
+      currentGames.filter(filterOutGames).foreach(current => processCurrentLiveGame(current))
 
       val finishedMatches: Seq[Long] = findFinishedMatches(currentGames)
       finishedMatches.foreach(processFinishedMatches)
     } catch {
       case e: Throwable => log.error("Error during game process", e)
+    }
+  }
+
+  def filterOutGames(gameOpt: Option[CurrentGameDTO]): Boolean = {
+    if (gameOpt.isDefined) {
+      val game = gameOpt.get
+      //todo move to db or file
+      game.basicInfo.league.leagueName != "CDEC Master"
+    } else {
+      false
     }
   }
 
