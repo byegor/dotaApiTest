@@ -24,7 +24,7 @@ class PlayerCache @Inject()(val teamService: TeamService, taskService: UpdateTas
 
 
   val cache: LoadingCache[Int, String] = CacheBuilder.newBuilder()
-    .expireAfterAccess(6, TimeUnit.HOURS)
+    .expireAfterAccess(24, TimeUnit.HOURS)
     .maximumSize(2000)
     .build(new CacheLoader[Int, String]() {
       def load(id: Int): String = {
