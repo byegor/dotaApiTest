@@ -18,7 +18,6 @@ import scala.concurrent.duration.Duration
 /**
   * Created by Egor on 04.06.2016.
   */
-//todo don't include games in LiveGameContainer if there is no pick
 //todo rehost
 //todo cache results for 1 min
 trait ScheduleRestService {
