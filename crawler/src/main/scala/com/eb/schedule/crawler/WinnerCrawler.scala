@@ -3,15 +3,11 @@ package com.eb.schedule.crawler
 import com.eb.schedule.dto.{ScheduledGameDTO, SeriesDTO}
 import com.eb.schedule.model.SeriesType
 import com.eb.schedule.model.services.ScheduledGameService
-import com.eb.schedule.model.slick.MatchSeries
 import com.eb.schedule.services.SeriesService
 import com.eb.schedule.utils.HttpUtils
 import com.google.gson.JsonObject
 import com.google.inject.Inject
 import org.slf4j.LoggerFactory
-
-import scala.concurrent.Future
-import scala.concurrent.ExecutionContext.Implicits.global
 
 class WinnerCrawler @Inject()(seriesService: SeriesService, scheduledGameService: ScheduledGameService, httpUtils: HttpUtils) extends Runnable {
 
@@ -22,7 +18,7 @@ class WinnerCrawler @Inject()(seriesService: SeriesService, scheduledGameService
       val series1: Map[ScheduledGameDTO, Seq[SeriesDTO]] = seriesService.getUnfinishedSeries()
       series1.foreach(tuple => tuple._2.foreach(updateWinners(_, tuple._1)))
     } catch {
-      case e: Throwable => log.error("", e)
+      case e: Throwable => log.error("some trouble with mysql logic i guess", e)
     }
   }
 
@@ -31,26 +27,30 @@ class WinnerCrawler @Inject()(seriesService: SeriesService, scheduledGameService
       val response: JsonObject = httpUtils.getResponseAsJson(CrawlerUrls.GET_MATCH_DETAILS + series.matchId)
       val result: JsonObject = response.getAsJsonObject("result")
       if (result != null && !result.has("error")) {
-        val radiantWin: Boolean = result.get("radiant_win").getAsBoolean
-        if (SeriesType.BO1 == game.seriesType) {
-          series.radiantWin = Some(radiantWin)
-        } else {
-          if (result.has("radiant_team_id")) {
-            if (result.get("radiant_team_id").getAsInt == game.radiantTeam.id) {
-              series.radiantWin = Some(radiantWin)
-            } else {
-              series.radiantWin = Some(!radiantWin)
-            }
+        try {
+          val radiantWin: Boolean = result.get("radiant_win").getAsBoolean
+          if (SeriesType.BO1 == game.seriesType) {
+            series.radiantWin = Some(radiantWin)
           } else {
-            if (series.radiantTeamId == game.radiantTeam.id) {
-              series.radiantWin = Some(radiantWin)
+            if (result.has("radiant_team_id")) {
+              if (result.get("radiant_team_id").getAsInt == game.radiantTeam.id) {
+                series.radiantWin = Some(radiantWin)
+              } else {
+                series.radiantWin = Some(!radiantWin)
+              }
             } else {
-              series.radiantWin = Some(!radiantWin)
+              if (series.radiantTeamId == game.radiantTeam.id) {
+                series.radiantWin = Some(radiantWin)
+              } else {
+                series.radiantWin = Some(!radiantWin)
+              }
             }
           }
+          seriesService.update(series)
+          log.debug("Winner updated for matchId: " + series.matchId + " and seriesId: " + series.gameId)
+        } catch {
+          case e: Throwable => log.error("Couldn't update winner for match: " + series.matchId, e)
         }
-        seriesService.update(series)
-        log.debug("Winner updated for matchId: " + series.matchId + " and seriesId: " + series.gameId)
       }
     }
   }

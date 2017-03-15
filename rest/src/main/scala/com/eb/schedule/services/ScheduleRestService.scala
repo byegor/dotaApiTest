@@ -19,7 +19,7 @@ import scala.concurrent.duration.Duration
   * Created by Egor on 04.06.2016.
   */
 //todo rehost
-//todo cache results for 1 min
+//todo cache results for 1 min on nginx side
 trait ScheduleRestService {
   def getGameByDate(milliseconds: Long): Map[String, Seq[GameBean]]
 
