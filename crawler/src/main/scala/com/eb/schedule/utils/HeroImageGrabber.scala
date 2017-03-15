@@ -9,14 +9,12 @@ import com.eb.schedule.services.HeroServiceImpl
 import com.google.inject.Guice
 
 import scala.concurrent.Await
-import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.duration.Duration
 import scala.sys.process._
 
 /**
   * Created by Egor on 24.06.2016.
   */
-  //todo get hero instane
 object HeroImageGrabber extends App {
 
 
@@ -24,7 +22,8 @@ object HeroImageGrabber extends App {
   private val heroServiceImpl: HeroServiceImpl = injector.getInstance(classOf[HeroServiceImpl])
   private val heroes: Seq[HeroDTO] = Await.result(heroServiceImpl.findAll(), Duration.Inf).filter(_.heroId != 0)
   for (hero <- heroes) {
-    fileDownloader("http://cdn.dota2.com/apps/dota2/images/heroes/" + hero.name + "_full.png", "h_" + hero.heroId + ".png")
+    val escapedName = hero.name.replaceAll(" ", "_")
+    fileDownloader("http://cdn.dota2.com/apps/dota2/images/heroes/" + escapedName + "_full.png", escapedName + ".png")
   }
 
   def fileDownloader(url: String, filename: String) = {

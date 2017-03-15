@@ -1,11 +1,12 @@
 package com.eb.schedule.model.slick
 
-import slick.lifted.{Rep, Tag}
 import slick.driver.MySQLDriver.api._
+import slick.lifted.{Rep, Tag}
 
 /**
   * Created by Egor on 26.03.2016.
   */
+//todo localized name
 case class Hero(id: Int, name: String)
 
 object Hero {

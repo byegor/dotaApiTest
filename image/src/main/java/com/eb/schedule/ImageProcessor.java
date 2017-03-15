@@ -3,10 +3,7 @@ package com.eb.schedule;
 import com.google.common.cache.CacheBuilder;
 import com.google.common.cache.CacheLoader;
 import com.google.common.cache.LoadingCache;
-import com.mashape.unirest.http.HttpResponse;
-import com.mashape.unirest.http.JsonNode;
 import com.mashape.unirest.http.Unirest;
-import org.json.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -18,16 +15,18 @@ import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
 
 /**
- * Created by Egor on 14.06.2016.
+ * Created by Egor on 15.03.2017.
  */
-public class ItemImageUtils {
+public abstract class ImageProcessor {
+    private final Logger logger = LoggerFactory.getLogger(this.getClass());
 
-    private final Logger logger = LoggerFactory.getLogger(ItemImageUtils.class);
-
-    private static final String GET_ITEM_LOGO = "http://media.steampowered.com/apps/dota2/images/items/%s_lg.png";
-
-    private final String dataFolder;
     private final byte[] defaultImage;
+    private final String dataFolder;
+
+    ImageProcessor(String dataFolder) throws IOException {
+        this.dataFolder = dataFolder;
+        defaultImage = getDefaultImage(dataFolder);
+    }
 
     private final LoadingCache<String, byte[]> images = CacheBuilder.newBuilder()
             .maximumSize(100)
@@ -38,30 +37,9 @@ public class ItemImageUtils {
                             return processImage(imageId);
                         }
                     });
-
-    public ItemImageUtils(String dataFolder) throws IOException {
-        this.dataFolder = dataFolder;
-        this.defaultImage = getDefaultImage(dataFolder);
-    }
-
-    private byte[] getDefaultImage(String dataFolder) throws IOException {
-        Path path = Paths.get(dataFolder).resolve("-1.png");
-        return Files.readAllBytes(path);
-    }
-
-    public byte[] getImage(String id) {
-        try {
-            return images.get(id);
-        } catch (ExecutionException ignore) {
-        }
-        return defaultImage;
-    }
-
     private byte[] processImage(String name) {
         try {
-            String url = String.format(GET_ITEM_LOGO, name);
-
-            try (InputStream inputStream = Unirest.get(url).asBinary().getBody()) {
+            try (InputStream inputStream = Unirest.get(getImageUrl(name)).asBinary().getBody()) {
                 int read = 0;
                 byte[] bytes = new byte[1024];
                 try (ByteArrayOutputStream outputStream = new ByteArrayOutputStream()) {
@@ -84,4 +62,21 @@ public class ItemImageUtils {
             outputStream.writeTo(file);
         }
     }
+
+
+    public byte[] getImage(String id) {
+        try {
+            return images.get(id);
+        } catch (ExecutionException ignore) {
+        }
+        return defaultImage;
+    }
+
+    private byte[] getDefaultImage(String dataFolder) throws IOException {
+        Path path = Paths.get(dataFolder).resolve("-1.png");
+        return Files.readAllBytes(path);
+    }
+
+
+    public abstract String getImageUrl(String name);
 }
