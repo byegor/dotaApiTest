@@ -5,7 +5,7 @@
 
     <groupId>com.eb.schedule</groupId>
     <artifactId>image-service</artifactId>
-    <version>0.1</version>
+    <version>0.2</version>
     <packaging>jar</packaging>
 
     <name>Image Service</name>

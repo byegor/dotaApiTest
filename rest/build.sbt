@@ -1,6 +1,6 @@
 name := "rest"
 
-version := "0.1"
+version := "0.2"
 
 lazy val scalatraVersion = "2.3.1"
 

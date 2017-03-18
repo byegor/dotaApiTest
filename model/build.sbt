@@ -1,6 +1,6 @@
 name := "model"
 
-version := "0.1"
+version := "0.2"
 
 libraryDependencies ++= Seq(
   "com.typesafe.slick" %% "slick" % "3.1.1",

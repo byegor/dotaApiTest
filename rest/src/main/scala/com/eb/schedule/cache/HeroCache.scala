@@ -12,6 +12,7 @@ import scala.concurrent.duration.Duration
 /**
   * Created by Egor on 26.03.2016.
   */
+//todo download hero from api and ivalidate cache
 class HeroCache @Inject()(val heroService: HeroService) {
 
   private val log = LoggerFactory.getLogger(this.getClass)
