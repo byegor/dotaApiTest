@@ -4,6 +4,7 @@ import com.google.common.cache.CacheBuilder;
 import com.google.common.cache.CacheLoader;
 import com.google.common.cache.LoadingCache;
 import com.mashape.unirest.http.Unirest;
+import com.mashape.unirest.http.exceptions.UnirestException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -37,18 +38,12 @@ public abstract class ImageProcessor {
                             return processImage(imageId);
                         }
                     });
+
     private byte[] processImage(String name) {
         try {
-            try (InputStream inputStream = Unirest.get(getImageUrl(name)).asBinary().getBody()) {
-                int read = 0;
-                byte[] bytes = new byte[1024];
+            try (InputStream inputStream = getImageAsStream(name)) {
                 try (ByteArrayOutputStream outputStream = new ByteArrayOutputStream()) {
-                    while ((read = inputStream.read(bytes)) != -1) {
-                        outputStream.write(bytes, 0, read);
-                    }
-
-                    saveImage(outputStream, name);
-                    return outputStream.toByteArray();
+                    return saveImage(name, inputStream, outputStream);
                 }
             }
         } catch (Exception e) {
@@ -57,12 +52,22 @@ public abstract class ImageProcessor {
         return defaultImage;
     }
 
-    private void saveImage(ByteArrayOutputStream outputStream, String name) throws Exception {
+    protected InputStream getImageAsStream(String name) throws UnirestException {
+        return Unirest.get(getImageUrl(name)).asBinary().getBody();
+    }
+
+    protected byte[] saveImage(String name, InputStream inputStream, ByteArrayOutputStream outputStream) throws Exception {
+        int read;
+        byte[] bytes = new byte[1024];
+        while ((read = inputStream.read(bytes)) != -1) {
+            outputStream.write(bytes, 0, read);
+        }
+
         try (FileOutputStream file = new FileOutputStream(new File(dataFolder, name + ".png"))) {
             outputStream.writeTo(file);
         }
+        return outputStream.toByteArray();
     }
-
 
     public byte[] getImage(String id) {
         try {
