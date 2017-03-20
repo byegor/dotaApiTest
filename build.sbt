@@ -22,7 +22,7 @@ libraryDependencies in ThisBuild ++= Seq(
   "ch.qos.logback" % "logback-classic" % "1.1.3",
 
   "com.fasterxml.jackson.core" % "jackson-annotations" % "2.8.3",
-  "com.eb.schedule" % "shared" % "0.1"
+  "com.eb.schedule" % "shared" % "0.2"
 )
 
 lazy val root = project.in(file(".")) aggregate(model, rest, crawler)

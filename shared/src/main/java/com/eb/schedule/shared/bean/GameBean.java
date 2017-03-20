@@ -37,6 +37,9 @@ public class GameBean implements Serializable {
     @JsonProperty("gs")
     public int gameStatus;
 
+    @JsonProperty("nog")
+    public int numberOfGames;
+
     public GameBean() {
     }
 
@@ -137,5 +140,13 @@ public class GameBean implements Serializable {
 
     public void setGameStatus(int gameStatus) {
         this.gameStatus = gameStatus;
+    }
+
+    public int getNumberOfGames() {
+        return numberOfGames;
+    }
+
+    public void setNumberOfGames(int numberOfGames) {
+        this.numberOfGames = numberOfGames;
     }
 }
