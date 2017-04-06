@@ -6,7 +6,7 @@ import com.eb.schedule.dto._
 import com.eb.schedule.live.{GameContainer, LiveGameHelper}
 import com.eb.schedule.model.MatchStatus
 import com.eb.schedule.model.services.{ScheduledGameService, UpdateTaskService}
-import com.eb.schedule.services.{NetWorthService, SeriesService}
+import com.eb.schedule.services.{DataProcessor, NetWorthService, SeriesService}
 import com.eb.schedule.utils.HttpUtils
 import com.google.gson.{JsonArray, JsonObject}
 import com.google.inject.Inject
@@ -18,7 +18,7 @@ import scala.concurrent.ExecutionContext.Implicits.global
 /**
   * Created by Egor on 23.03.2016.
   */
-class LiveGameTask @Inject()(val liveGameHelper: LiveGameHelper, val netWorthService: NetWorthService, val gameService: ScheduledGameService, val seriesService: SeriesService, val taskService: UpdateTaskService, val httpUtils: HttpUtils) extends Runnable {
+class LiveGameTask @Inject()(val liveGameHelper: LiveGameHelper, val netWorthService: NetWorthService, val gameService: ScheduledGameService, val seriesService: SeriesService, val taskService: UpdateTaskService, val httpUtils: HttpUtils, dataProcessor: DataProcessor) extends Runnable {
 
   private val log = LoggerFactory.getLogger(this.getClass)
 
@@ -35,6 +35,8 @@ class LiveGameTask @Inject()(val liveGameHelper: LiveGameHelper, val netWorthSer
 
       val finishedMatches: Seq[Long] = findFinishedMatches(currentGames)
       finishedMatches.foreach(processFinishedMatches)
+
+      dataProcessor.processCurrentGames()
     } catch {
       case e: Throwable => log.error("Error during game process", e)
     }

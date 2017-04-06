@@ -21,7 +21,7 @@ class LiveGameTaskTest extends RestBasicTest {
   val MATCH_ID: Long = 2234857740l
 
   private def createProcessor(): LiveGameTask = {
-    new LiveGameTask(liveGameHelper, netWorthService, scheduledGameService, seriesService, taskService, new HttpUtilsMock)
+    new LiveGameTask(liveGameHelper, netWorthService, scheduledGameService, seriesService, taskService, new HttpUtilsMock, dataProcessor)
   }
 
   test("getLiveLeagueGames") {
@@ -92,7 +92,7 @@ class LiveGameTaskTest extends RestBasicTest {
         res.add("result", json)
         res
       }
-    })
+    }, dataProcessor)
     Future {
       emptyProcessor.run()
     }.futureValue
@@ -116,7 +116,7 @@ class LiveGameTaskTest extends RestBasicTest {
         res.add("result", json)
         res
       }
-    }).run()
+    },dataProcessor).run()
     val secondGame = 2234857741l
     val lastGame = GameContainer.getLiveGame(secondGame).get
     Future {

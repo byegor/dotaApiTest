@@ -46,6 +46,8 @@ trait ScheduledGameService {
   def getScheduledGamesByStatus(matchStatus: MatchStatus): Future[Seq[ScheduledGameDTO]]
 
   def getRecentGames(millis: Long): Future[Map[ScheduledGameDTO, Seq[Option[SeriesDTO]]]]
+
+  def getRecentGamesRethink(millis: Long): Future[Map[ScheduledGameDTO, Seq[SeriesDTO]]]
 }
 
 
@@ -139,6 +141,23 @@ class ScheduledGameServiceImpl @Inject()(repository: ScheduledGameRepository, se
     val gamesByDate: Future[Seq[(ScheduledGame, Option[MatchSeries])]] = repository.getGamesBetweenDate(new Timestamp(start), new Timestamp(end))
     val gamesDto: Future[Seq[(ScheduledGameDTO, Option[SeriesDTO])]] = gamesByDate.map(seq => seq.map(game => (DTOUtils.crateDTO(game._1), DTOUtils.crateMatchDTO(game._2))))
     val map: Future[Map[ScheduledGameDTO, Seq[Option[SeriesDTO]]]] = gamesDto.map(seq => seq.groupBy(_._1).mapValues(_.map(_._2)))
+    map.onFailure {
+      case ex => log.error("couldn't get games between dates " + new Date(millis), ex)
+    }
+    map
+  }
+
+  def getRecentGamesRethink(millis: Long): Future[Map[ScheduledGameDTO, Seq[SeriesDTO]]] = {
+    val c = Calendar.getInstance()
+    c.setTimeInMillis(millis)
+    c.add(Calendar.HOUR_OF_DAY, -24)
+    val start = c.getTimeInMillis
+    val end = millis + TimeUnit.SECONDS.toMillis(10)
+
+
+    val gamesByDate: Future[Seq[(ScheduledGame, MatchSeries)]] = repository.getGamesBetweenDateRethink(new Timestamp(start), new Timestamp(end))
+    val gamesDto: Future[Seq[(ScheduledGameDTO, SeriesDTO)]] = gamesByDate.map(seq => seq.map(game => (DTOUtils.crateDTO(game._1), DTOUtils.crateDTO(game._2))))
+    val map: Future[Map[ScheduledGameDTO, Seq[SeriesDTO]]] = gamesDto.map(seq => seq.groupBy(_._1).mapValues(_.map(_._2)))
     map.onFailure {
       case ex => log.error("couldn't get games between dates " + new Date(millis), ex)
     }

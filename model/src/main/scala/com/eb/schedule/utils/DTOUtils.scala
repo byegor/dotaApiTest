@@ -1,8 +1,8 @@
 package com.eb.schedule.utils
 
 import com.eb.schedule.dto.{NetWorthDTO, _}
-import com.eb.schedule.model.{MatchStatus, SeriesType}
 import com.eb.schedule.model.slick._
+import com.eb.schedule.model.{MatchStatus, SeriesType}
 
 /**
   * Created by Egor on 13.03.2016.
@@ -22,12 +22,12 @@ object DTOUtils {
   }
 
   def crateDTO(l: MatchSeries): SeriesDTO = {
-    new SeriesDTO(l.scheduledGameId, l.matchId, l.gameNumber, l.radiantWin, l.finished, l.radiantTeam)
+    new SeriesDTO(l.scheduledGameId, l.matchId, l.gameNumber, l.radiantWin, l.finished, l.radiantTeam, l.startDate)
   }
 
   def crateMatchDTO(series: Option[MatchSeries]): Option[SeriesDTO] = {
     series match {
-      case Some(l) => Some(new SeriesDTO(l.scheduledGameId, l.matchId, l.gameNumber, l.radiantWin, l.finished, l.radiantTeam))
+      case Some(l) => Some(new SeriesDTO(l.scheduledGameId, l.matchId, l.gameNumber, l.radiantWin, l.finished, l.radiantTeam, l.startDate))
       case None => None
     }
 
@@ -63,7 +63,7 @@ object DTOUtils {
   }
 
   def transformMatchSeriesFromDTO(s: SeriesDTO): MatchSeries = {
-    new MatchSeries(s.gameId, s.matchId, s.gameNumber, s.radiantWin, s.finished, s.radiantTeamId)
+    new MatchSeries(s.gameId, s.matchId, s.gameNumber, s.radiantWin, s.finished, s.radiantTeamId, s.startDate)
   }
 
   def transformTeamFromDTO(t: TeamDTO): Team = {

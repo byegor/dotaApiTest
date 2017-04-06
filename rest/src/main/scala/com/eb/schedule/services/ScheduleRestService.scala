@@ -46,6 +46,7 @@ class ScheduledRestServiceImpl @Inject()(scheduledGameService: ScheduledGameServ
         .filter(matches => matches.radiantWin.isDefined).foreach(matches =>
         if (matches.radiantWin.get) gameBean.setRadiantWin(gameBean.radiantWin + 1) else gameBean.setDireWin(gameBean.direWin + 1)
       )
+      gameBean.numberOfGames = matches.count(op => op.isDefined)
       games += gameBean
     }
 
@@ -63,6 +64,7 @@ class ScheduledRestServiceImpl @Inject()(scheduledGameService: ScheduledGameServ
     new DateTime().withMillis(mil).withZone(DateTimeZone.UTC).withTimeAtStartOfDay().getMillis
   }
 
+  //todo return map with match by gameNumber
   override def getGameMatchesById(gameId: Int): Seq[Match] = {
     val finishedMatches: Seq[Match] = getGamesMatches(gameId)
 
@@ -78,17 +80,10 @@ class ScheduledRestServiceImpl @Inject()(scheduledGameService: ScheduledGameServ
   }
 
   def getGamesMatches(gameId: Int): Seq[Match] = {
-    val series: Seq[SeriesDTO] = Await.result(seriesService.findBySeriesId(gameId), Duration.Inf)
-    val gamesMatches: Seq[Match] = series.map(game => cacheHelper.getMatch(game.matchId)).filter(_.isDefined).map(_.get)
-    gamesMatches
+    Nil
   }
 
   def getMatchById(matchId: Long): Option[Match] = {
-    val liveGame: Option[CurrentGameDTO] = GameContainer.getLiveGame(matchId)
-    if (liveGame.isDefined) {
-      Some(liveGame.get.toMatch())
-    } else {
-      cacheHelper.getMatch(matchId)
-    }
+None
   }
 }

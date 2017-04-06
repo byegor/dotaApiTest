@@ -1,7 +1,6 @@
 package com.eb.schedule.cache
 
 import com.eb.schedule.dto.{HeroDTO, ItemDTO, LeagueDTO}
-import com.eb.schedule.shared.bean.Match
 import com.google.inject.{Inject, Singleton}
 import org.slf4j.LoggerFactory
 
@@ -25,7 +24,7 @@ class CacheHelper @Inject()(val heroCache: HeroCache, val itemCache: ItemCache, 
     leagueCache.getLeague(id)
   }
 
-  def getMatch(id: Long): Option[Match] = {
+  def getMatch(id: Long): Option[String] = {
     matchCache.getMatch(id)
   }
 

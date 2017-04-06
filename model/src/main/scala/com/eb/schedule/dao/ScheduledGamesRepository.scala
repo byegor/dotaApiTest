@@ -41,6 +41,8 @@ trait ScheduledGameRepository {
   def getScheduledGamesByStatus(matchStatus: MatchStatus): Future[Seq[ScheduledGame]]
 
   def getGamesBetweenDate(start: Timestamp, end: Timestamp): Future[Seq[(ScheduledGame, Option[MatchSeries])]]
+
+  def getGamesBetweenDateRethink(start: Timestamp, end: Timestamp): Future[Seq[(ScheduledGame, MatchSeries)]]
 }
 
 class ScheduledGameRepositoryImpl @Inject()(val database: DB) extends ScheduledGameRepository {
@@ -125,6 +127,15 @@ class ScheduledGameRepositoryImpl @Inject()(val database: DB) extends ScheduledG
     db.run(
       (for {
         (g, matchSeries) <- ScheduledGame.table joinLeft MatchSeries.table on (_.id === _.scheduledGameId)
+        if g.startDate > start && g.startDate < end
+      } yield (g, matchSeries)).result
+    )
+  }
+
+  def getGamesBetweenDateRethink(start: Timestamp, end: Timestamp): Future[Seq[(ScheduledGame, MatchSeries)]] = {
+    db.run(
+      (for {
+        (g, matchSeries) <- ScheduledGame.table join MatchSeries.table on (_.id === _.scheduledGameId)
         if g.startDate > start && g.startDate < end
       } yield (g, matchSeries)).result
     )
