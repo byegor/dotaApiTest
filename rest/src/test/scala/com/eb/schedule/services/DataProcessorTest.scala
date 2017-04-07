@@ -11,6 +11,7 @@ import org.joda.time.{DateTime, DateTimeZone}
 /**
   * Created by Egor on 05.04.2017.
   */
+//todo test rehost
 class DataProcessorTest extends RestBasicTest {
 
   test("Get time in mills") {
