@@ -1,0 +1,10 @@
+start on runlevel [2345]
+
+# When to stop the service
+stop on runlevel [016]
+
+# Automatically restart process if crashed
+respawn
+
+chdir /home/ec2-user/
+exec java -Xmx50m -jar crawler.jar
