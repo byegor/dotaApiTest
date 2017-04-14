@@ -25,14 +25,16 @@ libraryDependencies in ThisBuild ++= Seq(
   "com.eb.schedule" % "shared" % "0.2"
 )
 
-lazy val root = project.in(file(".")) aggregate(model, rest, crawler)
+lazy val root = project.in(file(".")) aggregate(model, restapi, crawler)
 
 
 lazy val model = project.in(file("model"))
 
-lazy val rest = project.in(file("rest")) dependsOn (model % "test->test;compile->compile")
+//lazy val rest = project.in(file("rest")) dependsOn (model % "test->test;compile->compile")
 
 lazy val crawler = project.in(file("crawler")) dependsOn (model % "test->test;compile->compile")
+
+lazy val restapi = project.in(file("rest-api"))
 
 /*assemblyMergeStrategy in assembly := {
 //  case PathList("javax", "servlet", xs @ _*)         => MergeStrategy.first

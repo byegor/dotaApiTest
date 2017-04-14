@@ -72,7 +72,7 @@ class DataProcessor @Inject()(scheduledGameService: ScheduledGameService, series
       gameBean.setId(game.id)
       gameBean.setSeriesType(game.seriesType.name())
       gameBean.setGameStatus(game.matchStatus.status)
-      gameBean.setNumberOfGames(matches.maxBy(_.gameNumber).gameNumber)
+      gameBean.setNumberOfGames(matches.size)
       gameBean.setStartTime(game.startDate.getTime)
 
       currentGames = gameBean :: currentGames

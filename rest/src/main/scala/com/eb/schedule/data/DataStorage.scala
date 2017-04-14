@@ -12,6 +12,9 @@ object DataStorage {
   private var currentMatches: ConcurrentHashMap[String, String] = new ConcurrentHashMap[String, String]()
   private var matchesByGames: ConcurrentHashMap[String, String] = new ConcurrentHashMap[String, String]()
 
+
+
+
   def setCurrentGames(currentGames: String, currentMatches: ConcurrentHashMap[String, String], matchesByGames: ConcurrentHashMap[String, String]): Unit = {
     this.currentMatches = currentMatches
     this.currentGames = currentGames
