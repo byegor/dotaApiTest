@@ -11,7 +11,7 @@ scalacOptions in ThisBuild ++= Seq(
 resolvers += Resolver.mavenLocal
 
 libraryDependencies in ThisBuild ++= Seq(
-  "org.scalatest" %% "scalatest" % "2.2.4" % "test",
+  "org.scalatest"       %% "scalatest"                    % "3.0.1"   % "test",
   "org.scalacheck" %% "scalacheck" % "1.12.2" % "test",
   "org.mockito" % "mockito-all" % "1.9.5" % "test",
   "com.google.inject" % "guice" % "4.0" exclude("com.google.guava", "guava"),

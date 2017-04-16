@@ -11,7 +11,7 @@ class MatchRoute {
 
   val route = pathPrefix("matches") {
     get {
-      path(LongNumber) { matchId =>
+      path(Segment) { matchId =>
         complete(HttpEntity(ContentTypes.`text/plain(UTF-8)`, DataStorage.getMatchById(matchId)))
       }
     }

@@ -10,18 +10,18 @@ import scala.collection.JavaConverters._
 object DataStorage {
 
   private var currentGames: String = ""
-  private var currentMatches: ConcurrentHashMap[Long, String] = new ConcurrentHashMap[Long, String]()
-  private var matchesByGames: ConcurrentHashMap[Int, String] = new ConcurrentHashMap[Int, String]()
+  private var currentMatches: java.util.Map[String, String] = new ConcurrentHashMap[String, String]()
+  private var matchesByGames: java.util.Map[String, String] = new ConcurrentHashMap[String, String]()
 
   def setData(data: Data): Unit = {
     this.currentGames = data.currentGames
-    this.currentMatches = new ConcurrentHashMap[Long, String](mapAsJavaMap(data.currentMatches))
-    this.matchesByGames = new ConcurrentHashMap[Int, String](mapAsJavaMap(data.matchesByGames))
+    this.currentMatches = new ConcurrentHashMap[String, String](mapAsJavaMap(data.currentMatches))
+    this.matchesByGames = new ConcurrentHashMap[String, String](mapAsJavaMap(data.matchesByGames))
   }
 
   def getCurrentGames: String = currentGames
 
-  def getMatchById(matchId: Long): String = currentMatches.get(matchId, "")
+  def getMatchById(matchId: String): String = currentMatches.getOrDefault(matchId, "")
 
-  def getMatchesByGameId(gameId: Int): String =  matchesByGames.getOrDefault(gameId, "")
+  def getMatchesByGameId(gameId: String): String =  matchesByGames.getOrDefault(gameId, "")
 }

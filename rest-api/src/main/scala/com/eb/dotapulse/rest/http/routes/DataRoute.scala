@@ -9,7 +9,7 @@ import com.eb.dotapulse.rest.data.{Data, DataStorage, JsonSupport}
   */
 class DataRoute extends Directives with JsonSupport{
 
-  val route: Route = post {
+  val route: Route = put {
     entity(as[Data]) { data =>
       DataStorage.setData(data)
       complete("OK")

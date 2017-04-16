@@ -14,7 +14,7 @@ class GamesRoute {
       pathSingleSlash {
         complete(HttpEntity(ContentTypes.`text/plain(UTF-8)`, DataStorage.getCurrentGames))
       } ~
-        path(IntNumber) { gameId =>
+        path(Segment) { gameId =>
           complete(HttpEntity(ContentTypes.`text/plain(UTF-8)`, DataStorage.getMatchesByGameId(gameId)))
         }
     }
