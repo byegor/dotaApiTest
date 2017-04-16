@@ -22,7 +22,7 @@ public enum MatchStatus {
                 return matchStatus;
             }
         }
-        throw  new IllegalArgumentException("so such match status as " + status);
+        throw  new IllegalArgumentException("no such match status as " + status);
     }
 
 }
