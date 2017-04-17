@@ -17,7 +17,7 @@ case class ItemDTO(itemId: Int, itemName: String = "")*/
 case class LiveMatch(matchId: Long, scheduledGameId: Int, radiantTeam: TeamScoreBoard, direTeam: TeamScoreBoard, league: Int, currentNet: Int, duration: Double, radiantScore: Int,
                      direScore: Int, seriesType: SeriesType, winByRadiant: Int, winByDire: Int)
 
-case class FinishedMatch(matchId: Long, startTime: Long, duration: Int, radiantWin: Boolean, radiantTeam: TeamScoreBoard, direTeam: TeamScoreBoard, league: League,
+case class FinishedMatch(matchId: Long, startTime: Long, duration: Int, radiantWin: Boolean, radiantTeam: TeamScoreBoard, direTeam: TeamScoreBoard, league: Int,
                          netWorth: NetWorth, gameNumber: Int, winByRadiant: Int = 0, winByDire: Int = 0)
 
 case class ScheduledGameDTO(id: Int, radiantTeam: Team, direTeam: Team, league: League, seriesType: SeriesType, startDate: Timestamp, matchStatus: MatchStatus)
