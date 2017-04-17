@@ -16,5 +16,7 @@ libraryDependencies ++= Seq(
 
 
   "org.apache.httpcomponents"   % "httpclient"        % "4.5",
-  "com.mashape.unirest"         % "unirest-java"      % "1.4.6"
+  "com.mashape.unirest"         % "unirest-java"      % "1.4.6",
+
+  "com.eb.schedule"             % "shared"            % "0.2"
 )

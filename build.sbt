@@ -30,7 +30,7 @@ lazy val root = project.in(file(".")) aggregate(model, restapi, crawler)
 
 lazy val model = project.in(file("model"))
 
-
+lazy val rest = project.in(file("rest"))
 
 lazy val crawler = project.in(file("crawler")) dependsOn (model % "test->test;compile->compile")
 

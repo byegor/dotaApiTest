@@ -1,16 +1,11 @@
 package com.eb.schedule.live
 
 import com.eb.schedule.cache._
-import com.eb.schedule.dto.{CurrentGameDTO, NetWorthDTO, PlayerDTO, TeamDTO}
-import com.eb.schedule.model.SeriesType
-import com.eb.schedule.model.services.TeamService
-import com.eb.schedule.services.NetWorthService
 import com.google.gson.{JsonArray, JsonObject}
 import com.google.inject.Inject
 import org.slf4j.LoggerFactory
 
 import scala.collection.mutable
-import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.duration.Duration
 import scala.concurrent.{Await, Future}
 
@@ -26,7 +21,7 @@ class LiveGameHelper @Inject()(val heroCache: HeroCache, val itemCache: ItemCach
       if (game.has("scoreboard")) {
         val matchId: Long = game.get("match_id").getAsLong
         val currentGame: CurrentGameDTO = new CurrentGameDTO(matchId)
-        fillGameWithTeams(game, currentGame)
+
         fillGameWithOther(game, currentGame)
         fillGameWithNetWorth(currentGame)
         Some(currentGame)
@@ -41,17 +36,6 @@ class LiveGameHelper @Inject()(val heroCache: HeroCache, val itemCache: ItemCach
     }
   }
 
-  def fillGameWithTeams(game: JsonObject, currentGame: CurrentGameDTO): Unit = {
-    val leagueId: Int = game.get("league_id").getAsInt
-    currentGame.basicInfo.league = leagueCache.getLeague(leagueId)
-    currentGame.basicInfo.radiantWin = game.get("radiant_series_wins").getAsByte
-    currentGame.basicInfo.direWin = game.get("dire_series_wins").getAsByte
-    currentGame.basicInfo.radiantTeam = parseTeam(game.getAsJsonObject("radiant_team"))
-    currentGame.basicInfo.direTeam = parseTeam(game.getAsJsonObject("dire_team"))
-    currentGame.basicInfo.seriesType = SeriesType.fromCode(game.get("series_type").getAsByte)
-    currentGame.radiantTeam = currentGame.basicInfo.radiantTeam.copy()
-    currentGame.direTeam = currentGame.basicInfo.direTeam.copy()
-  }
 
   def fillGameWithOther(game: JsonObject, currentGame: CurrentGameDTO): Unit = {
     val basicPlayerInfo: JsonArray = game.get("players").getAsJsonArray
