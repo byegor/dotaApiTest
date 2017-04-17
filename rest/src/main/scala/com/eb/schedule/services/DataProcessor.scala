@@ -47,11 +47,14 @@ class DataProcessor @Inject()(scheduledGameService: ScheduledGameService, series
         for((game, mathces) <- gamesPair){
 
           var matchesByGameNumber = HashMap[String, String]()
-          for(m <- mathces.sortBy(_.startDate.getTime)){
+          val sortedMatches = mathces.sortBy(_.startDate.getTime)
+          for(m <- sortedMatches){
             val jsonMatch = currentMatchesJson.get(m.matchId.toString)
             matchesByGameNumber = matchesByGameNumber + (m.gameNumber.toString -> jsonMatch)
           }
-          matchesByGames.put(game.id.toString, mapper.writeValueAsString(matchesByGameNumber))
+          val gameNumbers = matchesByGameNumber.keys.toSeq.sorted
+          val matchesList = gameNumbers.map( n => matchesByGameNumber.get(n)).filter(_.isDefined).map(_.get)
+          matchesByGames.put(game.id.toString, mapper.writeValueAsString(matchesList))
         }
 
         DataStorage.setCurrentGames(currentGamesJson, currentMatchesJson, matchesByGames)
@@ -72,7 +75,7 @@ class DataProcessor @Inject()(scheduledGameService: ScheduledGameService, series
       gameBean.setId(game.id)
       gameBean.setSeriesType(game.seriesType.name())
       gameBean.setGameStatus(game.matchStatus.status)
-      gameBean.setNumberOfGames(matches.maxBy(_.gameNumber).gameNumber)
+      gameBean.setNumberOfGames(Math.min(matches.maxBy(_.gameNumber).gameNumber, matches.size))
       gameBean.setStartTime(game.startDate.getTime)
 
       currentGames = gameBean :: currentGames
