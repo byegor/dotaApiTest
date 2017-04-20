@@ -1,50 +1,55 @@
 package com.eb.pulse.crawler.parser
 
+import com.eb.pulse.crawler.Lookup
 import com.eb.pulse.crawler.model.{FinishedMatch, Player, TeamScoreBoard}
-import com.eb.schedule.model.slick.{NetWorth, Team}
+import com.eb.schedule.model.slick.Team
 import com.google.gson.{JsonArray, JsonObject}
 import org.slf4j.LoggerFactory
 
 /**
   * Created by Egor on 16.04.2017.
   */
-class FinishedMatchParser {
+class FinishedMatchParser extends Lookup{
 
   private val log = LoggerFactory.getLogger(this.getClass)
 
-  //todo networhts
-  def parseMatch(jsonObject: JsonObject): FinishedMatch = {
-    val matchId = jsonObject.get("match_id").getAsLong
-    val duration = jsonObject.get("duration").getAsInt
-    val radiantWin = jsonObject.get("radiant_win").getAsBoolean
-    val startTime = jsonObject.get("start_time").getAsLong
-    val radiantScore = jsonObject.get("radiant_score").getAsByte
-    val direScore = jsonObject.get("dire_score").getAsByte
-    val league = jsonObject.get("leagueid").getAsInt
 
-    val direBarrackStatus = jsonObject.get("barracks_status_dire").getAsInt
-    val direTowerStatus = jsonObject.get("tower_status_dire").getAsInt
-    val radiantBarrackStatus = jsonObject.get("barracks_status_radiant").getAsInt
-    val radiantTowerStatus = jsonObject.get("tower_status_radiant").getAsInt
+  def parseMatch(jsonObject: JsonObject): Option[FinishedMatch] = {
+    try {
+      val matchId = jsonObject.get("match_id").getAsLong
+      val duration = jsonObject.get("duration").getAsInt
+      val radiantWin = jsonObject.get("radiant_win").getAsBoolean
+      val startTime = jsonObject.get("start_time").getAsLong
+      val radiantScore = jsonObject.get("radiant_score").getAsByte
+      val direScore = jsonObject.get("dire_score").getAsByte
+      val league = jsonObject.get("leagueid").getAsInt
+      val direBarrackStatus = jsonObject.get("barracks_status_dire").getAsInt
 
-    val radiantTeam = getTeam(jsonObject, "radiant_team_id", "radiant_name", "radiant_logo")
-    val direTeam = getTeam(jsonObject, "dire_team_id", "dire_name", "dire_logo")
+      val direTowerStatus = jsonObject.get("tower_status_dire").getAsInt
+      val radiantBarrackStatus = jsonObject.get("barracks_status_radiant").getAsInt
+      val radiantTowerStatus = jsonObject.get("tower_status_radiant").getAsInt
+      val radiantTeam = getTeam(jsonObject, "radiant_team_id", "radiant_name", "radiant_logo")
 
-    val playersList: JsonArray = jsonObject.get("players").getAsJsonArray
+      val direTeam = getTeam(jsonObject, "dire_team_id", "dire_name", "dire_logo")
+      val playersList: JsonArray = jsonObject.get("players").getAsJsonArray
 
-    val players = getPlayers(playersList)
+      val players = getPlayers(playersList)
 
-    val picks = getMatchPicks(jsonObject)
+      val picks = getMatchPicks(jsonObject)
 
-    val radiantScoreBoard = TeamScoreBoard(radiantTeam, players._1, picks.filter(p => p.radiant && p.pick).map(_.heroId), picks.filter(p => p.radiant && !p.pick).map(_.heroId),
-      radiantScore, radiantTowerStatus, radiantBarrackStatus)
+      val radiantScoreBoard = TeamScoreBoard(radiantTeam, players._1, picks.filter(p => p.radiant && p.pick).map(_.heroId), picks.filter(p => p.radiant && !p.pick).map(_.heroId),
+        radiantScore, radiantTowerStatus, radiantBarrackStatus)
 
-    val direScoreBoard = TeamScoreBoard(direTeam, players._2, picks.filter(p => !p.radiant && p.pick).map(_.heroId), picks.filter(p => !p.radiant && !p.pick).map(_.heroId),
-      direScore, direTowerStatus, direBarrackStatus)
+      val direScoreBoard = TeamScoreBoard(direTeam, players._2, picks.filter(p => !p.radiant && p.pick).map(_.heroId), picks.filter(p => !p.radiant && !p.pick).map(_.heroId),
+        direScore, direTowerStatus, direBarrackStatus)
 
-    //todo do we need game number
-    FinishedMatch(matchId, startTime, duration, radiantWin, radiantScoreBoard, direScoreBoard, league, new NetWorth(-1, ""), -1, radiantScore, direScore)
+      val networth = netWorthService.findByMatchId(matchId)
 
+      Some(FinishedMatch(matchId, startTime, duration, radiantWin, radiantScoreBoard, direScoreBoard, league, networth, radiantScore, direScore))
+    } catch {
+      case e: Throwable => log.error("Couldn't parse finished match: " + jsonObject, e)
+        None
+    }
   }
 
 

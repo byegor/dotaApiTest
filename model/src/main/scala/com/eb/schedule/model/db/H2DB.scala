@@ -7,8 +7,7 @@ import slick.jdbc.JdbcBackend
 /**
   * Created by Egor on 20.02.2016.
   */
-object H2DB extends DB{
+trait H2DB extends DB{
   val dbConfig: DatabaseConfig[JdbcProfile] = DatabaseConfig.forConfig[JdbcProfile]("h2")
   def db: JdbcBackend#DatabaseDef = dbConfig.db
-  import com.github.tototoshi.slick.H2JodaSupport._
 }

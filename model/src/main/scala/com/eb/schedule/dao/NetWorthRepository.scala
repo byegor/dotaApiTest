@@ -1,10 +1,7 @@
 package com.eb.schedule.dao
 
-import com.eb.schedule.model.db.DB
-import com.eb.schedule.model.slick.{Item, NetWorth}
-import com.eb.schedule.model.slick.Item.ItemTable
+import com.eb.schedule.model.slick.NetWorth
 import com.eb.schedule.model.slick.NetWorth.NetWorthTable
-import com.google.inject.Inject
 import org.slf4j.LoggerFactory
 import slick.driver.MySQLDriver.api._
 import slick.jdbc.JdbcBackend
@@ -25,11 +22,9 @@ trait NetWorthRepository {
   def insert(nw: NetWorth): Future[Int]
 }
 
-class NetWorthRepositoryImpl @Inject()(database: DB) extends NetWorthRepository {
+class NetWorthRepositoryImpl (implicit db: JdbcBackend#DatabaseDef) extends NetWorthRepository {
 
   private val log = LoggerFactory.getLogger(this.getClass)
-
-  val db: JdbcBackend#DatabaseDef = database.db
 
   lazy val netWorth = NetWorth.table
 

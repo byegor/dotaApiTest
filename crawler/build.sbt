@@ -1,6 +1,6 @@
 name := "crawler"
 
-version := "0.2"
+version := "0.3"
 
 libraryDependencies ++= Seq(
   "commons-dbutils" % "commons-dbutils" % "1.6",

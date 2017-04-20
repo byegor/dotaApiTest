@@ -1,26 +1,21 @@
 package com.eb.schedule.model
 
 
-import _root_.slick.dbio.Effect.Read
 import _root_.slick.driver.H2Driver.api._
-import _root_.slick.jdbc.meta.MTable
-import _root_.slick.lifted.TableQuery
-import _root_.slick.profile.BasicStreamingAction
 import com.eb.schedule.configure.{CoreModule, H2Module}
-import com.eb.schedule.model.db.{DB, H2DB}
+import com.eb.schedule.dao.NetWorthRepository
+import com.eb.schedule.model.db.DB
 import com.eb.schedule.model.services._
 import com.eb.schedule.model.slick.{Hero, League, _}
 import com.eb.schedule.services.{HeroService, NetWorthService, SeriesService}
 import com.google.inject.Guice
 import org.h2.jdbc.JdbcSQLException
+import org.scalatest._
 import org.scalatest.concurrent.ScalaFutures
-import org.scalatest.{BeforeAndAfter, BeforeAndAfterEach, FunSuite}
 import org.slf4j.LoggerFactory
 
 import scala.concurrent.Await
 import scala.concurrent.duration.Duration
-import scala.concurrent.duration.DurationInt
-import scala.concurrent.ExecutionContext.Implicits.global
 
 /**
   * Created by Egor on 20.02.2016.
@@ -36,6 +31,11 @@ abstract class BasicTest extends FunSuite with BeforeAndAfterEach with ScalaFutu
   val scheduledGameService = injector.getInstance(classOf[ScheduledGameService])
   val netWorthService = injector.getInstance(classOf[NetWorthService])
   val seriesService = injector.getInstance(classOf[SeriesService])
+
+
+  val netWorthRepository = injector.getInstance(classOf[NetWorthRepository])
+
+
 
   val initDb = {
     try {

@@ -1,19 +1,19 @@
 package com.eb.pulse.crawler.parser
 
+import com.eb.pulse.crawler.Lookup
 import com.eb.pulse.crawler.model.{LiveMatch, Player, TeamScoreBoard}
 import com.eb.schedule.model.SeriesType
-import com.eb.schedule.model.slick.Team
+import com.eb.schedule.model.slick.{NetWorth, Team}
 import com.google.gson.{JsonArray, JsonObject}
 import org.slf4j.LoggerFactory
 
 /**
   * Created by Egor on 16.04.2017.
   */
-class LiveMatchParser {
+class LiveMatchParser extends Lookup{
 
   private val log = LoggerFactory.getLogger(this.getClass)
 
-  //todo save networth
   def parse(json: JsonObject): Option[LiveMatch] = {
     try {
       if (json.has("scoreboard")) {
@@ -35,6 +35,7 @@ class LiveMatchParser {
         val direScoreBoard = getTeamScoreBoard(direTeam, scoreBoard.get("dire").getAsJsonObject, playerNames)
 
         val currentNet = radiantScoreBoard.players.reduce(_.netWorth + _.netWorth) - direScoreBoard.players.reduce(_.netWorth + _.netWorth)
+        netWorthService.insertOrUpdate(NetWorth(matchId, currentNet.toString))
 
         Some(LiveMatch(matchId, -1, radiantScoreBoard, direScoreBoard, leagueId, currentNet, duration, radiantScoreBoard.score, direScoreBoard.score, seriesType, radiantWin, direWin))
       } else {
