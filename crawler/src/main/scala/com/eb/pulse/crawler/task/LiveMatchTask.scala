@@ -1,30 +1,91 @@
 package com.eb.pulse.crawler.task
 
 import com.eb.pulse.crawler.Lookup
+import com.eb.pulse.crawler.data.GameDataHolder
+import com.eb.pulse.crawler.model.LiveMatch
+import com.eb.pulse.crawler.parser.LiveMatchParser
 import com.google.gson.{JsonArray, JsonObject}
+import com.typesafe.config.ConfigFactory
 import org.slf4j.LoggerFactory
+
+import scala.collection.mutable
+import scala.concurrent.Future
 
 /**
   * Created by Egor on 20.04.2017.
   */
-class LiveMatchTask extends Lookup{
+class LiveMatchTask extends Task with Lookup {
 
   private val log = LoggerFactory.getLogger(this.getClass)
 
-  val GET_LIVE_LEAGUE_MATCHES: String = "https://api.steampowered.com/IDOTA2Match_570/GetLiveLeagueGames/v0001/?key=D998B8BDFA96FAA893E52903D6A77EEA"
+  private val liveMatchParser = new LiveMatchParser
 
-  def getLiveLeagueGames(): List[JsonObject] = {
+  private val leaguesIdToSkip = getLeagueIdToSkip()
+
+  private val finishedSet: mutable.HashSet[Long] = new mutable.HashSet[Long]()
+
+
+  override def runTask(): Unit = {
+    val liveMatchesJson: List[JsonObject] = getLiveMatches()
+    val parsedLiveMatches: List[LiveMatch] = liveMatchesJson.map(liveMatchParser.parse).filter(filterOutLeagues).map(_.get)
+    val liveMatches =Future.sequence(parsedLiveMatches.map(processCurrentLiveGame))
+    liveMatches.onSuccess{
+      case seq =>
+        val finishedIds = findFinishedMatches(seq)
+        finishedIds.foreach(processFinishedMatches)
+        //todo send live mathces
+    }
+
+  }
+
+  def getLeagueIdToSkip() = {
+    val config = ConfigFactory.load()
+    config.getIntList("skip.league")
+  }
+
+  def filterOutLeagues(liveMatch: Option[LiveMatch]): Boolean = {
+    liveMatch match {
+      case Some(m) => !leaguesIdToSkip.contains(m.league)
+      case None => false
+    }
+  }
+
+  def getLiveMatches(): List[JsonObject] = {
     val response: JsonObject = httpUtils.getResponseAsJson(GET_LIVE_LEAGUE_MATCHES)
-    var gamesJson: List[JsonObject] = Nil
-    val gamesList: JsonArray = response.getAsJsonObject("result").getAsJsonArray("games")
-    for (i <- 0 until gamesList.size()) {
-      val game: JsonObject = gamesList.get(i).getAsJsonObject()
-      val leagueTier: Int = game.get("league_tier").getAsInt
+    var filteredMathces: List[JsonObject] = Nil
+    val matchesList: JsonArray = response.getAsJsonObject("result").getAsJsonArray("games")
+    for (i <- 0 until matchesList.size()) {
+      val liveMatch: JsonObject = matchesList.get(i).getAsJsonObject
+      val leagueTier: Int = liveMatch.get("league_tier").getAsInt
       if (leagueTier >= 2) {
-        gamesJson ::= game
+        filteredMathces ::= liveMatch
       }
     }
-    gamesJson
+    filteredMathces
+  }
+
+  def processCurrentLiveGame(liveMatch: LiveMatch): Future[LiveMatch] = {
+    val gameFuture = gameService.findGameByLiveMatch(liveMatch)
+    gameFuture.map(game => {
+      matchService.insertNewMatch(liveMatch, game.id, game.radiant)
+      GameDataHolder.updateLiveMatch(game.id, liveMatch)
+      liveMatch.copy(scheduledGameId = game.id)
+    }
+    )
+  }
+
+  def findFinishedMatches(liveGames: Seq[LiveMatch]): mutable.Set[Long] = {
+    val stillRunning: Set[Long] = liveGames.map(_.matchId).toSet
+    val alreadyStoredLiveMatches = GameDataHolder.getLiveMatchesId()
+    val diff: mutable.Set[Long] = alreadyStoredLiveMatches.diff(stillRunning)
+    diff.filterNot(id => finishedSet.add(id))
+  }
+
+  def processFinishedMatches(matchId: Long) {
+    matchService.finishMatch(matchId)
+    GameDataHolder.removeLiveMatch(matchId)
+    finishedSet.remove(matchId)
+
   }
 
 }

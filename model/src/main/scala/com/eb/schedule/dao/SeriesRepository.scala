@@ -1,17 +1,14 @@
 package com.eb.schedule.dao
 
-import com.eb.schedule.dto.SeriesDTO
 import com.eb.schedule.model.MatchStatus
-import com.eb.schedule.model.db.DB
 import com.eb.schedule.model.slick.MatchSeries.MatchSeriesTable
 import com.eb.schedule.model.slick.{MatchSeries, ScheduledGame}
-import com.google.inject.Inject
 import org.slf4j.LoggerFactory
 import slick.driver.MySQLDriver.api._
 import slick.jdbc.JdbcBackend
 
-import scala.concurrent.Future
 import scala.concurrent.ExecutionContext.Implicits.global
+import scala.concurrent.Future
 
 /**
   * Created by Egor on 26.03.2016.
@@ -35,8 +32,7 @@ trait SeriesRepository {
   def getRunningSeries(): Future[Seq[MatchSeries]]
 }
 
-class SeriesRepositoryImpl @Inject()(database: DB) extends SeriesRepository {
-  val db: JdbcBackend#DatabaseDef = database.db
+class SeriesRepositoryImpl (implicit db: JdbcBackend#DatabaseDef) extends SeriesRepository {
   private val log = LoggerFactory.getLogger(this.getClass)
 
   lazy val series = MatchSeries.table

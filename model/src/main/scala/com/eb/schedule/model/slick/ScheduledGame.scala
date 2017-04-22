@@ -8,7 +8,7 @@ import slick.lifted.{Rep, Tag}
 /**
   * Created by Egor on 23.03.2016.
   */
-case class ScheduledGame(id: Int, radiant: Int, dire: Int, leagueId: Int, seriesType: Byte, startDate: Timestamp, status: Byte = 0)
+case class ScheduledGame(id: Int, radiant: Int, dire: Int, leagueId: Int, seriesType: Byte, startDate: Timestamp = new Timestamp(System.currentTimeMillis()), status: Byte = 1)
 
 object ScheduledGame {
 

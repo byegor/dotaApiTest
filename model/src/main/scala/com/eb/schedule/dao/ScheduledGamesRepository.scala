@@ -2,12 +2,11 @@ package com.eb.schedule.model.dao
 
 import java.sql.Timestamp
 
-import com.eb.schedule.model.db.DB
 import com.eb.schedule.model.slick.ScheduledGame.ScheduledGameTable
 import com.eb.schedule.model.slick._
 import com.eb.schedule.model.{MatchStatus, SeriesType}
-import com.google.inject.Inject
 import org.slf4j.LoggerFactory
+import slick.jdbc.JdbcBackend
 
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
@@ -45,12 +44,9 @@ trait ScheduledGameRepository {
   def getGamesBetweenDateRethink(start: Timestamp, end: Timestamp): Future[Seq[(ScheduledGame, MatchSeries)]]
 }
 
-class ScheduledGameRepositoryImpl @Inject()(val database: DB) extends ScheduledGameRepository {
+class ScheduledGameRepositoryImpl (implicit db: JdbcBackend#DatabaseDef) extends ScheduledGameRepository {
   private val log = LoggerFactory.getLogger(this.getClass)
 
-  import database.dbConfig.driver.api._
-
-  val db = database.db
   lazy val games = ScheduledGame.table
 
   def filterQuery(id: Int): Query[ScheduledGameTable, ScheduledGame, Seq] = games.filter(_.id === id)

@@ -35,6 +35,7 @@ class LiveMatchParser extends Lookup{
         val direScoreBoard = getTeamScoreBoard(direTeam, scoreBoard.get("dire").getAsJsonObject, playerNames)
 
         val currentNet = radiantScoreBoard.players.reduce(_.netWorth + _.netWorth) - direScoreBoard.players.reduce(_.netWorth + _.netWorth)
+        //todo move to liveGameText
         netWorthService.insertOrUpdate(NetWorth(matchId, currentNet.toString))
 
         Some(LiveMatch(matchId, -1, radiantScoreBoard, direScoreBoard, leagueId, currentNet, duration, radiantScoreBoard.score, direScoreBoard.score, seriesType, radiantWin, direWin))
