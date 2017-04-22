@@ -15,4 +15,4 @@ case class FinishedMatch(matchId: Long, startTime: Long, duration: Int, radiantW
 
 case class Player(accountId: Int, name: String, hero: Int, items: List[Int], level: Int, kills: Int, death: Int, assists: Int, netWorth: Int)
 
-case class TeamScoreBoard(team: Team, players: List[Player] = Nil, picks: List[Int] = Nil, bans: List[Int] = Nil, score: Int, towerStatus: Int = -1, barrackStatus: Int = -1)
+case class TeamScoreBoard(team: Team, players: List[Player] = Nil, picks: List[Int] = Nil, bans: List[Int] = Nil, score: Int = 0, towerStatus: Int = -1, barrackStatus: Int = -1)

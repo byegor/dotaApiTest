@@ -11,7 +11,7 @@ import com.eb.schedule.utils.HttpUtils
 trait Lookup {
 
   private val netWorthRepository = new NetWorthRepositoryImpl
-  private val scheduledGameRepository = new ScheduledGameRepositoryImpl
+   val scheduledGameRepository = new ScheduledGameRepositoryImpl
   private val seriesRepository = new SeriesRepositoryImpl
 
   val netWorthService = new NetworthService(netWorthRepository)
