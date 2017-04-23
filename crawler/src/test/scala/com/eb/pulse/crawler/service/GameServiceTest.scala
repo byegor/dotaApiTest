@@ -4,14 +4,13 @@ import java.sql.Timestamp
 
 import com.eb.pulse.crawler.Lookup
 import com.eb.pulse.crawler.model.{LiveMatch, TeamScoreBoard}
-import com.eb.schedule.model.db.H2DB
 import com.eb.schedule.model.slick.{ScheduledGame, Team}
 import com.eb.schedule.model.{BasicTest, MatchStatus, SeriesType}
 
 /**
   * Created by Egor on 22.04.2017.
   */
-class GameServiceTest extends BasicTest with Lookup with H2DB {
+class GameServiceTest extends BasicTest with Lookup {
 
   test("testFindGameByLiveMatch") {
     val lm = LiveMatch(1, -1, TeamScoreBoard(Team(1)), TeamScoreBoard(Team(2)), 1, 0, 1, 0, 0, SeriesType.BO1, 0, 0)

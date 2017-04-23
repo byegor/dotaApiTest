@@ -2,7 +2,6 @@ package com.eb.schedule.configure
 
 import com.eb.schedule.dao._
 import com.eb.schedule.model.dao._
-import com.eb.schedule.model.db.{DB, H2DB, MysqlDB}
 import com.eb.schedule.model.services._
 import com.eb.schedule.services._
 import com.eb.schedule.utils.HttpUtils
@@ -40,12 +39,12 @@ class CoreModule extends AbstractModule{
 
 class MysqlModule extends AbstractModule{
   override def configure(): Unit = {
-    bind(classOf[DB]).toInstance(MysqlDB)
+//    bind(classOf[DB]).toInstance(MysqlDB)
   }
 }
 
 class H2Module extends AbstractModule{
   override def configure(): Unit = {
-    bind(classOf[DB]).toInstance(H2DB)
+//    bind(classOf[DB]).toInstance(H2DB)
   }
 }

@@ -6,6 +6,7 @@ import com.eb.schedule.model.slick.ScheduledGame.ScheduledGameTable
 import com.eb.schedule.model.slick._
 import com.eb.schedule.model.{MatchStatus, SeriesType}
 import org.slf4j.LoggerFactory
+import slick.driver.MySQLDriver.api._
 import slick.jdbc.JdbcBackend
 
 import scala.concurrent.ExecutionContext.Implicits.global

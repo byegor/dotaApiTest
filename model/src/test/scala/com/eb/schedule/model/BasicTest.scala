@@ -20,10 +20,10 @@ import scala.concurrent.duration.Duration
 /**
   * Created by Egor on 20.02.2016.
   */
-abstract class BasicTest extends FunSuite with BeforeAndAfterEach with ScalaFutures {
+abstract class BasicTest extends FunSuite with BeforeAndAfterEach with ScalaFutures with DB{
   private val log = LoggerFactory.getLogger(this.getClass)
   val injector = Guice.createInjector(new H2Module, new CoreModule)
-  val db = injector.getInstance(classOf[DB]).db
+  val db = dbConfig.db
 
   val teamService = injector.getInstance(classOf[TeamService])
   val taskService = injector.getInstance(classOf[UpdateTaskService])

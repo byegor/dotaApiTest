@@ -1,9 +1,7 @@
 package com.eb.schedule.model.dao
 
-import com.eb.schedule.model.db.DB
 import com.eb.schedule.model.slick.UpdateTask
 import com.eb.schedule.model.slick.UpdateTask.UpdateTaskTable
-import com.google.inject.Inject
 import slick.driver.MySQLDriver.api._
 import slick.jdbc.JdbcBackend
 
@@ -27,9 +25,7 @@ trait UpdateTaskRepository {
   def getPendingTasks(classname: String): Future[Seq[UpdateTask]]
 }
 
-class UpdateTaskRepositoryImpl @Inject()(database: DB) extends UpdateTaskRepository {
-
-  val db: JdbcBackend#DatabaseDef = database.db
+class UpdateTaskRepositoryImpl (implicit db: JdbcBackend#DatabaseDef) extends UpdateTaskRepository {
 
   lazy val tasks = UpdateTask.table
 

@@ -1,9 +1,7 @@
 package com.eb.schedule.dao
 
-import com.eb.schedule.model.db.DB
 import com.eb.schedule.model.slick.Item
 import com.eb.schedule.model.slick.Item.ItemTable
-import com.google.inject.Inject
 import slick.driver.MySQLDriver.api._
 import slick.jdbc.JdbcBackend
 
@@ -23,8 +21,7 @@ trait ItemRepository {
   def insert(items: Seq[Item])
 }
 
-class ItemRepositoryImpl @Inject()(database: DB) extends ItemRepository {
-  val db: JdbcBackend#DatabaseDef = database.db
+class ItemRepositoryImpl (implicit db: JdbcBackend#DatabaseDef) extends ItemRepository {
 
   lazy val item = Item.table
 

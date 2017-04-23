@@ -2,13 +2,12 @@ package com.eb.pulse.crawler.service
 
 import com.eb.pulse.crawler.Lookup
 import com.eb.schedule.model.BasicTest
-import com.eb.schedule.model.db.H2DB
 import com.eb.schedule.model.slick.NetWorth
 
 /**
   * Created by Egor on 20.04.2017.
   */
-class NetworthServiceTest extends BasicTest with Lookup with H2DB{
+class NetworthServiceTest extends BasicTest with Lookup{
 
   val worthService = new NetworthService(netWorthRepository)
 

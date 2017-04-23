@@ -1,9 +1,7 @@
 package com.eb.schedule.dao
 
-import com.eb.schedule.model.db.DB
 import com.eb.schedule.model.slick.Hero
 import com.eb.schedule.model.slick.Hero.HeroTable
-import com.google.inject.Inject
 import slick.driver.MySQLDriver.api._
 import slick.jdbc.JdbcBackend
 
@@ -21,8 +19,7 @@ trait HeroRepository {
   def findAll(): Future[Seq[Hero]]
 }
 
-class HeroRepositoryImpl @Inject()(database: DB) extends HeroRepository {
-  val db: JdbcBackend#DatabaseDef = database.db
+class HeroRepositoryImpl (implicit db: JdbcBackend#DatabaseDef) extends HeroRepository {
 
   lazy val hero = Hero.table
 

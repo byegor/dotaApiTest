@@ -4,6 +4,7 @@ import com.eb.schedule.dao.NetWorthRepository
 import com.eb.schedule.model.slick.NetWorth
 import org.slf4j.LoggerFactory
 
+import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.{Await, Future}
 
 /**

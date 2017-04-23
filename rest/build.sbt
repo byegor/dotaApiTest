@@ -14,7 +14,7 @@ libraryDependencies ++= Seq(
   "com.fasterxml.jackson.module" %% "jackson-module-scala" % "2.8.3"
 )
 
-jetty()
+//jetty()
 
 javaOptions ++= Seq(
   "-Xdebug",

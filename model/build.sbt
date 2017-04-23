@@ -2,6 +2,8 @@ name := "model"
 
 version := "0.2"
 
+javaOptions in Test += "-Dconfig.file=application-test.conf"
+
 libraryDependencies ++= Seq(
   "com.typesafe.slick"          %% "slick"            % "3.2.0",
   "com.typesafe.slick"          %% "slick-hikaricp"   % "3.2.0" exclude("com.zaxxer", "HikariCP-java6"),

@@ -1,11 +1,10 @@
 package com.eb.schedule.model.dao
 
 
-import com.eb.schedule.model.db.DB
 import com.eb.schedule.model.slick.Team.TeamsTable
 import com.eb.schedule.model.slick._
-import com.google.inject.Inject
 import org.slf4j.LoggerFactory
+import slick.driver.MySQLDriver.api._
 import slick.jdbc.JdbcBackend
 
 import scala.concurrent.ExecutionContext.Implicits.global
@@ -31,13 +30,9 @@ trait TeamRepository {
 }
 
 
-class TeamRepositoryImpl @Inject()(val database: DB) extends TeamRepository {
+class TeamRepositoryImpl (implicit db: JdbcBackend#DatabaseDef) extends TeamRepository {
 
   private val log = LoggerFactory.getLogger(this.getClass)
-
-  val db: JdbcBackend#DatabaseDef = database.dbConfig.db
-
-  import database.dbConfig.driver.api._
 
   private lazy val teams = Team.table
 

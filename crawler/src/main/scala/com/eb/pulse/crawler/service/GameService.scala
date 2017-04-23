@@ -8,6 +8,7 @@ import com.eb.schedule.model.MatchStatus
 import com.eb.schedule.model.dao.ScheduledGameRepository
 import com.eb.schedule.model.slick.ScheduledGame
 
+import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.{Await, Future}
 
 /**

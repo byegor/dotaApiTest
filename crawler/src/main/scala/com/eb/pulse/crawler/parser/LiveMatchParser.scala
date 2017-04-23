@@ -34,8 +34,8 @@ class LiveMatchParser extends Lookup{
         val radiantScoreBoard = getTeamScoreBoard(radiantTeam, scoreBoard.get("radiant").getAsJsonObject, playerNames)
         val direScoreBoard = getTeamScoreBoard(direTeam, scoreBoard.get("dire").getAsJsonObject, playerNames)
 
-        val currentNet = radiantScoreBoard.players.reduce(_.netWorth + _.netWorth) - direScoreBoard.players.reduce(_.netWorth + _.netWorth)
-        //todo move to liveGameText
+        val currentNet:Int = radiantScoreBoard.players.map(_.netWorth).sum - direScoreBoard.players.map(_.netWorth).sum
+        //todo move to liveMatch task?
         netWorthService.insertOrUpdate(NetWorth(matchId, currentNet.toString))
 
         Some(LiveMatch(matchId, -1, radiantScoreBoard, direScoreBoard, leagueId, currentNet, duration, radiantScoreBoard.score, direScoreBoard.score, seriesType, radiantWin, direWin))
@@ -110,7 +110,7 @@ class LiveMatchParser extends Lookup{
 
 
   def getHeroesFromPicks(jsonPicks: JsonArray): List[Int] = {
-    var picks = Nil
+    var picks:List[Int] = Nil
     if (jsonPicks != null) {
       for (i <- 0 until jsonPicks.size()) {
         val pick: JsonObject = jsonPicks.get(i).getAsJsonObject

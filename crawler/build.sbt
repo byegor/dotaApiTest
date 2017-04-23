@@ -2,6 +2,8 @@ name := "crawler"
 
 version := "0.3"
 
+javaOptions in Test += "-Dconfig.file=application-test.conf"
+
 libraryDependencies ++= Seq(
   "commons-dbutils" % "commons-dbutils" % "1.6",
 

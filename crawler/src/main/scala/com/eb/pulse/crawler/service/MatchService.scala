@@ -6,6 +6,8 @@ import com.eb.pulse.crawler.model.LiveMatch
 import com.eb.schedule.dao.SeriesRepository
 import com.eb.schedule.model.slick.MatchSeries
 
+import scala.concurrent.ExecutionContext.Implicits.global
+
 /**
   * Created by Egor on 22.04.2017.
   */
@@ -24,7 +26,7 @@ class MatchService(seriesRepository: SeriesRepository) extends Service {
     }
   }
 
-  def finishMatch(matchId:Long): Unit ={
+  def finishMatch(matchId:Long) ={
     seriesRepository.update(matchId, true)
   }
 }

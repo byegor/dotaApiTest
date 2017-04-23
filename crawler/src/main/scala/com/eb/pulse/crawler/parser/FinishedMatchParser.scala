@@ -9,7 +9,7 @@ import org.slf4j.LoggerFactory
 /**
   * Created by Egor on 16.04.2017.
   */
-class FinishedMatchParser extends Lookup{
+class FinishedMatchParser extends Lookup {
 
   private val log = LoggerFactory.getLogger(this.getClass)
 
@@ -54,7 +54,8 @@ class FinishedMatchParser extends Lookup{
 
 
   private def getPlayers(playersList: JsonArray): (List[Player], List[Player]) = {
-    var radiantPlayers, direPlayers = Nil
+    var radiantPlayers: List[Player] = Nil
+    var direPlayers: List[Player] = Nil
     for (i <- 0 until playersList.size()) {
       val player: JsonObject = playersList.get(i).getAsJsonObject
       val accountId: Int = player.get("account_id").getAsInt
@@ -63,7 +64,7 @@ class FinishedMatchParser extends Lookup{
       val deaths = player.get("deaths").getAsInt
       val assists = player.get("assists").getAsInt
       val level = player.get("level").getAsInt
-      var items = Nil
+      var items:List[Int] = Nil
       for (i <- 0 until 6) {
         val itemId: Int = player.get("item_" + i).getAsInt
         items ::= itemId
@@ -89,7 +90,7 @@ class FinishedMatchParser extends Lookup{
   }
 
   def getMatchPicks(json: JsonObject): List[Pick] = {
-    var picks = Nil
+    var picks: List[Pick] = Nil
     if (json.has("picks_bans")) {
       val pickAndBans: JsonArray = json.get("picks_bans").getAsJsonArray
       for (i <- 0 until pickAndBans.size()) {

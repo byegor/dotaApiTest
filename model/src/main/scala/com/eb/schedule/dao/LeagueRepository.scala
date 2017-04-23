@@ -1,9 +1,7 @@
 package com.eb.schedule.model.dao
 
-import com.eb.schedule.model.db.DB
 import com.eb.schedule.model.slick.League.LeaguesTable
 import com.eb.schedule.model.slick._
-import com.google.inject.Inject
 import org.slf4j.LoggerFactory
 import slick.driver.MySQLDriver.api._
 import slick.jdbc.JdbcBackend
@@ -30,10 +28,8 @@ trait LeagueRepository {
   def delete(id: Int): Future[Int]
 }
 
-class LeagueRepositoryImpl @Inject()(database: DB) extends LeagueRepository {
+class LeagueRepositoryImpl (implicit db: JdbcBackend#DatabaseDef) extends LeagueRepository {
   private val log = LoggerFactory.getLogger(this.getClass)
-
-  val db: JdbcBackend#DatabaseDef = database.db
 
   lazy val leagues = League.table
   lazy val tasks = UpdateTask.table
