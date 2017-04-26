@@ -1,26 +1,23 @@
-package com.eb.schedule.crawler
+package com.eb.pulse.crawler.task
 
+import com.eb.pulse.crawler.Lookup
 import com.eb.schedule.crawler.CrawlerUrls._
-import com.eb.schedule.dto.ItemDTO
-import com.eb.schedule.services.ItemService
-import com.eb.schedule.utils.HttpUtils
+import com.eb.schedule.model.slick.Item
 import com.google.gson.{JsonArray, JsonObject}
-import com.google.inject.Inject
-import org.json.{JSONArray, JSONObject}
 import org.slf4j.LoggerFactory
 
 
-class ItemsCrawler @Inject()(itemService: ItemService, httpUtils: HttpUtils) extends Runnable {
+class DownloadItemTask extends Runnable with Lookup {
 
   private val log = LoggerFactory.getLogger(this.getClass)
 
   def run() {
     try {
       val steamItems: JsonArray = getItemsInfoFromSteam()
-      var items: List[ItemDTO] = Nil
+      var items: List[Item] = Nil
       for (i <- 0 until steamItems.size()) {
         val itemJson: JsonObject = steamItems.get(i).getAsJsonObject
-        items ::= new ItemDTO(itemJson.get("id").getAsInt, parseName(itemJson.get("name").getAsString))
+        items ::= Item(itemJson.get("id").getAsInt, parseName(itemJson.get("name").getAsString))
       }
       itemService.insert(items)
     }catch {

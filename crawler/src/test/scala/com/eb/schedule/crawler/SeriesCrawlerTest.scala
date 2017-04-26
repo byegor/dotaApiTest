@@ -2,6 +2,8 @@ package com.eb.schedule.crawler
 
 import java.sql.Timestamp
 
+import com.eb.pulse.crawler.Lookup
+import com.eb.pulse.crawler.task.FindFinishedGamesTask
 import com.eb.schedule.dto.{LeagueDTO, ScheduledGameDTO, SeriesDTO, TeamDTO}
 import com.eb.schedule.model.{BasicTest, MatchStatus, SeriesType}
 import com.eb.schedule.utils.HttpUtils
@@ -14,15 +16,9 @@ import scala.io.BufferedSource
 /**
   * Created by Egor on 14.05.2016.
   */
-class SeriesCrawlerTest extends BasicTest {
+class SeriesCrawlerTest extends BasicTest  with Lookup{
 
-  val seriesCrawler = new SeriesCrawler(seriesService, scheduledGameService, new HttpUtils() {
-    override def getResponseAsJson(url: String): JsonObject = {
-      val source: BufferedSource = io.Source.fromURL(getClass.getResource("/match.json"))
-      val lines = try source.mkString finally source.close()
-      new JsonParser().parse(lines).getAsJsonObject
-    }
-  })
+  val seriesCrawler = new FindFinishedGamesTask()
 
   test("testUpdateStatus for not finished series") {
     var id: Int = -1

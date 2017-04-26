@@ -2,6 +2,7 @@ package com.eb.schedule
 
 import java.util.concurrent.{Executors, ScheduledExecutorService, TimeUnit}
 
+import com.eb.pulse.crawler.task.FindFinishedGamesTask
 import com.eb.schedule.configure.{CoreModule, MysqlModule}
 import com.eb.schedule.crawler._
 import com.eb.schedule.model.services._
@@ -27,8 +28,8 @@ object CrawlerStarter extends App {
   val itemService = injector.getInstance(classOf[ItemService])
   val httpUtils = injector.getInstance(classOf[HttpUtils])
 
-  private val leagueCrawler: LeagueCrawler = new LeagueCrawler(leagueService, taskService, httpUtils)
-  private val seriesCrawler: SeriesCrawler = new SeriesCrawler(seriesService, scheduledGameService, httpUtils)
+  private val seriesCrawler: FindFinishedGamesTask = new FindFinishedGamesTask()
+  private val leagueCrawler: FindLeagueTask = new FindLeagueTask(leagueService, taskService, httpUtils)
   private val winnerCrawler: WinnerCrawler = new WinnerCrawler(seriesService, scheduledGameService, httpUtils)
   private val longRunningCrawler: LongRunningGamesCrawler = new LongRunningGamesCrawler(seriesService, scheduledGameService, httpUtils)
   //  private val itemsCrawler: ItemsCrawler = new ItemsCrawler(itemService, httpUtils)

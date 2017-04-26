@@ -13,7 +13,6 @@ import com.google.inject.AbstractModule
 class CoreModule extends AbstractModule{
   override def configure(): Unit = {
     //repository
-    bind(classOf[HeroRepository]).to(classOf[HeroRepositoryImpl])
     bind(classOf[ItemRepository]).to(classOf[ItemRepositoryImpl])
     bind(classOf[TeamRepository]).to(classOf[TeamRepositoryImpl])
     bind(classOf[UpdateTaskRepository]).to(classOf[UpdateTaskRepositoryImpl])
@@ -23,7 +22,6 @@ class CoreModule extends AbstractModule{
     bind(classOf[SeriesRepository]).to(classOf[SeriesRepositoryImpl])
 
     //service
-    bind(classOf[HeroService]).to(classOf[HeroServiceImpl]).in(classOf[com.google.inject.Singleton])
     bind(classOf[ItemService]).to(classOf[ItemServiceImpl]).in(classOf[com.google.inject.Singleton])
     bind(classOf[TeamService]).to(classOf[TeamServiceImpl]).in(classOf[com.google.inject.Singleton])
     bind(classOf[UpdateTaskService]).to(classOf[UpdateTaskServiceImpl]).in(classOf[com.google.inject.Singleton])

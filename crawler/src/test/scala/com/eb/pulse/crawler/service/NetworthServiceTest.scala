@@ -9,7 +9,7 @@ import com.eb.schedule.model.slick.NetWorth
   */
 class NetworthServiceTest extends BasicTest with Lookup{
 
-  val worthService = new NetworthService(netWorthRepository)
+  val worthService = new NetworthService(networthRepository)
 
   private def insertNetWorth(matchId: Long, net: String) = {
     worthService.insertOrUpdate(NetWorth(matchId, net))

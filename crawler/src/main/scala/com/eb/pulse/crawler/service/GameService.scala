@@ -36,4 +36,8 @@ class GameService(repository: ScheduledGameRepository) extends Service {
     })
     scheduledGame
   }
+
+  def finishTheGame(gameId:Int) ={
+    repository.updateStatus(gameId, MatchStatus.FINISHED.status)
+  }
 }
