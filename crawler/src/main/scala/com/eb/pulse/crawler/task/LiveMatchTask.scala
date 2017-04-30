@@ -1,6 +1,7 @@
 package com.eb.pulse.crawler.task
 
-import com.eb.pulse.crawler.Lookup
+import java.util
+
 import com.eb.pulse.crawler.data.GameDataHolder
 import com.eb.pulse.crawler.model.LiveMatch
 import com.eb.pulse.crawler.parser.LiveMatchParser
@@ -24,9 +25,9 @@ class LiveMatchTask(gameService: GameService, matchService: MatchService, httpUt
 
   private val liveMatchParser = new LiveMatchParser(networthService)
 
-  private val leaguesIdToSkip = getLeagueIdToSkip()
+  private val leaguesIdToSkip = getLeagueIdToSkip
 
-  private val finishedSet: mutable.HashSet[Long] = new mutable.HashSet[Long]()
+  protected val finishedSet: mutable.HashSet[Long] = new mutable.HashSet[Long]()
 
 
   override def run(): Unit = {
@@ -42,7 +43,7 @@ class LiveMatchTask(gameService: GameService, matchService: MatchService, httpUt
 
   }
 
-  def getLeagueIdToSkip() = {
+  def getLeagueIdToSkip: util.List[Integer] = {
     val config = ConfigFactory.load()
     config.getIntList("skip.league")
   }
@@ -81,7 +82,7 @@ class LiveMatchTask(gameService: GameService, matchService: MatchService, httpUt
     val gameFuture = gameService.findGameByLiveMatch(liveMatch)
     gameFuture.map(game => {
       matchService.insertNewMatch(liveMatch, game.id, game.radiant)
-      GameDataHolder.updateLiveMatch(game.id, liveMatch)
+      GameDataHolder.setLiveMatchId(liveMatch)
       liveMatch.copy(scheduledGameId = game.id)
     }
     )
