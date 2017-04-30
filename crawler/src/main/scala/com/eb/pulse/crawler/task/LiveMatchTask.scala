@@ -56,7 +56,7 @@ class LiveMatchTask(gameService: GameService, matchService: MatchService, httpUt
 
 
   def filterOutLessPlayers(liveMatch: LiveMatch): Boolean = {
-    liveMatch.radiantTeamBoard.players.size < 5 || liveMatch.direTeamBoard.players.size < 5
+    liveMatch.radiantTeamBoard.players.size == 5 && liveMatch.direTeamBoard.players.size == 5
   }
 
   def filterOutLeagues(liveMatch: LiveMatch): Boolean = {
