@@ -4,6 +4,9 @@ import com.eb.pulse.crawler.Lookup
 import com.eb.pulse.crawler.data.GameDataHolder
 import com.eb.pulse.crawler.model.LiveMatch
 import com.eb.pulse.crawler.parser.LiveMatchParser
+import com.eb.pulse.crawler.service.{GameService, MatchService, NetworthService}
+import com.eb.schedule.crawler.CrawlerUrls
+import com.eb.schedule.utils.HttpUtils
 import com.google.gson.{JsonArray, JsonObject}
 import com.typesafe.config.ConfigFactory
 import org.slf4j.LoggerFactory
@@ -15,18 +18,18 @@ import scala.concurrent.Future
 /**
   * Created by Egor on 20.04.2017.
   */
-class LiveMatchTask extends Task with Lookup {
+class LiveMatchTask(gameService: GameService, matchService: MatchService, httpUtils: HttpUtils, networthService: NetworthService) extends Runnable{
 
   private val log = LoggerFactory.getLogger(this.getClass)
 
-  private val liveMatchParser = new LiveMatchParser
+  private val liveMatchParser = new LiveMatchParser(networthService)
 
   private val leaguesIdToSkip = getLeagueIdToSkip()
 
   private val finishedSet: mutable.HashSet[Long] = new mutable.HashSet[Long]()
 
 
-  override def runTask(): Unit = {
+  override def run(): Unit = {
     val liveMatchesJson: List[JsonObject] = getLiveMatches()
     val parsedLiveMatches: List[LiveMatch] = liveMatchesJson.map(liveMatchParser.parse).filter(filterOutLeagues).map(_.get)
     val liveMatches =Future.sequence(parsedLiveMatches.map(processCurrentLiveGame))
@@ -52,7 +55,7 @@ class LiveMatchTask extends Task with Lookup {
   }
 
   def getLiveMatches(): List[JsonObject] = {
-    val response: JsonObject = httpUtils.getResponseAsJson(GET_LIVE_LEAGUE_MATCHES)
+    val response: JsonObject = httpUtils.getResponseAsJson(CrawlerUrls.GET_LIVE_LEAGUE_MATCHES)
     var filteredMathces: List[JsonObject] = Nil
     val matchesList: JsonArray = response.getAsJsonObject("result").getAsJsonArray("games")
     for (i <- 0 until matchesList.size()) {

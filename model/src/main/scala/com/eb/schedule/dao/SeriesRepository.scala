@@ -4,7 +4,7 @@ import com.eb.schedule.model.MatchStatus
 import com.eb.schedule.model.slick.MatchSeries.MatchSeriesTable
 import com.eb.schedule.model.slick.{MatchSeries, ScheduledGame}
 import org.slf4j.LoggerFactory
-import slick.driver.MySQLDriver.api._
+import slick.jdbc.MySQLProfile.api._
 import slick.jdbc.JdbcBackend
 
 import scala.concurrent.ExecutionContext.Implicits.global
@@ -15,7 +15,7 @@ import scala.concurrent.Future
   */
 trait SeriesRepository {
 
-  def findSeriesId(id: Int): Future[Seq[MatchSeries]]
+  def findSeriesByGameId(id: Int): Future[Seq[MatchSeries]]
 
   def exists(id: Int, matchId:Long): Future[Boolean]
 
@@ -30,6 +30,8 @@ trait SeriesRepository {
   def getSeriesWithoutWinner: Future[Seq[MatchSeries]]
 
   def getRunningSeries(): Future[Seq[MatchSeries]]
+
+  def updateMatchWithRadiantWin(matchId: Long, radiantWin: Some[Boolean]): Future[Int]
 }
 
 class SeriesRepositoryImpl (implicit db: JdbcBackend#DatabaseDef) extends SeriesRepository {
@@ -39,7 +41,7 @@ class SeriesRepositoryImpl (implicit db: JdbcBackend#DatabaseDef) extends Series
 
   def filterQuery(id: Int): Query[MatchSeriesTable, MatchSeries, Seq] = series.filter(_.scheduledGameId === id)
 
-  def findSeriesId(id: Int): Future[Seq[MatchSeries]] =
+  def findSeriesByGameId(id: Int): Future[Seq[MatchSeries]] =
     db.run(filterQuery(id).result)
 
   def exists(id: Int, matchId:Long): Future[Boolean] =
@@ -84,6 +86,12 @@ class SeriesRepositoryImpl (implicit db: JdbcBackend#DatabaseDef) extends Series
   def getRunningSeries(): Future[Seq[MatchSeries]] = {
     db.run(
       series.filter(game => !game.finished).result
+    )
+  }
+
+  def updateMatchWithRadiantWin(matchId: Long, radiantWin: Some[Boolean]): Future[Int] ={
+    db.run(
+      series.filter(game => game.matchId === matchId).map(_.radiantWin).update(radiantWin)
     )
   }
 }

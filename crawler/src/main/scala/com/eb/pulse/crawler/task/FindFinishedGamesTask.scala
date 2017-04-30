@@ -1,11 +1,12 @@
 package com.eb.pulse.crawler.task
 
 import com.eb.pulse.crawler.Lookup
+import com.eb.pulse.crawler.service.{GameService, MatchService}
 import com.eb.schedule.model.SeriesType
 import com.eb.schedule.model.slick.{MatchSeries, ScheduledGame}
 import org.slf4j.LoggerFactory
-import scala.concurrent.ExecutionContext.Implicits.global
 
+import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 
 /**
@@ -16,7 +17,7 @@ import scala.concurrent.Future
   *
   * Created by Egor on 10.05.2016.
   */
-class FindFinishedGamesTask extends Runnable with Lookup {
+class FindFinishedGamesTask(gameService: GameService, matchService: MatchService) extends Runnable {
 
   private val log = LoggerFactory.getLogger(this.getClass)
 

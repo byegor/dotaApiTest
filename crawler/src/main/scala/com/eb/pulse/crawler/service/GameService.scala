@@ -20,8 +20,11 @@ class GameService(repository: ScheduledGameRepository) extends Service {
 
     val gamesFuture = repository.getScheduledGames(liveMatch.radiantTeamBoard.team.id, liveMatch.direTeamBoard.team.id, liveMatch.league, liveMatch.seriesType)
     val hoursForTheGame = TimeUnit.HOURS.toMillis(liveMatch.seriesType.gamesCount + 1)
-    val game = gamesFuture.map(future => future.find(game => (System.currentTimeMillis() - game.startDate.getTime) < hoursForTheGame))
-    val scheduledGame = game.map(g => if (g.isDefined) {
+    val game = gamesFuture.map(future =>
+      future.find(game =>
+        (System.currentTimeMillis() - game.startDate.getTime) < hoursForTheGame))
+    val scheduledGame = game.map(g =>
+      if (g.isDefined) {
       if (MatchStatus.FINISHED.status == g.get.status) {
         val copy = g.get.copy(status = MatchStatus.LIVE.status)
         repository.update(copy)

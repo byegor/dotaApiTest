@@ -3,7 +3,7 @@ package com.eb.schedule.dao
 import com.eb.schedule.model.slick.NetWorth
 import com.eb.schedule.model.slick.NetWorth.NetWorthTable
 import org.slf4j.LoggerFactory
-import slick.driver.MySQLDriver.api._
+import slick.jdbc.MySQLProfile.api._
 import slick.jdbc.JdbcBackend
 
 import scala.concurrent.Future

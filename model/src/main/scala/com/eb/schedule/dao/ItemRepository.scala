@@ -2,7 +2,7 @@ package com.eb.schedule.dao
 
 import com.eb.schedule.model.slick.Item
 import com.eb.schedule.model.slick.Item.ItemTable
-import slick.driver.MySQLDriver.api._
+import slick.jdbc.MySQLProfile.api._
 import slick.jdbc.JdbcBackend
 
 import scala.concurrent.Future

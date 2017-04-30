@@ -4,7 +4,7 @@ package com.eb.schedule.model.dao
 import com.eb.schedule.model.slick.Team.TeamsTable
 import com.eb.schedule.model.slick._
 import org.slf4j.LoggerFactory
-import slick.driver.MySQLDriver.api._
+import slick.jdbc.MySQLProfile.api._
 import slick.jdbc.JdbcBackend
 
 import scala.concurrent.ExecutionContext.Implicits.global

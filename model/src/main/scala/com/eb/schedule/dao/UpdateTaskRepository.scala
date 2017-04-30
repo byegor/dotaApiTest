@@ -2,7 +2,7 @@ package com.eb.schedule.model.dao
 
 import com.eb.schedule.model.slick.UpdateTask
 import com.eb.schedule.model.slick.UpdateTask.UpdateTaskTable
-import slick.driver.MySQLDriver.api._
+import slick.jdbc.MySQLProfile.api._
 import slick.jdbc.JdbcBackend
 
 import scala.concurrent.Future

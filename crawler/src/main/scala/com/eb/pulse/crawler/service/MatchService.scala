@@ -38,4 +38,8 @@ class MatchService(seriesRepository: SeriesRepository) extends Service {
     val unfinishedMatchesFuture = seriesRepository.getUnfinishedSeries
     unfinishedMatchesFuture.map(result => result.groupBy(_._1).mapValues(_.map(_._2)))
   }
+
+  def updateMatchWithWinner(matchId: Long, radiantWin: Boolean): Unit ={
+    seriesRepository.updateMatchWithRadiantWin(matchId, Some(radiantWin))
+  }
 }

@@ -1,7 +1,7 @@
 package com.eb.schedule.model.slick
 
 import slick.lifted.{Rep, Tag}
-import slick.driver.MySQLDriver.api._
+import slick.jdbc.MySQLProfile.api._
 
 /**
   * Created by Egor on 13.02.2016.

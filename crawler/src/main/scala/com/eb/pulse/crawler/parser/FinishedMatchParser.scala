@@ -2,6 +2,7 @@ package com.eb.pulse.crawler.parser
 
 import com.eb.pulse.crawler.Lookup
 import com.eb.pulse.crawler.model.{FinishedMatch, Player, TeamScoreBoard}
+import com.eb.pulse.crawler.service.NetworthService
 import com.eb.schedule.model.slick.Team
 import com.google.gson.{JsonArray, JsonObject}
 import org.slf4j.LoggerFactory
@@ -9,7 +10,7 @@ import org.slf4j.LoggerFactory
 /**
   * Created by Egor on 16.04.2017.
   */
-class FinishedMatchParser extends Lookup {
+class FinishedMatchParser(netWorthService: NetworthService) {
 
   private val log = LoggerFactory.getLogger(this.getClass)
 

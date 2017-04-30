@@ -36,7 +36,7 @@ trait SeriesService {
 
 class SeriesServiceImpl @Inject()(rep: SeriesRepository) extends SeriesService {
   def findBySeriesId(id: Int): Future[Seq[SeriesDTO]] = {
-    rep.findSeriesId(id).map(seq => seq.map(DTOUtils.crateDTO))
+    rep.findSeriesByGameId(id).map(seq => seq.map(DTOUtils.crateDTO))
   }
 
   def exists(id: Int, matchId: Long): Future[Boolean] = {

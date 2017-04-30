@@ -1,13 +1,14 @@
 package com.eb.pulse.crawler.task
 
-import com.eb.pulse.crawler.Lookup
+import com.eb.pulse.crawler.service.ItemService
 import com.eb.schedule.crawler.CrawlerUrls._
 import com.eb.schedule.model.slick.Item
+import com.eb.schedule.utils.HttpUtils
 import com.google.gson.{JsonArray, JsonObject}
 import org.slf4j.LoggerFactory
 
 
-class DownloadItemTask extends Runnable with Lookup {
+class DownloadItemTask(itemService: ItemService, httpUtils: HttpUtils) extends Runnable {
 
   private val log = LoggerFactory.getLogger(this.getClass)
 

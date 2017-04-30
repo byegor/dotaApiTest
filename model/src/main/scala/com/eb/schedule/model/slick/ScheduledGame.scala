@@ -2,7 +2,7 @@ package com.eb.schedule.model.slick
 
 import java.sql.Timestamp
 
-import slick.driver.MySQLDriver.api._
+import slick.jdbc.MySQLProfile.api._
 import slick.lifted.{Rep, Tag}
 
 /**

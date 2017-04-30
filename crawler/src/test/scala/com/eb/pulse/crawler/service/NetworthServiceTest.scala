@@ -1,15 +1,15 @@
 package com.eb.pulse.crawler.service
 
-import com.eb.pulse.crawler.Lookup
-import com.eb.schedule.model.BasicTest
+import com.eb.pulse.crawler.{Lookup, TestLookup}
+import com.eb.schedule.model.BasicFunSuiteTest
 import com.eb.schedule.model.slick.NetWorth
 
 /**
   * Created by Egor on 20.04.2017.
   */
-class NetworthServiceTest extends BasicTest with Lookup{
+class NetworthServiceTest extends BasicFunSuiteTest {
 
-  val worthService = new NetworthService(networthRepository)
+  val worthService = new NetworthService(TestLookup.netWorthRepository)
 
   private def insertNetWorth(matchId: Long, net: String) = {
     worthService.insertOrUpdate(NetWorth(matchId, net))
