@@ -18,7 +18,7 @@ class GameService(repository: ScheduledGameRepository) extends Service {
 
   def findGameByLiveMatch(liveMatch: LiveMatch): Future[ScheduledGame] = {
 
-    val gamesFuture = repository.getScheduledGames(liveMatch.radiantTeamBoard.team.id, liveMatch.direTeamBoard.team.id, liveMatch.league, liveMatch.seriesType)
+    val gamesFuture = repository.getScheduledGames(liveMatch.radiantTeamBoard.team.id, liveMatch.direTeamBoard.team.id, liveMatch.leagueId, liveMatch.seriesType)
     val hoursForTheGame = TimeUnit.HOURS.toMillis(liveMatch.seriesType.gamesCount + 1)
     val game = gamesFuture.map(future =>
       future.find(game =>
@@ -33,7 +33,7 @@ class GameService(repository: ScheduledGameRepository) extends Service {
         g.get
       }
     } else {
-      val newGame = ScheduledGame(-1, liveMatch.radiantTeamBoard.team.id, liveMatch.direTeamBoard.team.id, liveMatch.league, liveMatch.seriesType.code, new Timestamp(System.currentTimeMillis() - liveMatch.duration.toLong * 1000))
+      val newGame = ScheduledGame(-1, liveMatch.radiantTeamBoard.team.id, liveMatch.direTeamBoard.team.id, liveMatch.leagueId, liveMatch.seriesType.code, new Timestamp(System.currentTimeMillis() - liveMatch.duration.toLong * 1000))
       val newGameId = Await.result(repository.insertAndGet(newGame), timeout)
       newGame.copy(id = newGameId)
     })

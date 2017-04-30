@@ -1,9 +1,7 @@
 package com.eb.pulse.crawler.service
 
-import com.eb.schedule.dto.LeagueDTO
 import com.eb.schedule.model.dao.LeagueRepository
 import com.eb.schedule.model.slick.League
-import com.eb.schedule.utils.DTOUtils
 
 import scala.concurrent.Future
 

@@ -7,7 +7,7 @@ import com.eb.schedule.model.slick._
   * Created by Egor on 13.03.2016.
   */
 //todo do we need current Net worth
-case class LiveMatch(matchId: Long, scheduledGameId: Int, radiantTeamBoard: TeamScoreBoard, direTeamBoard: TeamScoreBoard, league: Int, currentNet: Int, duration: Double, radiantScore: Int,
+case class LiveMatch(matchId: Long, scheduledGameId: Int, radiantTeamBoard: TeamScoreBoard, direTeamBoard: TeamScoreBoard, leagueId: Int, currentNet: Int, duration: Double, radiantScore: Int,
                      direScore: Int, seriesType: SeriesType, winByRadiant: Int, winByDire: Int)
 
 case class FinishedMatch(matchId: Long, startTime: Long, duration: Int, radiantWin: Boolean, radiantTeam: TeamScoreBoard, direTeam: TeamScoreBoard, league: Int,

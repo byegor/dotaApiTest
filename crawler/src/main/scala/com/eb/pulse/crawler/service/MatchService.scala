@@ -4,13 +4,10 @@ import java.sql.Timestamp
 
 import com.eb.pulse.crawler.model.LiveMatch
 import com.eb.schedule.dao.SeriesRepository
-import com.eb.schedule.dto.{ScheduledGameDTO, SeriesDTO}
 import com.eb.schedule.model.slick.{MatchSeries, ScheduledGame}
-import com.eb.schedule.utils.DTOUtils
 
-import scala.concurrent.{Await, Future}
 import scala.concurrent.ExecutionContext.Implicits.global
-import scala.concurrent.duration.Duration
+import scala.concurrent.Future
 
 /**
   * Created by Egor on 22.04.2017.

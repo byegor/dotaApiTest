@@ -18,7 +18,7 @@ import scala.concurrent.Future
 /**
   * Created by Egor on 20.04.2017.
   */
-class LiveMatchTask(gameService: GameService, matchService: MatchService, httpUtils: HttpUtils, networthService: NetworthService) extends Runnable{
+class LiveMatchTask(gameService: GameService, matchService: MatchService, httpUtils: HttpUtils, networthService: NetworthService) extends Runnable {
 
   private val log = LoggerFactory.getLogger(this.getClass)
 
@@ -31,13 +31,13 @@ class LiveMatchTask(gameService: GameService, matchService: MatchService, httpUt
 
   override def run(): Unit = {
     val liveMatchesJson: List[JsonObject] = getLiveMatches()
-    val parsedLiveMatches: List[LiveMatch] = liveMatchesJson.map(liveMatchParser.parse).filter(filterOutLeagues).map(_.get)
-    val liveMatches =Future.sequence(parsedLiveMatches.map(processCurrentLiveGame))
-    liveMatches.onSuccess{
+    val parsedLiveMatches: List[LiveMatch] = liveMatchesJson.map(liveMatchParser.parse).filter(filterOutLiveMatches).map(_.get)
+    val liveMatches = Future.sequence(parsedLiveMatches.map(processCurrentLiveGame))
+    liveMatches.onSuccess {
       case seq =>
         val finishedIds = findFinishedMatches(seq)
         finishedIds.foreach(processFinishedMatches)
-        //todo send live mathces
+      //todo send live mathces
     }
 
   }
@@ -47,11 +47,20 @@ class LiveMatchTask(gameService: GameService, matchService: MatchService, httpUt
     config.getIntList("skip.league")
   }
 
-  def filterOutLeagues(liveMatch: Option[LiveMatch]): Boolean = {
+  def filterOutLiveMatches(liveMatch: Option[LiveMatch]): Boolean = {
     liveMatch match {
-      case Some(m) => !leaguesIdToSkip.contains(m.league)
+      case Some(m) => filterOutLeagues(m) && filterOutLessPlayers(m)
       case None => false
     }
+  }
+
+
+  def filterOutLessPlayers(liveMatch: LiveMatch): Boolean = {
+    liveMatch.radiantTeamBoard.players.size < 5 || liveMatch.direTeamBoard.players.size < 5
+  }
+
+  def filterOutLeagues(liveMatch: LiveMatch): Boolean = {
+    !leaguesIdToSkip.contains(liveMatch.leagueId)
   }
 
   def getLiveMatches(): List[JsonObject] = {
@@ -91,5 +100,4 @@ class LiveMatchTask(gameService: GameService, matchService: MatchService, httpUt
     finishedSet.remove(matchId)
 
   }
-
 }
