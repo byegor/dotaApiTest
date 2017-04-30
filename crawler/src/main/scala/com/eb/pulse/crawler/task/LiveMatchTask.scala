@@ -19,6 +19,7 @@ import scala.concurrent.Future
 /**
   * Created by Egor on 20.04.2017.
   */
+//todo restart task
 class LiveMatchTask(gameService: GameService, matchService: MatchService, httpUtils: HttpUtils, networthService: NetworthService) extends Runnable {
 
   private val log = LoggerFactory.getLogger(this.getClass)
