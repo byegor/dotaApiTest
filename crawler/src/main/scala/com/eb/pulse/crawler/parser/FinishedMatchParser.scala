@@ -1,6 +1,5 @@
 package com.eb.pulse.crawler.parser
 
-import com.eb.pulse.crawler.Lookup
 import com.eb.pulse.crawler.model.{FinishedMatch, Player, TeamScoreBoard}
 import com.eb.pulse.crawler.service.NetworthService
 import com.eb.schedule.model.slick.Team

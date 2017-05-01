@@ -28,6 +28,21 @@ public class Player implements Serializable{
     @JsonProperty("nw")
     int netWorth;
 
+
+    public Player() {
+    }
+
+    public Player(int accountId, String name, HeroBean hero, List<Item> items, int level, int kills, int deaths, int assists) {
+        this.accountId = accountId;
+        this.name = name;
+        this.hero = hero;
+        this.items = items;
+        this.level = level;
+        this.kills = kills;
+        this.deaths = deaths;
+        this.assists = assists;
+    }
+
     public int getAccountId() {
         return accountId;
     }

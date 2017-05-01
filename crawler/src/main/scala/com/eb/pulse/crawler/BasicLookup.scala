@@ -1,8 +1,10 @@
 package com.eb.pulse.crawler
 
+import com.eb.pulse.crawler.cache._
+import com.eb.pulse.crawler.parser.FinishedMatchParser
 import com.eb.pulse.crawler.service._
-import com.eb.schedule.dao.{ItemRepositoryImpl, NetWorthRepositoryImpl, SeriesRepositoryImpl}
-import com.eb.schedule.model.dao.{LeagueRepositoryImpl, ScheduledGameRepositoryImpl, UpdateTaskRepositoryImpl}
+import com.eb.schedule.dao.{HeroRepositoryImpl, ItemRepositoryImpl, NetWorthRepositoryImpl, SeriesRepositoryImpl}
+import com.eb.schedule.model.dao.{LeagueRepositoryImpl, ScheduledGameRepositoryImpl, TeamRepositoryImpl, UpdateTaskRepositoryImpl}
 import com.eb.schedule.model.db.DB
 import com.eb.schedule.utils.HttpUtils
 
@@ -17,6 +19,8 @@ abstract class BasicLookup extends DB{
   val itemRepository = new ItemRepositoryImpl
   val leagueRepository = new LeagueRepositoryImpl
   val taskRepository = new UpdateTaskRepositoryImpl
+  val heroRepository = new HeroRepositoryImpl
+  val teamRepository = new TeamRepositoryImpl
 
   val netWorthService = new NetworthService(netWorthRepository)
   val gameService = new GameService(scheduledGameRepository)
@@ -24,7 +28,19 @@ abstract class BasicLookup extends DB{
   val itemService = new ItemService(itemRepository)
   val leagueService = new LeagueService(leagueRepository)
   val taskService = new TaskService(taskRepository)
+  val heroService = new HeroService(heroRepository)
+  val teamService = new TeamService(teamRepository)
 
   val httpUtils = new HttpUtils
+
+
+  val heroCache = new HeroCache(heroService)
+  val itemCache = new ItemCache(itemService)
+  val teamCache = new TeamCache(teamService, taskService)
+  val playerCache = new PlayerCache(httpUtils)
+  val leagueCache = new LeagueCache(leagueService, taskService)
+  val finishedMatchCache = new FinishedMatchCache(new FinishedMatchParser(netWorthService), httpUtils)
+
+  val cacheHelper = new CacheHelper(heroCache, itemCache, leagueCache, playerCache, teamCache, finishedMatchCache)
 
 }

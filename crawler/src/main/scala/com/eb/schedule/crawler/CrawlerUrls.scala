@@ -11,6 +11,7 @@ object CrawlerUrls {
   val GET_LIVE_LEAGUE_MATCHES: String = "https://api.steampowered.com/IDOTA2Match_570/GetLiveLeagueGames/v0001/?key=D998B8BDFA96FAA893E52903D6A77EEA"
 
   val GET_ITEMS: String = "https://api.steampowered.com/IEconDOTA2_570/GetGameItems/v0001/?key=D998B8BDFA96FAA893E52903D6A77EEA"
+  val GET_HEROES: String = "http://api.steampowered.com/IEconDOTA2_570/GetHeroes/v1?key=D998B8BDFA96FAA893E52903D6A77EEA"
 
   val GET_MATCH_DETAILS: String = "https://api.steampowered.com/IDOTA2Match_570/GetMatchDetails/v001/?key=D998B8BDFA96FAA893E52903D6A77EEA&match_id="
 

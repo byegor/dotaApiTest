@@ -14,7 +14,6 @@ libraryDependencies in ThisBuild ++= Seq(
   "org.scalatest"       %% "scalatest"                    % "3.0.1"   % "test",
   "org.scalacheck"      %% "scalacheck"                   % "1.13.5"  % "test",
   "org.mockito"         % "mockito-all"                   % "1.9.5"   % "test",
-  "com.google.inject"   % "guice"                         % "4.0" exclude("com.google.guava", "guava"), //todo remove guice - use lookup
   "com.google.code.gson" % "gson" % "2.6.2", //todo remove gson use jackson everywhere
   "com.google.guava" % "guava" % "19.0",
 

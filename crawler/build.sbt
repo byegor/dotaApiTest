@@ -9,7 +9,11 @@ libraryDependencies ++= Seq(
 
   "org.apache.httpcomponents" % "httpclient" % "4.5",
   "com.mashape.unirest" % "unirest-java" % "1.4.6",
-  "org.jsoup" % "jsoup" % "1.8.3"
+  "com.fasterxml.jackson.module" %% "jackson-module-scala" % "2.8.3",
+  "org.jsoup" % "jsoup" % "1.8.3",
+
+  "com.eb.schedule"             % "shared"            % "0.3"
+
 )
 
 
