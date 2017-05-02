@@ -1,12 +1,6 @@
 name := "rest-api"
 
-organization := "com.eb.dotapulse"
-
 version := "0.2"
-
-scalaVersion in ThisProject := "2.12.1"
-
-resolvers += Resolver.mavenLocal
 
 libraryDependencies ++= Seq(
   "com.typesafe.akka"   %% "akka-actor"                   % "2.4.17",
@@ -21,5 +15,3 @@ libraryDependencies ++= Seq(
 )
 
 mainClass in assembly := Some("com.eb.dotapulse.rest.RestApiServer")
-
-parallelExecution in ThisBuild := false

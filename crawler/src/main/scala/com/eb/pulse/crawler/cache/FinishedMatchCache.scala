@@ -32,7 +32,7 @@ class FinishedMatchCache(finishedMatchParser: FinishedMatchParser, val httpUtils
           case None => throw new CacheItemNotFoundException
         }
       }
-    })
+    }).asInstanceOf[LoadingCache[Long, String]]
 
   private def findMatch(matchId: Long): Option[Match] = {
     try {

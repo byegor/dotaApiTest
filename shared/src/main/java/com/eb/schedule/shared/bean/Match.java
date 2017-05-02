@@ -44,21 +44,6 @@ public class Match implements Serializable {
     @JsonProperty("dban")
     private List<HeroBean> direBans;
 
-    public Match(Long matchId, Long startTime, String duration, int matchStatus, TeamBean radiantTeam, TeamBean direTeam, String matchScore, List<Integer> networth, int gameNumber, List<HeroBean> radianPicks, List<HeroBean> radianBans, List<HeroBean> direPicks, List<HeroBean> direBans) {
-        this.matchId = matchId;
-        this.startTime = startTime;
-        this.duration = duration;
-        this.matchStatus = matchStatus;
-        this.radiantTeam = radiantTeam;
-        this.direTeam = direTeam;
-        this.matchScore = matchScore;
-        this.networth = networth;
-        this.gameNumber = gameNumber;
-        this.radianPicks = radianPicks;
-        this.radianBans = radianBans;
-        this.direPicks = direPicks;
-        this.direBans = direBans;
-    }
 
     public Long getMatchId() {
         return matchId;

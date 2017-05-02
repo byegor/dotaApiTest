@@ -6,6 +6,8 @@ import com.eb.schedule.model.slick._
 /**
   * Created by Egor on 13.03.2016.
   */
+//todo i think we can union liveMatch and FinishedMatch at least they can have one parent
+
 //todo do we need current Net worth
 case class LiveMatch(matchId: Long, scheduledGameId: Int, radiantTeamBoard: TeamScoreBoard, direTeamBoard: TeamScoreBoard, leagueId: Int, currentNet: Int, duration: Double, radiantScore: Int,
                      direScore: Int, seriesType: SeriesType, winByRadiant: Int, winByDire: Int)

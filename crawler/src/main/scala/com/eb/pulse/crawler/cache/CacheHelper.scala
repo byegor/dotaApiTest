@@ -30,5 +30,8 @@ class CacheHelper (val heroCache: HeroCache, val itemCache: ItemCache, val leagu
     itemCache.getItem(id)
   }
 
+  def getPlayerName(accId:Int):String={
+    playerCache.getPlayerName(accId)
+  }
 
 }

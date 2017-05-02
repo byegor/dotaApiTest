@@ -28,7 +28,7 @@ class LeagueCache(val leagueService: LeagueService, taskService: TaskService) {
           case None => throw new CacheItemNotFoundException
         }
       }
-    })
+    }).asInstanceOf[LoadingCache[Int, League]]
 
   def getLeague(id: Int): League = {
     try {

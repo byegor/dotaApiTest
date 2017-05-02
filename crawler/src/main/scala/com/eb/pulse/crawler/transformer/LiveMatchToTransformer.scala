@@ -2,7 +2,7 @@ package com.eb.pulse.crawler.transformer
 
 import com.eb.pulse.crawler.Lookup
 import com.eb.pulse.crawler.cache.CacheHelper
-import com.eb.pulse.crawler.model.{FinishedMatch, Player, TeamScoreBoard}
+import com.eb.pulse.crawler.model.{FinishedMatch, LiveMatch, Player, TeamScoreBoard}
 import com.eb.schedule.model.MatchStatus
 import com.eb.schedule.shared.bean.{HeroBean, Item, Match, TeamBean}
 
@@ -12,27 +12,27 @@ import scala.collection.JavaConversions._
 /**
   * Created by Iegor.Bondarenko on 01.05.2017.
   */
-object FinishedMatchToTransformer {
+object LiveMatchToTransformer {
 
   val cacheHelper: CacheHelper = Lookup.cacheHelper
+  val networthService = Lookup.netWorthService
 
-  def transform(finishedMatch: FinishedMatch): Match = {
-    val radiantTeam = transformTeam(finishedMatch.radiantTeam)
-    val direTeam = transformTeam(finishedMatch.direTeam)
+  def transform(liveMatch: LiveMatch): Match = {
+    val radiantTeam = transformTeam(liveMatch.radiantTeamBoard)
+    val direTeam = transformTeam(liveMatch.radiantTeamBoard)
+    val netWorth = networthService.findByMatchId(liveMatch.matchId)
     val matchBean = new Match()
-    matchBean.setMatchId(finishedMatch.matchId)
-    //todo do i need start time
-    matchBean.setStartTime(finishedMatch.startTime)
-    matchBean.setDuration(getDuration(finishedMatch.duration))
+    matchBean.setMatchId(liveMatch.matchId)
+    matchBean.setDuration(getDuration(liveMatch.duration.toInt))
     matchBean.setMatchStatus(MatchStatus.FINISHED.status)
     matchBean.setRadiantTeam(radiantTeam)
     matchBean.setDireTeam(direTeam)
-    matchBean.setNetworth(seqAsJavaList(finishedMatch.netWorth.netWorth.split(",").toList.map(new Integer(_))))
-    matchBean.setGameNumber(-1) //todo do i need gameNumber
-    matchBean.setRadianPicks(seqAsJavaList(finishedMatch.radiantTeam.picks.map(cacheHelper.getHero(_)).map(hero => new HeroBean(hero.id, hero.name))))
-    matchBean.setRadianBans(seqAsJavaList(finishedMatch.radiantTeam.bans.map(cacheHelper.getHero(_)).map(hero => new HeroBean(hero.id, hero.name))))
-    matchBean.setDirePicks(seqAsJavaList(finishedMatch.direTeam.picks.map(cacheHelper.getHero(_)).map(hero => new HeroBean(hero.id, hero.name))))
-    matchBean.setDireBans(seqAsJavaList(finishedMatch.direTeam.bans.map(cacheHelper.getHero(_)).map(hero => new HeroBean(hero.id, hero.name))))
+    matchBean.setNetworth(seqAsJavaList(netWorth.netWorth.split(",").toList.map(new Integer(_))))
+    matchBean.setGameNumber(-1) //todo do i need gameNumber in match bean
+    matchBean.setRadianPicks(seqAsJavaList(liveMatch.radiantTeamBoard.picks.map(cacheHelper.getHero(_)).map(hero => new HeroBean(hero.id, hero.name))))
+    matchBean.setRadianBans(seqAsJavaList(liveMatch.radiantTeamBoard.bans.map(cacheHelper.getHero(_)).map(hero => new HeroBean(hero.id, hero.name))))
+    matchBean.setDirePicks(seqAsJavaList(liveMatch.radiantTeamBoard.picks.map(cacheHelper.getHero(_)).map(hero => new HeroBean(hero.id, hero.name))))
+    matchBean.setDireBans(seqAsJavaList(liveMatch.radiantTeamBoard.bans.map(cacheHelper.getHero(_)).map(hero => new HeroBean(hero.id, hero.name))))
     matchBean
   }
 
@@ -50,7 +50,7 @@ object FinishedMatchToTransformer {
 
       val player = new com.eb.schedule.shared.bean.Player()
       player.setAccountId(p.accountId)
-      player.setName(cacheHelper.getPlayerName(p.accountId))
+      player.setName(p.name)
       player.setHero(new HeroBean(hero.id, hero.name))
       player.setItems(seqAsJavaList(items))
       player.setLevel(p.level)

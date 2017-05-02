@@ -1,6 +1,7 @@
 name := "rest"
 
 version := "0.2"
+/*
 
 lazy val scalatraVersion = "2.3.1"
 
@@ -23,4 +24,4 @@ javaOptions ++= Seq(
 
 mainClass in assembly := Some("com.eb.schedule.rest.JettyRunner")
 
-unmanagedResourceDirectories in Compile += { baseDirectory.value / "src/main/webapp" }
+unmanagedResourceDirectories in Compile += { baseDirectory.value / "src/main/webapp" }*/

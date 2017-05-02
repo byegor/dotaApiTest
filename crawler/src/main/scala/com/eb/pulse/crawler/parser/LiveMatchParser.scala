@@ -1,5 +1,6 @@
 package com.eb.pulse.crawler.parser
 
+import com.eb.pulse.crawler.cache.PlayerCache
 import com.eb.pulse.crawler.model.{LiveMatch, Player, TeamScoreBoard}
 import com.eb.pulse.crawler.service.NetworthService
 import com.eb.schedule.model.SeriesType
@@ -10,7 +11,7 @@ import org.slf4j.LoggerFactory
 /**
   * Created by Egor on 16.04.2017.
   */
-class LiveMatchParser(netWorthService: NetworthService){
+class LiveMatchParser(netWorthService: NetworthService, playerCache: PlayerCache){
 
   private val log = LoggerFactory.getLogger(this.getClass)
 
@@ -30,6 +31,7 @@ class LiveMatchParser(netWorthService: NetworthService){
         val duration = scoreBoard.get("duration").getAsDouble
 
         val playerNames = getPlayerNames(json.get("players").getAsJsonArray)
+        playerCache.put(playerNames)
 
         val radiantScoreBoard = getTeamScoreBoard(radiantTeam, scoreBoard.get("radiant").getAsJsonObject, playerNames)
         val direScoreBoard = getTeamScoreBoard(direTeam, scoreBoard.get("dire").getAsJsonObject, playerNames)

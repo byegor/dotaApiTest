@@ -2,16 +2,19 @@ package com.eb.pulse.crawler.cache
 
 import java.util.concurrent.TimeUnit
 
+import com.eb.schedule.cache.CachedTeam
 import com.eb.schedule.utils.HttpUtils
 import com.google.common.cache.{CacheBuilder, CacheLoader, LoadingCache}
 import com.google.gson.{JsonArray, JsonObject}
 import org.slf4j.LoggerFactory
 
+import scala.collection.JavaConversions._
+
 /**
   * Created by Egor on 26.03.2016.
   */
 
-class PlayerCache (httpUtils: HttpUtils) {
+class PlayerCache(httpUtils: HttpUtils) {
 
   private val log = LoggerFactory.getLogger(this.getClass)
   private val URL = "https://api.steampowered.com/ISteamUser/GetPlayerSummaries/v0002/?key=D998B8BDFA96FAA893E52903D6A77EEA&steamids="
@@ -36,7 +39,7 @@ class PlayerCache (httpUtils: HttpUtils) {
           throw new CacheItemNotFoundException
         }
       }
-    })
+    }).asInstanceOf[LoadingCache[Int, String]]
 
   def getPlayerName(id: Int): String = {
     try {
