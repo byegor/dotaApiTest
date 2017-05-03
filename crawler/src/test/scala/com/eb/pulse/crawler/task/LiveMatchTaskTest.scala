@@ -15,7 +15,7 @@ import scala.concurrent.Future
   */
 class LiveMatchTaskTest extends BasicWordSuiteTest {
 
-  val liveMatchTask = new LiveMatchTask(TestLookup.gameService, TestLookup.matchService, TestLookup.httpUtils, TestLookup.netWorthService, TestLookup.cacheHelper)
+  val liveMatchTask = new LiveMatchTask(TestLookup.gameService, TestLookup.matchService, TestLookup.httpUtils, TestLookup.netWorthService, TestLookup.cacheHelper, TestLookup.teamService)
 
   "LiveMatchTaskTest" should {
 
@@ -91,10 +91,11 @@ class LiveMatchTaskTest extends BasicWordSuiteTest {
               whenReady(TestLookup.seriesRepository.findSeriesByGameId(game.id)) {
                 seq =>
                   val series = seq.head
-                  assert(series.finished, "finished field should be updated with true as match was finished")
+                  series.finished should equal(true) withClue "finished field should be updated with true as match was finished"
               }
           }
       }
     }
   }
+
 }

@@ -6,8 +6,8 @@ import com.eb.schedule.model.slick.ScheduledGame.ScheduledGameTable
 import com.eb.schedule.model.slick._
 import com.eb.schedule.model.{MatchStatus, SeriesType}
 import org.slf4j.LoggerFactory
-import slick.jdbc.MySQLProfile.api._
 import slick.jdbc.JdbcBackend
+import slick.jdbc.MySQLProfile.api._
 
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
@@ -45,7 +45,7 @@ trait ScheduledGameRepository {
   def getGamesBetweenDateRethink(start: Timestamp, end: Timestamp): Future[Seq[(ScheduledGame, MatchSeries)]]
 }
 
-class ScheduledGameRepositoryImpl (implicit db: JdbcBackend#DatabaseDef) extends ScheduledGameRepository {
+class ScheduledGameRepositoryImpl(implicit db: JdbcBackend#DatabaseDef) extends ScheduledGameRepository {
   private val log = LoggerFactory.getLogger(this.getClass)
 
   lazy val games = ScheduledGame.table
@@ -55,6 +55,7 @@ class ScheduledGameRepositoryImpl (implicit db: JdbcBackend#DatabaseDef) extends
   def findById(id: Int): Future[ScheduledGame] =
     db.run(filterQuery(id).result.head)
 
+  def findAll(): Future[Seq[ScheduledGame]] = db.run(games.map(g => g).result)
 
   def exists(id: Int): Future[Boolean] =
     db.run(filterQuery(id).exists.result)

@@ -48,7 +48,7 @@ class HttpUtils {
   }
 
   //todo url should be configurable
-  def sendData(data: String) = {
+  def sendData(data: String)  {
     Unirest.post("http://localhost:8188").body(data).asStringAsync(new Callback[String] {
       override def failed(e: UnirestException): Unit = {
 //todo

@@ -2,7 +2,7 @@ package com.eb.pulse.crawler.transformer
 
 import com.eb.pulse.crawler.Lookup
 import com.eb.pulse.crawler.cache.CacheHelper
-import com.eb.pulse.crawler.model.{FinishedMatch, LiveMatch, Player, TeamScoreBoard}
+import com.eb.pulse.crawler.model.{LiveMatch, Player, TeamScoreBoard}
 import com.eb.schedule.model.MatchStatus
 import com.eb.schedule.shared.bean.{HeroBean, Item, Match, TeamBean}
 
@@ -12,7 +12,7 @@ import scala.collection.JavaConversions._
 /**
   * Created by Iegor.Bondarenko on 01.05.2017.
   */
-object LiveMatchToTransformer {
+object LiveMatchTransformer {
 
   val cacheHelper: CacheHelper = Lookup.cacheHelper
   val networthService = Lookup.netWorthService

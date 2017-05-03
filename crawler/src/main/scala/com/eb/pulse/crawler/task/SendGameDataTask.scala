@@ -3,7 +3,7 @@ package com.eb.pulse.crawler.task
 import com.eb.pulse.crawler.cache.CacheHelper
 import com.eb.pulse.crawler.model.LiveMatch
 import com.eb.pulse.crawler.service.{GameService, MatchService}
-import com.eb.pulse.crawler.transformer.LiveMatchToTransformer
+import com.eb.pulse.crawler.transformer.LiveMatchTransformer
 import com.eb.schedule.model.SeriesType
 import com.eb.schedule.model.slick.{League, MatchSeries, ScheduledGame, Team}
 import com.eb.schedule.shared.bean.{GameBean, LeagueBean, TeamBean}
@@ -97,7 +97,7 @@ class SendGameDataTask(liveMatches: Seq[LiveMatch], gameService: GameService, ma
       val liveMatchOption = liveMatchesById.get(m.matchId)
       liveMatchOption match {
         case Some(m) =>
-          val matchBean = LiveMatchToTransformer.transform(m)
+          val matchBean = LiveMatchTransformer.transform(m)
           allMatchesById = allMatchesById + (m.matchId.toString -> mapper.writeValueAsString(matchBean))
         case None =>
           cacheHelper.getMatch(m.matchId) match {

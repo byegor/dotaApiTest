@@ -9,6 +9,7 @@ import com.eb.schedule.model.slick._
 //todo i think we can union liveMatch and FinishedMatch at least they can have one parent
 
 //todo do we need current Net worth
+//todo why do i have duplicates dire and radiant score in live match and TeamScoreBoard
 case class LiveMatch(matchId: Long, scheduledGameId: Int, radiantTeamBoard: TeamScoreBoard, direTeamBoard: TeamScoreBoard, leagueId: Int, currentNet: Int, duration: Double, radiantScore: Int,
                      direScore: Int, seriesType: SeriesType, winByRadiant: Int, winByDire: Int)
 

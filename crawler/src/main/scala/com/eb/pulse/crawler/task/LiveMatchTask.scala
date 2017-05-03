@@ -6,7 +6,7 @@ import com.eb.pulse.crawler.cache.CacheHelper
 import com.eb.pulse.crawler.data.GameDataHolder
 import com.eb.pulse.crawler.model.LiveMatch
 import com.eb.pulse.crawler.parser.LiveMatchParser
-import com.eb.pulse.crawler.service.{GameService, MatchService, NetworthService}
+import com.eb.pulse.crawler.service.{GameService, MatchService, NetworthService, TeamService}
 import com.eb.schedule.crawler.CrawlerUrls
 import com.eb.schedule.utils.HttpUtils
 import com.google.gson.{JsonArray, JsonObject}
@@ -16,16 +16,17 @@ import org.slf4j.LoggerFactory
 import scala.collection.mutable
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
+import scala.util.{Failure, Success}
 
 /**
   * Created by Egor on 20.04.2017.
   */
 //todo restart task
-class LiveMatchTask(gameService: GameService, matchService: MatchService, httpUtils: HttpUtils, networthService: NetworthService, cacheHelper: CacheHelper) extends Runnable {
+class LiveMatchTask(gameService: GameService, matchService: MatchService, httpUtils: HttpUtils, networthService: NetworthService, cacheHelper: CacheHelper, teamService: TeamService) extends Runnable {
 
   private val log = LoggerFactory.getLogger(this.getClass)
 
-  private val liveMatchParser = new LiveMatchParser(networthService, cacheHelper)
+  private val liveMatchParser = new LiveMatchParser(networthService, cacheHelper, teamService)
 
   private val leaguesIdToSkip = getLeagueIdToSkip
 
@@ -36,13 +37,14 @@ class LiveMatchTask(gameService: GameService, matchService: MatchService, httpUt
     val liveMatchesJson: List[JsonObject] = getLiveMatches()
     val parsedLiveMatches: List[LiveMatch] = liveMatchesJson.map(liveMatchParser.parse).filter(filterOutLiveMatches).map(_.get)
     val liveMatches = Future.sequence(parsedLiveMatches.map(processCurrentLiveGame))
-    liveMatches.onSuccess {
-      case seq =>
-        val finishedIds = findFinishedMatches(seq)
+    liveMatches.onComplete {
+      case Success(liveMatchesResult) =>
+        val finishedIds = findFinishedMatches(liveMatchesResult)
         finishedIds.foreach(processFinishedMatches)
-        sendMatches(seq)
-    }
+        sendMatches(liveMatchesResult)
+      case Failure(ex) => log.error("Couldn't process live matches", ex)
 
+    }
   }
 
   def getLeagueIdToSkip: util.List[Integer] = {
@@ -102,7 +104,6 @@ class LiveMatchTask(gameService: GameService, matchService: MatchService, httpUt
     GameDataHolder.removeLiveMatch(matchId)
     finishedSet.remove(matchId)
   }
-
 
   def sendMatches(liveMatches: Seq[LiveMatch]) = {
     new SendGameDataTask(liveMatches, gameService, matchService, httpUtils, cacheHelper).execute()

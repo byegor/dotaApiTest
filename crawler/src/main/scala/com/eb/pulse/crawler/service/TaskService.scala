@@ -1,9 +1,7 @@
 package com.eb.pulse.crawler.service
 
-import com.eb.schedule.dto.TaskDTO
 import com.eb.schedule.model.dao.UpdateTaskRepository
 import com.eb.schedule.model.slick.{League, Team, UpdateTask}
-import com.eb.schedule.utils.DTOUtils
 
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
@@ -32,16 +30,16 @@ class TaskService (taskRepository: UpdateTaskRepository)  {
     taskRepository.delete(id, classname)
   }
 
-  def getPendingTeamTasks(): Future[Seq[TaskDTO]] = {
+  def getPendingTeamTasks(): Future[Seq[UpdateTask]] = {
     getPendingTasks(Team.getClass.getSimpleName)
   }
 
-  def getPendingLeagueTasks(): Future[Seq[TaskDTO]] = {
+  def getPendingLeagueTasks(): Future[Seq[UpdateTask]] = {
     getPendingTasks(League.getClass.getSimpleName)
   }
 
 
-  private def getPendingTasks(classname: String): Future[Seq[TaskDTO]] = {
-    taskRepository.getPendingTasks(classname).map(f => f.map(t => DTOUtils.createUpdateTaskDTO(t)))
+  private def getPendingTasks(classname: String): Future[Seq[UpdateTask]] = {
+    taskRepository.getPendingTasks(classname)
   }
 }

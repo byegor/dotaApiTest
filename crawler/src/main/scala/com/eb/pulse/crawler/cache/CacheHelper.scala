@@ -18,6 +18,10 @@ class CacheHelper(val heroCache: HeroCache, val itemCache: ItemCache, val league
     teamCache.getTeam(id)
   }
 
+  def putTeam(team: Team): Unit ={
+    teamCache.put(team)
+  }
+
   def getLeague(id: Int): League = {
     leagueCache.getLeague(id)
   }

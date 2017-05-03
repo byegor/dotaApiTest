@@ -1,13 +1,12 @@
 package com.eb.schedule.model
 
-import org.scalatest.{FunSuite, WordSpec}
 import org.scalatest.concurrent.ScalaFutures
-import org.slf4j.LoggerFactory
+import org.scalatest.{AppendedClues, Matchers, WordSpec}
 
 /**
   *
   */
-abstract class BasicWordSuiteTest extends WordSpec with BasicDBTest with ScalaFutures {
+abstract class BasicWordSuiteTest extends WordSpec with AppendedClues with Matchers with BasicDBTest with ScalaFutures {
 
   import org.scalatest.time.{Millis, Seconds, Span}
 

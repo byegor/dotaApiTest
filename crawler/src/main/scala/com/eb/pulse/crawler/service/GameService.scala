@@ -28,22 +28,22 @@ class GameService(repository: ScheduledGameRepository) extends Service {
         (System.currentTimeMillis() - game.startDate.getTime) < hoursForTheGame))
     val scheduledGame = game.map(g =>
       if (g.isDefined) {
-      if (MatchStatus.FINISHED.status == g.get.status) {
-        val copy = g.get.copy(status = MatchStatus.LIVE.status)
-        repository.update(copy)
-        copy
+        if (MatchStatus.FINISHED.status == g.get.status) {
+          val copy = g.get.copy(status = MatchStatus.LIVE.status)
+          repository.update(copy)
+          copy
+        } else {
+          g.get
+        }
       } else {
-        g.get
-      }
-    } else {
-      val newGame = ScheduledGame(-1, liveMatch.radiantTeamBoard.team.id, liveMatch.direTeamBoard.team.id, liveMatch.leagueId, liveMatch.seriesType.code, new Timestamp(System.currentTimeMillis() - liveMatch.duration.toLong * 1000))
-      val newGameId = Await.result(repository.insertAndGet(newGame), timeout)
-      newGame.copy(id = newGameId)
-    })
+        val newGame = ScheduledGame(-1, liveMatch.radiantTeamBoard.team.id, liveMatch.direTeamBoard.team.id, liveMatch.leagueId, liveMatch.seriesType.code, new Timestamp(System.currentTimeMillis() - liveMatch.duration.toLong * 1000))
+        val newGameId = Await.result(repository.insertAndGet(newGame), timeout)
+        newGame.copy(id = newGameId)
+      })
     scheduledGame
   }
 
-  def finishTheGame(gameId:Int) ={
+  def finishTheGame(gameId: Int) = {
     repository.updateStatus(gameId, MatchStatus.FINISHED.status)
   }
 

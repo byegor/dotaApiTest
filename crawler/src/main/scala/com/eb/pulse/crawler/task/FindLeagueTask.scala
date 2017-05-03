@@ -1,9 +1,7 @@
 package com.eb.pulse.crawler.task
 
-import com.eb.pulse.crawler.Lookup
 import com.eb.pulse.crawler.service.{LeagueService, TaskService}
 import com.eb.schedule.crawler.CrawlerUrls._
-import com.eb.schedule.dto.TaskDTO
 import com.eb.schedule.model.Finished
 import com.eb.schedule.model.slick.{League, UpdateTask}
 import com.eb.schedule.utils.HttpUtils
@@ -13,15 +11,15 @@ import org.slf4j.LoggerFactory
 import scala.concurrent.duration.Duration
 import scala.concurrent.{Await, Future}
 
-
+//todo i guess i forgot to refactor this tas
 class FindLeagueTask(leagueService: LeagueService, taskService: TaskService, httpUtils: HttpUtils) extends Runnable{
 
   private val log = LoggerFactory.getLogger(this.getClass)
 
   def run() {
     try {
-      val tasks: Future[Seq[TaskDTO]] = taskService.getPendingLeagueTasks()
-      val result: Seq[TaskDTO] = Await.result(tasks, Duration.Inf)
+      val tasks: Future[Seq[UpdateTask]] = taskService.getPendingLeagueTasks()
+      val result: Seq[UpdateTask] = Await.result(tasks, Duration.Inf)
       val ids: Seq[Long] = result.map(_.id)
       val steamItems: JsonArray = getItemsInfoFromSteam()
       for (i <- 0 until steamItems.size()) {

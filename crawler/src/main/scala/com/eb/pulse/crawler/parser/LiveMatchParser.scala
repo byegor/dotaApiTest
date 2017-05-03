@@ -2,7 +2,7 @@ package com.eb.pulse.crawler.parser
 
 import com.eb.pulse.crawler.cache.CacheHelper
 import com.eb.pulse.crawler.model.{LiveMatch, Player, TeamScoreBoard}
-import com.eb.pulse.crawler.service.NetworthService
+import com.eb.pulse.crawler.service.{NetworthService, TeamService}
 import com.eb.schedule.model.SeriesType
 import com.eb.schedule.model.slick.{NetWorth, Team}
 import com.google.gson.{JsonArray, JsonObject}
@@ -12,7 +12,7 @@ import org.slf4j.LoggerFactory
 /**
   * Created by Egor on 16.04.2017.
   */
-class LiveMatchParser(netWorthService: NetworthService, cacheHelper: CacheHelper){
+class LiveMatchParser(netWorthService: NetworthService, cacheHelper: CacheHelper, teamService: TeamService) {
 
   private val log = LoggerFactory.getLogger(this.getClass)
 
@@ -37,7 +37,7 @@ class LiveMatchParser(netWorthService: NetworthService, cacheHelper: CacheHelper
         val radiantScoreBoard = getTeamScoreBoard(radiantTeam, scoreBoard.get("radiant").getAsJsonObject, playerNames)
         val direScoreBoard = getTeamScoreBoard(direTeam, scoreBoard.get("dire").getAsJsonObject, playerNames)
 
-        val currentNet:Int = radiantScoreBoard.players.map(_.netWorth).sum - direScoreBoard.players.map(_.netWorth).sum
+        val currentNet: Int = radiantScoreBoard.players.map(_.netWorth).sum - direScoreBoard.players.map(_.netWorth).sum
         //todo move to liveMatch task?
         netWorthService.insertOrUpdate(NetWorth(matchId, currentNet.toString))
 
@@ -54,7 +54,6 @@ class LiveMatchParser(netWorthService: NetworthService, cacheHelper: CacheHelper
   }
 
 
-  //todo save team
   def parseTeam(json: JsonObject): Team = {
     if (json == null) {
       Team(-1)
@@ -62,7 +61,10 @@ class LiveMatchParser(netWorthService: NetworthService, cacheHelper: CacheHelper
       val teamId: Int = json.get("team_id").getAsInt
       val name = json.get("team_name").getAsString
       val logo = json.get("team_logo").getAsLong
-      Team(teamId, name, logo = logo)
+      val team = Team(teamId, name, logo = logo)
+      teamService.upsertTeam(team)
+      cacheHelper.putTeam(team)
+      team
     }
   }
 
@@ -74,7 +76,6 @@ class LiveMatchParser(netWorthService: NetworthService, cacheHelper: CacheHelper
     TeamScoreBoard(team, teamPlayers, picks, bans, score)
   }
 
-  //todo player cache
   def getPlayerNames(basicPlayerInfo: JsonArray): Map[Int, String] = {
     var playerNames = Map[Int, String]()
     for (i <- 0 until basicPlayerInfo.size()) {
@@ -104,7 +105,7 @@ class LiveMatchParser(netWorthService: NetworthService, cacheHelper: CacheHelper
 
       var items: List[Int] = Nil
       for (j <- 0 to 5) {
-        items ::= player.get("item" + j).getAsInt
+        items = items :+ player.get("item" + j).getAsInt
       }
       players ::= Player(accId, names(accId), hero, items, level, kills, deaths, assists, netWorth)
     }
@@ -113,12 +114,12 @@ class LiveMatchParser(netWorthService: NetworthService, cacheHelper: CacheHelper
 
 
   def getHeroesFromPicks(jsonPicks: JsonArray): List[Int] = {
-    var picks:List[Int] = Nil
+    var picks: List[Int] = Nil
     if (jsonPicks != null) {
       for (i <- 0 until jsonPicks.size()) {
         val pick: JsonObject = jsonPicks.get(i).getAsJsonObject
         val heroId: Int = pick.get("hero_id").getAsInt
-        picks ::= heroId
+        picks :+= heroId
       }
     }
     picks

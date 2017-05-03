@@ -57,15 +57,20 @@ class FindFinishedGamesTaskTest extends BasicFunSuiteTest {
     }
 
     whenReady(precondition) { result =>
-      seriesCrawler.run()
-    }
-    whenReady(TestLookup.matchService.getUnfinishedSeries()) {
-      res => assert(0 == res.size)
+      whenReady(Future {
+        seriesCrawler.run()
+      }) {
+        ignore =>
+          whenReady(TestLookup.matchService.getUnfinishedSeries()) {
+            res => assert(0 == res.size)
+          }
+
+          whenReady(TestLookup.scheduledGameRepository.findById(scheduledGameId)) {
+            result =>
+              assert(MatchStatus.FINISHED.status == result.status)
+          }
+      }
     }
 
-    whenReady(TestLookup.scheduledGameRepository.findById(scheduledGameId)) {
-      result =>
-        assert(MatchStatus.FINISHED.status == result.status)
-    }
   }
 }

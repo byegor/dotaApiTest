@@ -4,8 +4,8 @@ import com.eb.schedule.model.MatchStatus
 import com.eb.schedule.model.slick.MatchSeries.MatchSeriesTable
 import com.eb.schedule.model.slick.{MatchSeries, ScheduledGame}
 import org.slf4j.LoggerFactory
-import slick.jdbc.MySQLProfile.api._
 import slick.jdbc.JdbcBackend
+import slick.jdbc.MySQLProfile.api._
 
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
@@ -17,7 +17,7 @@ trait SeriesRepository {
 
   def findSeriesByGameId(id: Int): Future[Seq[MatchSeries]]
 
-  def exists(id: Int, matchId:Long): Future[Boolean]
+  def exists(id: Int, matchId: Long): Future[Boolean]
 
   def insert(matchSeries: MatchSeries): Future[Int]
 
@@ -34,7 +34,7 @@ trait SeriesRepository {
   def updateMatchWithRadiantWin(matchId: Long, radiantWin: Some[Boolean]): Future[Int]
 }
 
-class SeriesRepositoryImpl (implicit db: JdbcBackend#DatabaseDef) extends SeriesRepository {
+class SeriesRepositoryImpl(implicit db: JdbcBackend#DatabaseDef) extends SeriesRepository {
   private val log = LoggerFactory.getLogger(this.getClass)
 
   lazy val series = MatchSeries.table
@@ -44,7 +44,9 @@ class SeriesRepositoryImpl (implicit db: JdbcBackend#DatabaseDef) extends Series
   def findSeriesByGameId(id: Int): Future[Seq[MatchSeries]] =
     db.run(filterQuery(id).result)
 
-  def exists(id: Int, matchId:Long): Future[Boolean] =
+  def findByMatchId(matchId: Long) = db.run(series.filter(_.matchId === matchId).result.headOption)
+
+  def exists(id: Int, matchId: Long): Future[Boolean] =
     db.run(series.filter(series => series.scheduledGameId === id && series.matchId === matchId).exists.result)
 
   def insert(matchSeries: MatchSeries): Future[Int] = {
@@ -61,7 +63,7 @@ class SeriesRepositoryImpl (implicit db: JdbcBackend#DatabaseDef) extends Series
     )
   }
 
-  def update(matchId: Long, finished: Boolean): Future[Int] ={
+  def update(matchId: Long, finished: Boolean): Future[Int] = {
     db.run(
       series.filter(game => game.matchId === matchId).map(_.finished).update(finished)
     )
@@ -89,7 +91,7 @@ class SeriesRepositoryImpl (implicit db: JdbcBackend#DatabaseDef) extends Series
     )
   }
 
-  def updateMatchWithRadiantWin(matchId: Long, radiantWin: Some[Boolean]): Future[Int] ={
+  def updateMatchWithRadiantWin(matchId: Long, radiantWin: Some[Boolean]): Future[Int] = {
     db.run(
       series.filter(game => game.matchId === matchId).map(_.radiantWin).update(radiantWin)
     )

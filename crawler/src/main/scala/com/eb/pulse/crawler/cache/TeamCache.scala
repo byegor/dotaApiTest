@@ -18,7 +18,7 @@ class TeamCache (val teamService: TeamService, taskService: TaskService) {
   private val log = LoggerFactory.getLogger(this.getClass)
 
   private val cache: LoadingCache[Int, Team] = CacheBuilder.newBuilder()
-    .expireAfterAccess(3, TimeUnit.HOURS)
+    .expireAfterWrite(20, TimeUnit.HOURS)
     .maximumSize(200)
     .build(new CacheLoader[Int, Team]() {
       def load(teamId: Int): Team = {
@@ -44,8 +44,8 @@ class TeamCache (val teamService: TeamService, taskService: TaskService) {
     }
   }
 
-  def invalidateTeam(id:Int): Unit ={
-    cache.invalidate(id)
+  def put(team:Team): Unit ={
+    cache.put(team.id, team)
   }
 
 
