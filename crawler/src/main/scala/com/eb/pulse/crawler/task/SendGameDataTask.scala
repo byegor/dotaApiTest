@@ -15,14 +15,14 @@ import org.joda.time.{DateTime, DateTimeZone}
 import org.slf4j.LoggerFactory
 
 import scala.collection.immutable.{HashMap, ListMap}
+import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 import scala.util.{Failure, Success}
-import scala.concurrent.ExecutionContext.Implicits.global
 
 /**
   * Created by Iegor.Bondarenko on 01.05.2017.
   */
-class SendLiveMatchesTask(liveMatches: Seq[LiveMatch], gameService: GameService, matchService: MatchService, httpUtils: HttpUtils, cacheHelper: CacheHelper) {
+class SendGameDataTask(liveMatches: Seq[LiveMatch], gameService: GameService, matchService: MatchService, httpUtils: HttpUtils, cacheHelper: CacheHelper) {
   private val log = LoggerFactory.getLogger(this.getClass)
 
   val mapper = new ObjectMapper()
@@ -33,7 +33,7 @@ class SendLiveMatchesTask(liveMatches: Seq[LiveMatch], gameService: GameService,
   val liveMatchesById = liveMatches.map(m => m.matchId -> m).toMap
 
 
-  def processCurrentGames(): Unit = {
+  def execute(): Unit = {
     val gamesBetweenDate: Future[Map[ScheduledGame, Seq[MatchSeries]]] = gameService.getRecentGames(System.currentTimeMillis())
     gamesBetweenDate.onComplete {
       case Success(gamesPair) => {

@@ -15,7 +15,7 @@ import scala.concurrent.Future
   */
 class LiveMatchTaskTest extends BasicWordSuiteTest {
 
-  val liveMatchTask = new LiveMatchTask(TestLookup.gameService, TestLookup.matchService, TestLookup.httpUtils, TestLookup.netWorthService, TestLookup.playerCache)
+  val liveMatchTask = new LiveMatchTask(TestLookup.gameService, TestLookup.matchService, TestLookup.httpUtils, TestLookup.netWorthService, TestLookup.cacheHelper)
 
   "LiveMatchTaskTest" should {
 
