@@ -2,13 +2,13 @@ package com.eb.pulse.crawler.cache
 
 import java.util.concurrent.TimeUnit
 
-import com.eb.schedule.cache.CachedTeam
 import com.eb.schedule.utils.HttpUtils
 import com.google.common.cache.{CacheBuilder, CacheLoader, LoadingCache}
 import com.google.gson.{JsonArray, JsonObject}
 import org.slf4j.LoggerFactory
 
-import scala.collection.JavaConversions._
+import scala.collection.JavaConverters._
+
 
 /**
   * Created by Egor on 26.03.2016.
@@ -51,8 +51,9 @@ class PlayerCache(httpUtils: HttpUtils) {
     }
   }
 
-  def put(id: Int, name: String): Unit = {
-    cache.put(id, name)
+  def put(playerNames: Map[Int, String]): Unit = {
+    val javaMap = mapAsJavaMap(playerNames)
+    cache.putAll(javaMap)
   }
 
 

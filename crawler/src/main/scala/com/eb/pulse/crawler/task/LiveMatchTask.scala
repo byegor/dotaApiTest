@@ -2,6 +2,7 @@ package com.eb.pulse.crawler.task
 
 import java.util
 
+import com.eb.pulse.crawler.cache.PlayerCache
 import com.eb.pulse.crawler.data.GameDataHolder
 import com.eb.pulse.crawler.model.LiveMatch
 import com.eb.pulse.crawler.parser.LiveMatchParser
@@ -20,11 +21,11 @@ import scala.concurrent.Future
   * Created by Egor on 20.04.2017.
   */
 //todo restart task
-class LiveMatchTask(gameService: GameService, matchService: MatchService, httpUtils: HttpUtils, networthService: NetworthService) extends Runnable {
+class LiveMatchTask(gameService: GameService, matchService: MatchService, httpUtils: HttpUtils, networthService: NetworthService, playerCache: PlayerCache) extends Runnable {
 
   private val log = LoggerFactory.getLogger(this.getClass)
 
-  private val liveMatchParser = new LiveMatchParser(networthService)
+  private val liveMatchParser = new LiveMatchParser(networthService, playerCache)
 
   private val leaguesIdToSkip = getLeagueIdToSkip
 
@@ -103,5 +104,5 @@ class LiveMatchTask(gameService: GameService, matchService: MatchService, httpUt
   }
 
 
-  def sendMatches
+  def sendMatches={}
 }

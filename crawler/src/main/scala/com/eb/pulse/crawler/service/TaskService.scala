@@ -4,7 +4,6 @@ import com.eb.schedule.dto.TaskDTO
 import com.eb.schedule.model.dao.UpdateTaskRepository
 import com.eb.schedule.model.slick.{League, Team, UpdateTask}
 import com.eb.schedule.utils.DTOUtils
-import com.google.inject.Inject
 
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future

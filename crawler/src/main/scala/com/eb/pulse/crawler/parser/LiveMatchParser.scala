@@ -8,6 +8,7 @@ import com.eb.schedule.model.slick.{NetWorth, Team}
 import com.google.gson.{JsonArray, JsonObject}
 import org.slf4j.LoggerFactory
 
+
 /**
   * Created by Egor on 16.04.2017.
   */

@@ -4,13 +4,6 @@ import java.util.concurrent.{Executors, ScheduledExecutorService, TimeUnit}
 
 import com.eb.pulse.crawler.Lookup
 import com.eb.pulse.crawler.task.{FindFinishedGamesTask, FindLeagueTask, FindLongRunningGameTask, FindWinnerForTheMatchTask}
-import com.eb.schedule.configure.{CoreModule, MysqlModule}
-import com.eb.schedule.crawler._
-import com.eb.schedule.model.db.MysqlDB
-import com.eb.schedule.model.services._
-import com.eb.schedule.services.{ItemService, SeriesService}
-import com.eb.schedule.utils.HttpUtils
-import com.google.inject.Guice
 
 
 /**

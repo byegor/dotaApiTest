@@ -6,6 +6,8 @@ import com.eb.pulse.crawler.parser.FinishedMatchParser
 import com.eb.pulse.crawler.transformer.FinishedMatchToTransformer
 import com.eb.schedule.shared.bean.Match
 import com.eb.schedule.utils.HttpUtils
+import com.fasterxml.jackson.databind.ObjectMapper
+import com.fasterxml.jackson.module.scala.DefaultScalaModule
 import com.google.common.cache.{CacheBuilder, CacheLoader, LoadingCache}
 import com.google.gson.JsonObject
 import org.slf4j.LoggerFactory

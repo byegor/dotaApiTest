@@ -6,7 +6,7 @@ import com.eb.pulse.crawler.model.{FinishedMatch, Player, TeamScoreBoard}
 import com.eb.schedule.model.MatchStatus
 import com.eb.schedule.shared.bean.{HeroBean, Item, Match, TeamBean}
 
-import scala.collection.JavaConversions._
+import scala.collection.JavaConverters._
 
 
 /**
@@ -40,7 +40,7 @@ object FinishedMatchToTransformer {
   def transformTeam(teamScoreBoard: TeamScoreBoard): TeamBean = {
     val players = transformPlayers(teamScoreBoard.players)
     val team = teamScoreBoard.team
-    new TeamBean(team.id, team.name, team.tag, team.logo, players)
+    new TeamBean(team.id, team.name, team.tag, team.logo, seqAsJavaList(players))
   }
 
   def transformPlayers(players: List[Player]): Seq[com.eb.schedule.shared.bean.Player] = {
