@@ -3,7 +3,9 @@ package com.eb.pulse.crawler.task
 import com.eb.schedule.dao.SeriesRepository
 import com.eb.schedule.model.slick.MatchSeries
 
+import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
+
 
 /**
   * Created by Iegor.Bondarenko on 04.05.2017.
