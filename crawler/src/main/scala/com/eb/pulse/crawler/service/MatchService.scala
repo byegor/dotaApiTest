@@ -28,11 +28,11 @@ class MatchService(seriesRepository: SeriesRepository) extends Service {
   }
 
   def finishMatch(matchId:Long) ={
-    seriesRepository.update(matchId, true)
+    seriesRepository.updateFinishedState(matchId, true)
   }
 
-  def getUnfinishedSeries(): Future[Map[ScheduledGame, Seq[MatchSeries]]] = {
-    val unfinishedMatchesFuture = seriesRepository.getUnfinishedSeries
+  def getNotFinishedGamesWithMatches(): Future[Map[ScheduledGame, Seq[MatchSeries]]] = {
+    val unfinishedMatchesFuture = seriesRepository.getNotFinishedGamesWithMatches
     unfinishedMatchesFuture.map(result => result.groupBy(_._1).mapValues(_.map(_._2)))
   }
 

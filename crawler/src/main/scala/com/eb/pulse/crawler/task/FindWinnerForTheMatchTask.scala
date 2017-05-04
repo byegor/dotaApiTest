@@ -9,8 +9,7 @@ import com.google.gson.JsonObject
 import org.slf4j.LoggerFactory
 
 import scala.concurrent.ExecutionContext.Implicits.global
-import scala.concurrent.duration.Duration
-import scala.concurrent.{Await, Future}
+import scala.concurrent.Future
 
 class FindWinnerForTheMatchTask(matchService: MatchService, httpUtils: HttpUtils) extends Runnable{
 
@@ -18,7 +17,7 @@ class FindWinnerForTheMatchTask(matchService: MatchService, httpUtils: HttpUtils
 
   override def run(): Unit = {
     try {
-      val unfinishedGames: Future[Map[ScheduledGame, Seq[MatchSeries]]] = matchService.getUnfinishedSeries()
+      val unfinishedGames: Future[Map[ScheduledGame, Seq[MatchSeries]]] = matchService.getNotFinishedGamesWithMatches()
       unfinishedGames.map(games => games.foreach(tuple => tuple._2.foreach(updateWinners(_, tuple._1))))
     } catch {
       case e: Throwable => log.error("some trouble with mysql logic i guess", e)

@@ -2,7 +2,6 @@ package com.eb.pulse.crawler.task
 
 import java.util.concurrent.TimeUnit
 
-import com.eb.pulse.crawler.Lookup
 import com.eb.pulse.crawler.service.{GameService, MatchService}
 import com.eb.schedule.crawler.CrawlerUrls
 import com.eb.schedule.utils.HttpUtils
@@ -20,7 +19,7 @@ class FindLongRunningGameTask(gameService: GameService, matchService: MatchServi
 
   override def run(): Unit = {
     try {
-      val unfinishedSeries = matchService.getUnfinishedSeries()
+      val unfinishedSeries = matchService.getNotFinishedGamesWithMatches()
       val lastMatchByGame = unfinishedSeries.map(series => series.map(tuple => (tuple._1, tuple._2.maxBy(_.startDate.getTime))))
       val longRunningGames = lastMatchByGame.map(matches => matches.filter(tuple => System.currentTimeMillis() - tuple._2.startDate.getTime > TWO_HOUR))
       longRunningGames.onComplete {

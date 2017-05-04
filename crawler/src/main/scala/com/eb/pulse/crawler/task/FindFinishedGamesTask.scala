@@ -1,6 +1,5 @@
 package com.eb.pulse.crawler.task
 
-import com.eb.pulse.crawler.Lookup
 import com.eb.pulse.crawler.service.{GameService, MatchService}
 import com.eb.schedule.model.SeriesType
 import com.eb.schedule.model.slick.{MatchSeries, ScheduledGame}
@@ -23,7 +22,7 @@ class FindFinishedGamesTask(gameService: GameService, matchService: MatchService
 
   override def run(): Unit = {
     try {
-      val unfinishedMathcesByGame: Future[Map[ScheduledGame, Seq[MatchSeries]]] = matchService.getUnfinishedSeries()
+      val unfinishedMathcesByGame: Future[Map[ScheduledGame, Seq[MatchSeries]]] = matchService.getNotFinishedGamesWithMatches()
       val shouldBeProcessed: Future[Map[ScheduledGame, Seq[MatchSeries]]] = unfinishedMathcesByGame.map(um => um.filterNot(tuple => tuple._2.exists(_.radiantWin.isEmpty)))
 
       val gameScoreTuple = shouldBeProcessed.map(g => g.map(tuple => (tuple._1, SeriesType.fromCode(tuple._1.seriesType).gamesCount, tuple._2.count(_.radiantWin.get), tuple._2.count(!_.radiantWin.get))))

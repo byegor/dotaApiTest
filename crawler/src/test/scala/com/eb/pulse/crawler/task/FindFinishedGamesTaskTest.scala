@@ -32,7 +32,7 @@ class FindFinishedGamesTaskTest extends BasicFunSuiteTest {
       seriesCrawler.run()
     }
 
-    val unfinishedSeries: Future[Map[ScheduledGame, Seq[MatchSeries]]] = TestLookup.matchService.getUnfinishedSeries()
+    val unfinishedSeries: Future[Map[ScheduledGame, Seq[MatchSeries]]] = TestLookup.matchService.getNotFinishedGamesWithMatches()
     whenReady(unfinishedSeries) {
       res => {
         assert(1 == res.size)
@@ -61,7 +61,7 @@ class FindFinishedGamesTaskTest extends BasicFunSuiteTest {
         seriesCrawler.run()
       }) {
         ignore =>
-          whenReady(TestLookup.matchService.getUnfinishedSeries()) {
+          whenReady(TestLookup.matchService.getNotFinishedGamesWithMatches()) {
             res => assert(0 == res.size)
           }
 

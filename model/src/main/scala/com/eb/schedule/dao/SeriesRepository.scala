@@ -23,13 +23,13 @@ trait SeriesRepository {
 
   def update(series: MatchSeries): Future[Int]
 
-  def update(matchId: Long, finished: Boolean): Future[Int]
+  def updateFinishedState(matchId: Long, finished: Boolean): Future[Int]
 
-  def getUnfinishedSeries: Future[Seq[(ScheduledGame, MatchSeries)]]
+  def getNotFinishedGamesWithMatches: Future[Seq[(ScheduledGame, MatchSeries)]]
 
   def getSeriesWithoutWinner: Future[Seq[MatchSeries]]
 
-  def getRunningSeries(): Future[Seq[MatchSeries]]
+  def getLiveMatches(): Future[Seq[MatchSeries]]
 
   def updateMatchWithRadiantWin(matchId: Long, radiantWin: Some[Boolean]): Future[Int]
 }
@@ -63,14 +63,14 @@ class SeriesRepositoryImpl(implicit db: JdbcBackend#DatabaseDef) extends SeriesR
     )
   }
 
-  def update(matchId: Long, finished: Boolean): Future[Int] = {
+  def updateFinishedState(matchId: Long, finished: Boolean): Future[Int] = {
     db.run(
       series.filter(game => game.matchId === matchId).map(_.finished).update(finished)
     )
   }
 
 
-  def getUnfinishedSeries(): Future[Seq[(ScheduledGame, MatchSeries)]] = {
+  def getNotFinishedGamesWithMatches(): Future[Seq[(ScheduledGame, MatchSeries)]] = {
     db.run(
       (for {
         (matchSeries, g) <- series join ScheduledGame.table on (_.scheduledGameId === _.id)
@@ -85,7 +85,7 @@ class SeriesRepositoryImpl(implicit db: JdbcBackend#DatabaseDef) extends SeriesR
     )
   }
 
-  def getRunningSeries(): Future[Seq[MatchSeries]] = {
+  def getLiveMatches(): Future[Seq[MatchSeries]] = {
     db.run(
       series.filter(game => !game.finished).result
     )

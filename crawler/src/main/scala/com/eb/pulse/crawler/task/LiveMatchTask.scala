@@ -21,7 +21,6 @@ import scala.util.{Failure, Success}
 /**
   * Created by Egor on 20.04.2017.
   */
-//todo restart task
 class LiveMatchTask(gameService: GameService, matchService: MatchService, httpUtils: HttpUtils, networthService: NetworthService, cacheHelper: CacheHelper, teamService: TeamService) extends Runnable {
 
   private val log = LoggerFactory.getLogger(this.getClass)
