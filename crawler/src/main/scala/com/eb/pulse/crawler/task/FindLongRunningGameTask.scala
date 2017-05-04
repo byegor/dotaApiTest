@@ -9,19 +9,18 @@ import com.google.gson.JsonObject
 import org.slf4j.LoggerFactory
 
 import scala.concurrent.ExecutionContext.Implicits.global
-import scala.util.Success
+import scala.util.{Failure, Success}
 
-//todo start count time not from starting the series but from the last game. Start from TEST
 class FindLongRunningGameTask(gameService: GameService, matchService: MatchService, httpUtils: HttpUtils) extends Runnable{
 
   private val log = LoggerFactory.getLogger(this.getClass)
-  private val TWO_HOUR: Long = TimeUnit.HOURS.toMillis(2)
+  private val TWO_HOURS: Long = TimeUnit.HOURS.toMillis(2)
 
   override def run(): Unit = {
     try {
       val unfinishedSeries = matchService.getNotFinishedGamesWithMatches()
       val lastMatchByGame = unfinishedSeries.map(series => series.map(tuple => (tuple._1, tuple._2.maxBy(_.startDate.getTime))))
-      val longRunningGames = lastMatchByGame.map(matches => matches.filter(tuple => System.currentTimeMillis() - tuple._2.startDate.getTime > TWO_HOUR))
+      val longRunningGames = lastMatchByGame.map(matches => matches.filter(tuple => System.currentTimeMillis() - tuple._2.startDate.getTime > TWO_HOURS))
       longRunningGames.onComplete {
         case Success(res) => for ((game, lastMatch) <- res) {
           if (lastMatch.finished) {
@@ -36,6 +35,7 @@ class FindLongRunningGameTask(gameService: GameService, matchService: MatchServi
             }
           }
         }
+        case Failure(ex) => log.error("Issue on finding long running matches", ex)
       }
     } catch {
       case e: Throwable => log.error("Exception while finding long running games", e)
