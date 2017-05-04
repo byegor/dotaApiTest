@@ -27,7 +27,7 @@ class DownloadHeroTask(taskService: TaskService, httpUtils: HttpUtils, heroServi
             val heroId = json.get("id").getAsInt
             if (ids.contains(heroId)) {
               val heroName = json.get("name").getAsString
-              val insertHero = heroService.insertHero(Hero(heroId, heroName))
+              val insertHero = heroService.insertHero(Hero(heroId, heroName.replace("npc_dota_hero_", "")))
               insertHero.onComplete {
                 case Success(ignore) => heroCache.refresh()
               }
