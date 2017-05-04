@@ -39,7 +39,7 @@ class TaskService (taskRepository: UpdateTaskRepository)  {
   }
 
 
-  private def getPendingTasks(classname: String): Future[Seq[UpdateTask]] = {
+  def getPendingTasks(classname: String): Future[Seq[UpdateTask]] = {
     taskRepository.getPendingTasks(classname)
   }
 }

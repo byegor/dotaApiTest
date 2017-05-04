@@ -34,7 +34,7 @@ class FindWinnerForTheMatchTask(matchService: MatchService, httpUtils: HttpUtils
           if (SeriesType.BO1.code == game.seriesType) {
             matchService.updateMatchWithWinner(series.matchId, radiantWin)
           } else {
-            if (result.has("radiant_team_id")) {// todo replace if with boolean operation
+            if (result.has("radiant_team_id")) {
               if (result.get("radiant_team_id").getAsInt == game.radiant) {
                 matchService.updateMatchWithWinner(series.matchId, radiantWin)
               } else {
@@ -45,7 +45,6 @@ class FindWinnerForTheMatchTask(matchService: MatchService, httpUtils: HttpUtils
                 matchService.updateMatchWithWinner(series.matchId, radiantWin)
               } else {
                 matchService.updateMatchWithWinner(series.matchId, !radiantWin)
-
               }
             }
           }
