@@ -9,7 +9,6 @@ import com.eb.pulse.crawler.task.{FindFinishedGamesTask, FindLeagueTask, FindLon
 /**
   * Created by Егор on 08.02.2016.
   */
-//todo remove empty scheduled games without series
 //todo check rehost
 object CrawlerStarter extends App {
 
