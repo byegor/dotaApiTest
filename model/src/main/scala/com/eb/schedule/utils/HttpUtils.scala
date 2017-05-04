@@ -7,12 +7,19 @@ import com.google.gson.{JsonObject, JsonParser}
 import com.mashape.unirest.http.async.Callback
 import com.mashape.unirest.http.exceptions.UnirestException
 import com.mashape.unirest.http.{HttpResponse, Unirest}
+import com.typesafe.config.{Config, ConfigFactory}
+import org.slf4j.LoggerFactory
 
 
 class HttpUtils {
 
+  private val log = LoggerFactory.getLogger(this.getClass)
+
   private val lock: AnyRef = new Object()
   private val jsonParser = new JsonParser
+
+  val config: Config = ConfigFactory.load()
+  val REST_API_URL: String = config.getString("restapi.url")
 
   def getResponseAsJson(url: String): JsonObject = {
     lock.synchronized {
@@ -41,23 +48,21 @@ class HttpUtils {
     }
     out.close()
     in.close()
-    val response = out.toByteArray()
-    val fos = new FileOutputStream(fileName);
+    val response = out.toByteArray
+    val fos = new FileOutputStream(fileName)
     fos.write(response)
     fos.close()
   }
 
-  //todo url should be configurable
   def sendData(data: String)  {
-    Unirest.post("http://localhost:8188").body(data).asStringAsync(new Callback[String] {
+    Unirest.post(REST_API_URL).body(data).asStringAsync(new Callback[String] {
       override def failed(e: UnirestException): Unit = {
-//todo
+        log.error("Couldn't send data to restapi on " + REST_API_URL, e)
       }
 
       override def completed(response: HttpResponse[String]): Unit = {}
 
       override def cancelled(): Unit = {}
-
     })
 
   }
