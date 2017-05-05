@@ -4,7 +4,7 @@ import com.eb.pulse.crawler.cache.CacheHelper
 import com.eb.pulse.crawler.model.{LiveMatch, Player, TeamScoreBoard}
 import com.eb.pulse.crawler.service.{NetworthService, TeamService}
 import com.eb.schedule.model.SeriesType
-import com.eb.schedule.model.slick.{NetWorth, Team}
+import com.eb.schedule.model.slick.Team
 import com.google.gson.{JsonArray, JsonObject}
 import org.slf4j.LoggerFactory
 
@@ -38,8 +38,6 @@ class LiveMatchParser(netWorthService: NetworthService, cacheHelper: CacheHelper
         val direScoreBoard = getTeamScoreBoard(direTeam, scoreBoard.get("dire").getAsJsonObject, playerNames)
 
         val currentNet: Int = radiantScoreBoard.players.map(_.netWorth).sum - direScoreBoard.players.map(_.netWorth).sum
-        //todo move to liveMatch task?
-        netWorthService.insertOrUpdate(NetWorth(matchId, currentNet.toString))
 
         Some(LiveMatch(matchId, -1, radiantScoreBoard, direScoreBoard, leagueId, currentNet, duration, seriesType, radiantWin, direWin))
       } else {

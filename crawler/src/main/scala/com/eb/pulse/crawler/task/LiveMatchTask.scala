@@ -8,6 +8,7 @@ import com.eb.pulse.crawler.model.LiveMatch
 import com.eb.pulse.crawler.parser.LiveMatchParser
 import com.eb.pulse.crawler.service.{GameService, MatchService, NetworthService, TeamService}
 import com.eb.schedule.crawler.CrawlerUrls
+import com.eb.schedule.model.slick.NetWorth
 import com.eb.schedule.utils.HttpUtils
 import com.google.gson.{JsonArray, JsonObject}
 import com.typesafe.config.ConfigFactory
@@ -86,6 +87,8 @@ class LiveMatchTask(gameService: GameService, matchService: MatchService, httpUt
     gameFuture.map(game => {
       matchService.insertNewMatch(liveMatch, game.id, game.radiant)
       GameDataHolder.setLiveMatchId(liveMatch)
+      networthService.insertOrUpdate(NetWorth(liveMatch.matchId, liveMatch.currentNet.toString))
+
       liveMatch.copy(scheduledGameId = game.id)
     }
     )

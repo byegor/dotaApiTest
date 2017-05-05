@@ -7,6 +7,7 @@ import com.eb.schedule.model.slick.Hero
 import com.eb.schedule.utils.HttpUtils
 import com.google.gson.{JsonArray, JsonObject}
 
+import scala.concurrent.ExecutionContext.Implicits.global
 import scala.util.Success
 
 /**
@@ -14,7 +15,7 @@ import scala.util.Success
   */
 class DownloadHeroTask(taskService: TaskService, httpUtils: HttpUtils, heroService: HeroService, heroCache: HeroCache) {
 
-//todo nextVersion: download icon
+  //todo nextVersion: download icon
   def execute(): Unit = {
     val pendingTasks = taskService.getPendingTasks(Hero.getClass.getSimpleName)
     val heroesId = pendingTasks.map(seq => seq.map(_.id))

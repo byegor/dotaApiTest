@@ -34,7 +34,7 @@ abstract class BasicLookup extends DB{
   val httpUtils = new HttpUtils
 
 
-  val heroCache = new HeroCache(heroService)
+  val heroCache = new HeroCache(heroService, taskService)
   val itemCache = new ItemCache(itemService)
   val teamCache = new TeamCache(teamService, taskService)
   val playerCache = new PlayerCache(httpUtils)

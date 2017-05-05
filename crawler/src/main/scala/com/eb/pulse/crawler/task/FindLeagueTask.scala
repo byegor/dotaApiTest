@@ -2,7 +2,6 @@ package com.eb.pulse.crawler.task
 
 import com.eb.pulse.crawler.service.{LeagueService, TaskService}
 import com.eb.schedule.crawler.CrawlerUrls._
-import com.eb.schedule.model.Finished
 import com.eb.schedule.model.slick.{League, UpdateTask}
 import com.eb.schedule.utils.HttpUtils
 import com.google.gson.{JsonArray, JsonObject}
@@ -29,7 +28,7 @@ class FindLeagueTask(leagueService: LeagueService, taskService: TaskService, htt
         if (ids.contains(leagueId)) {
           log.debug("find league for saving: {}", itemJson)
           leagueService.insert(new League(leagueId, parseName(itemJson.get("name").getAsString), url = Some(itemJson.get("tournament_url").getAsString)))
-          taskService.update(new UpdateTask(leagueId, League.getClass.getSimpleName, Finished.status.toByte))
+          taskService.update(new UpdateTask(leagueId, League.getClass.getSimpleName, 1))
         }
       }
     } catch {
