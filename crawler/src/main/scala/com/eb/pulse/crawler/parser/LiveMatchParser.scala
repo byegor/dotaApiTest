@@ -41,7 +41,7 @@ class LiveMatchParser(netWorthService: NetworthService, cacheHelper: CacheHelper
         //todo move to liveMatch task?
         netWorthService.insertOrUpdate(NetWorth(matchId, currentNet.toString))
 
-        Some(LiveMatch(matchId, -1, radiantScoreBoard, direScoreBoard, leagueId, currentNet, duration, radiantScoreBoard.score, direScoreBoard.score, seriesType, radiantWin, direWin))
+        Some(LiveMatch(matchId, -1, radiantScoreBoard, direScoreBoard, leagueId, currentNet, duration, seriesType, radiantWin, direWin))
       } else {
         None
       }

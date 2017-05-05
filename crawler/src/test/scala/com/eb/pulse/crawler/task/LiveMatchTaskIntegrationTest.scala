@@ -149,8 +149,8 @@ class LiveMatchTaskIntegrationTest extends BasicWordSuiteTest {
         liveMatch.leagueId shouldEqual 4446
         liveMatch.currentNet shouldEqual 549
         liveMatch.duration.toInt shouldEqual 129
-        liveMatch.radiantScore shouldEqual 3
-        liveMatch.direScore shouldEqual 2
+        liveMatch.radiantTeamBoard.score shouldEqual 3
+        liveMatch.direTeamBoard.score shouldEqual 2
         liveMatch.winByRadiant shouldEqual 1
         liveMatch.winByDire shouldEqual 0
 

@@ -12,7 +12,7 @@ class GameServiceTest extends BasicWordSuiteTest{
 
   "Find Scheduled game by Live Match" should {
     "find game that already was there" in {
-      val lm = LiveMatch(1, -1, TeamScoreBoard(Team(1)), TeamScoreBoard(Team(2)), 1, 0, 1, 0, 0, SeriesType.BO1, 0, 0)
+      val lm = LiveMatch(1, -1, TeamScoreBoard(Team(1)), TeamScoreBoard(Team(2)), 1, 0, 1, SeriesType.BO1, 0, 0)
 
       whenReady(TestLookup.scheduledGameRepository.insertAndGet(ScheduledGame(1, 1, 2, 1, 0, status = MatchStatus.FINISHED.status))) {
         gameId =>
@@ -25,7 +25,7 @@ class GameServiceTest extends BasicWordSuiteTest{
     }
 
     "create new game as league id doesn't match" in {
-      val lm = LiveMatch(1, -1, TeamScoreBoard(Team(1)), TeamScoreBoard(Team(2)), 2, 0, 1, 0, 0, SeriesType.BO1, 0, 0)
+      val lm = LiveMatch(1, -1, TeamScoreBoard(Team(1)), TeamScoreBoard(Team(2)), 2, 0, 1, SeriesType.BO1, 0, 0)
 
       whenReady(TestLookup.scheduledGameRepository.insertAndGet(ScheduledGame(id = 1, radiant = 1, dire = 2, leagueId = 1, SeriesType.BO1.code, status = 0))) {
         gameId =>

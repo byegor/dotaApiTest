@@ -20,15 +20,13 @@ class LiveMatchTaskTest extends BasicWordSuiteTest {
   "LiveMatchTaskTest" should {
 
     "filterOutLessPlayers - filter out matches with less then 5 players per team" in {
-      val liveMatch = LiveMatch(1, 1, radiantTeamBoard = TeamScoreBoard(Team(1), players = List(Player(1, "", 1, Nil, 1, 1, 1, 1, 1)), Nil, Nil),
-        direTeamBoard = TeamScoreBoard(Team(2), Nil, Nil, Nil), 1, 0, 0, 0, 0, SeriesType.BO1, 0, 0)
+      val liveMatch = LiveMatch(1, 1, radiantTeamBoard = TeamScoreBoard(Team(1), players = List(Player(1, "", 1, Nil, 1, 1, 1, 1, 1)), Nil, Nil), direTeamBoard = TeamScoreBoard(Team(2), Nil, Nil, Nil), 1, 0, 0, SeriesType.BO1, 0, 0)
       val passed = liveMatchTask.filterOutLessPlayers(liveMatch)
       assert(!passed, "should not passed as number of players less then 5")
     }
 
     "filterOutLeagues - filter out leagues that are in ban list" in {
-      val liveMatch = LiveMatch(1, 1, radiantTeamBoard = TeamScoreBoard(Team(1), players = List(Player(1, "", 1, Nil, 1, 1, 1, 1, 1)), Nil, Nil),
-        direTeamBoard = TeamScoreBoard(Team(2), Nil, Nil, Nil), leagueId = 4177, 0, 0, 0, 0, SeriesType.BO1, 0, 0)
+      val liveMatch = LiveMatch(1, 1, radiantTeamBoard = TeamScoreBoard(Team(1), players = List(Player(1, "", 1, Nil, 1, 1, 1, 1, 1)), Nil, Nil), direTeamBoard = TeamScoreBoard(Team(2), Nil, Nil, Nil), leagueId = 4177, 0, 0, SeriesType.BO1, 0, 0)
       val passed = liveMatchTask.filterOutLeagues(liveMatch)
       assert(!passed, "league with this id should be filtered out")
 
@@ -36,15 +34,13 @@ class LiveMatchTaskTest extends BasicWordSuiteTest {
     }
 
     "filterOutLiveMatches - composition of filtering by  number of players and leagueId" in {
-      val liveMatch = LiveMatch(1, 1, radiantTeamBoard = TeamScoreBoard(Team(1), players = List(Player(1, "", 1, Nil, 1, 1, 1, 1, 1)), Nil, Nil),
-        direTeamBoard = TeamScoreBoard(Team(2), Nil, Nil, Nil), leagueId = 4177, 0, 0, 0, 0, SeriesType.BO1, 0, 0)
+      val liveMatch = LiveMatch(1, 1, radiantTeamBoard = TeamScoreBoard(Team(1), players = List(Player(1, "", 1, Nil, 1, 1, 1, 1, 1)), Nil, Nil), direTeamBoard = TeamScoreBoard(Team(2), Nil, Nil, Nil), leagueId = 4177, 0, 0, SeriesType.BO1, 0, 0)
       val passed = liveMatchTask.filterOutLiveMatches(Some(liveMatch))
       assert(!passed, "Should be filtered out as non plaers condition non league condition is met")
     }
 
     "findFinishedMatches" in {
-      val liveMatch = LiveMatch(19, 1, radiantTeamBoard = TeamScoreBoard(Team(1), players = List(Player(1, "", 1, Nil, 1, 1, 1, 1, 1)), Nil, Nil),
-        direTeamBoard = TeamScoreBoard(Team(2), Nil, Nil, Nil), leagueId = 4177, 0, 0, 0, 0, SeriesType.BO1, 0, 0)
+      val liveMatch = LiveMatch(19, 1, radiantTeamBoard = TeamScoreBoard(Team(1), players = List(Player(1, "", 1, Nil, 1, 1, 1, 1, 1)), Nil, Nil), direTeamBoard = TeamScoreBoard(Team(2), Nil, Nil, Nil), leagueId = 4177, 0, 0, SeriesType.BO1, 0, 0)
       val secondLiveMatch = liveMatch.copy(matchId = 20)
       GameDataHolder.setLiveMatchId(liveMatch)
       GameDataHolder.setLiveMatchId(secondLiveMatch)
@@ -55,8 +51,7 @@ class LiveMatchTaskTest extends BasicWordSuiteTest {
     }
 
     "processCurrentLiveGame" in {
-      val liveMatch = LiveMatch(5, -1, radiantTeamBoard = TeamScoreBoard(Team(45), players = List(Player(1, "", 1, Nil, 1, 1, 1, 1, 1)), Nil, Nil),
-        direTeamBoard = TeamScoreBoard(Team(34), Nil, Nil, Nil), leagueId = 4177, 0, 0, 0, 0, SeriesType.BO1, 0, 0)
+      val liveMatch = LiveMatch(5, -1, radiantTeamBoard = TeamScoreBoard(Team(45), players = List(Player(1, "", 1, Nil, 1, 1, 1, 1, 1)), Nil, Nil), direTeamBoard = TeamScoreBoard(Team(34), Nil, Nil, Nil), leagueId = 4177, 0, 0, SeriesType.BO1, 0, 0)
       whenReady(liveMatchTask.processCurrentLiveGame(liveMatch)) {
         m =>
           assert(m.scheduledGameId > 0, " new scheduled game should be created")
@@ -76,8 +71,7 @@ class LiveMatchTaskTest extends BasicWordSuiteTest {
     }
 
     "processFinishedMatches" in {
-      val liveMatch = LiveMatch(matchId = 10, 1, radiantTeamBoard = TeamScoreBoard(Team(1), players = List(Player(1, "", 1, Nil, 1, 1, 1, 1, 1)), Nil, Nil),
-        direTeamBoard = TeamScoreBoard(Team(3), Nil, Nil, Nil), leagueId = 417, 0, 0, 0, 0, SeriesType.BO1, 0, 0)
+      val liveMatch = LiveMatch(matchId = 10, 1, radiantTeamBoard = TeamScoreBoard(Team(1), players = List(Player(1, "", 1, Nil, 1, 1, 1, 1, 1)), Nil, Nil), direTeamBoard = TeamScoreBoard(Team(3), Nil, Nil, Nil), leagueId = 417, 0, 0, SeriesType.BO1, 0, 0)
       GameDataHolder.setLiveMatchId(liveMatch)
 
       whenReady(TestLookup.gameService.findGameByLiveMatch(liveMatch)) {

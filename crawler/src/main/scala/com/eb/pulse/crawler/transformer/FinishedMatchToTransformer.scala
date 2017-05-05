@@ -27,6 +27,7 @@ object FinishedMatchToTransformer {
     matchBean.setMatchStatus(MatchStatus.FINISHED.status)
     matchBean.setRadiantTeam(radiantTeam)
     matchBean.setDireTeam(direTeam)
+    matchBean.setMatchScore(finishedMatch.radiantTeam.score + " - " + finishedMatch.direTeam.score)
     matchBean.setNetworth(seqAsJavaList(finishedMatch.netWorth.netWorth.split(",").toList.map(new Integer(_))))
     matchBean.setGameNumber(-1) //todo do i need gameNumber
     matchBean.setRadianPicks(seqAsJavaList(finishedMatch.radiantTeam.picks.map(cacheHelper.getHero(_)).map(hero => new HeroBean(hero.id, hero.name))))

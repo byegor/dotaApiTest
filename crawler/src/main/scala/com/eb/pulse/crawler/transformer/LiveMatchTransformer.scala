@@ -27,6 +27,7 @@ object LiveMatchTransformer {
     matchBean.setMatchStatus(MatchStatus.FINISHED.status)
     matchBean.setRadiantTeam(radiantTeam)
     matchBean.setDireTeam(direTeam)
+    matchBean.setMatchScore(liveMatch.radiantTeamBoard.score + " - " + liveMatch.direTeamBoard.score)
     matchBean.setNetworth(seqAsJavaList(netWorth.netWorth.split(",").toList.map(new Integer(_))))
     matchBean.setGameNumber(-1) //todo do i need gameNumber in match bean
     matchBean.setRadianPicks(seqAsJavaList(liveMatch.radiantTeamBoard.picks.map(cacheHelper.getHero(_)).map(hero => new HeroBean(hero.id, hero.name))))
