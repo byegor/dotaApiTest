@@ -3,7 +3,6 @@ package com.eb.pulse.crawler.transformer
 import com.eb.pulse.crawler.Lookup
 import com.eb.pulse.crawler.cache.CacheHelper
 import com.eb.pulse.crawler.model.{LiveMatch, Player, TeamScoreBoard}
-import com.eb.schedule.model.MatchStatus
 import com.eb.schedule.shared.bean.{HeroBean, Item, Match, TeamBean}
 
 import scala.collection.JavaConversions._
@@ -19,12 +18,12 @@ object LiveMatchTransformer {
 
   def transform(liveMatch: LiveMatch): Match = {
     val radiantTeam = transformTeam(liveMatch.radiantTeamBoard)
-    val direTeam = transformTeam(liveMatch.radiantTeamBoard)
+    val direTeam = transformTeam(liveMatch.direTeamBoard)
     val netWorth = networthService.findByMatchId(liveMatch.matchId)
     val matchBean = new Match()
     matchBean.setMatchId(liveMatch.matchId)
     matchBean.setDuration(getDuration(liveMatch.duration.toInt))
-    matchBean.setMatchStatus(MatchStatus.FINISHED.status)
+    matchBean.setMatchStatus(0)
     matchBean.setRadiantTeam(radiantTeam)
     matchBean.setDireTeam(direTeam)
     matchBean.setMatchScore(liveMatch.radiantTeamBoard.score + " - " + liveMatch.direTeamBoard.score)
@@ -32,8 +31,8 @@ object LiveMatchTransformer {
     matchBean.setGameNumber(-1) //todo do i need gameNumber in match bean
     matchBean.setRadianPicks(seqAsJavaList(liveMatch.radiantTeamBoard.picks.map(cacheHelper.getHero(_)).map(hero => new HeroBean(hero.id, hero.name))))
     matchBean.setRadianBans(seqAsJavaList(liveMatch.radiantTeamBoard.bans.map(cacheHelper.getHero(_)).map(hero => new HeroBean(hero.id, hero.name))))
-    matchBean.setDirePicks(seqAsJavaList(liveMatch.radiantTeamBoard.picks.map(cacheHelper.getHero(_)).map(hero => new HeroBean(hero.id, hero.name))))
-    matchBean.setDireBans(seqAsJavaList(liveMatch.radiantTeamBoard.bans.map(cacheHelper.getHero(_)).map(hero => new HeroBean(hero.id, hero.name))))
+    matchBean.setDirePicks(seqAsJavaList(liveMatch.direTeamBoard.picks.map(cacheHelper.getHero(_)).map(hero => new HeroBean(hero.id, hero.name))))
+    matchBean.setDireBans(seqAsJavaList(liveMatch.direTeamBoard.bans.map(cacheHelper.getHero(_)).map(hero => new HeroBean(hero.id, hero.name))))
     matchBean
   }
 

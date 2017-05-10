@@ -1,7 +1,7 @@
 package com.eb.pulse.crawler.task
 
+import com.eb.pulse.crawler.CrawlerUrls
 import com.eb.pulse.crawler.service.MatchService
-import com.eb.schedule.crawler.CrawlerUrls
 import com.eb.schedule.model.SeriesType
 import com.eb.schedule.model.slick.{MatchSeries, ScheduledGame}
 import com.eb.schedule.utils.HttpUtils

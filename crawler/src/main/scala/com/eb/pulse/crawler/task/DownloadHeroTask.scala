@@ -1,8 +1,8 @@
 package com.eb.pulse.crawler.task
 
+import com.eb.pulse.crawler.CrawlerUrls.GET_HEROES
 import com.eb.pulse.crawler.cache.HeroCache
 import com.eb.pulse.crawler.service.{HeroService, TaskService}
-import com.eb.schedule.crawler.CrawlerUrls.GET_HEROES
 import com.eb.schedule.model.slick.Hero
 import com.eb.schedule.utils.HttpUtils
 import com.google.gson.{JsonArray, JsonObject}
@@ -13,10 +13,10 @@ import scala.util.Success
 /**
   * Created by Iegor.Bondarenko on 04.05.2017.
   */
-class DownloadHeroTask(taskService: TaskService, httpUtils: HttpUtils, heroService: HeroService, heroCache: HeroCache) {
+class DownloadHeroTask(taskService: TaskService, httpUtils: HttpUtils, heroService: HeroService, heroCache: HeroCache) extends Runnable{
 
   //todo nextVersion: download icon
-  def execute(): Unit = {
+  def run(): Unit = {
     val pendingTasks = taskService.getPendingTasks(Hero.getClass.getSimpleName)
     val heroesId = pendingTasks.map(seq => seq.map(_.id))
     heroesId.onComplete {

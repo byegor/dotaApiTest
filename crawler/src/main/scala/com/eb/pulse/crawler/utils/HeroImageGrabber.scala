@@ -1,4 +1,4 @@
-package com.eb.schedule.utils
+package com.eb.pulse.crawler.utils
 
 import java.io.File
 import java.net.URL

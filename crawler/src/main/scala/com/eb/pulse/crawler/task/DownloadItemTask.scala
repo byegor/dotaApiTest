@@ -1,7 +1,7 @@
 package com.eb.pulse.crawler.task
 
+import com.eb.pulse.crawler.CrawlerUrls._
 import com.eb.pulse.crawler.service.ItemService
-import com.eb.schedule.crawler.CrawlerUrls._
 import com.eb.schedule.model.slick.Item
 import com.eb.schedule.utils.HttpUtils
 import com.google.gson.{JsonArray, JsonObject}

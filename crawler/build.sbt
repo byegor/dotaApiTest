@@ -16,4 +16,4 @@ libraryDependencies ++= Seq(
 )
 
 
-mainClass in assembly := Some("com.eb.schedule.CrawlerStarter")
+mainClass in assembly := Some("com.eb.pulse.crawler.CrawlerStarter")

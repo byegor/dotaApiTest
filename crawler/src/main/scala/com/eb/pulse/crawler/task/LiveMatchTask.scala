@@ -2,12 +2,12 @@ package com.eb.pulse.crawler.task
 
 import java.util
 
+import com.eb.pulse.crawler.CrawlerUrls
 import com.eb.pulse.crawler.cache.CacheHelper
 import com.eb.pulse.crawler.data.GameDataHolder
 import com.eb.pulse.crawler.model.LiveMatch
 import com.eb.pulse.crawler.parser.LiveMatchParser
 import com.eb.pulse.crawler.service.{GameService, MatchService, NetworthService, TeamService}
-import com.eb.schedule.crawler.CrawlerUrls
 import com.eb.schedule.model.slick.NetWorth
 import com.eb.schedule.utils.HttpUtils
 import com.google.gson.{JsonArray, JsonObject}
@@ -87,7 +87,9 @@ class LiveMatchTask(gameService: GameService, matchService: MatchService, httpUt
     gameFuture.map(game => {
       matchService.insertNewMatch(liveMatch, game.id, game.radiant)
       GameDataHolder.setLiveMatchId(liveMatch)
-      networthService.insertOrUpdate(NetWorth(liveMatch.matchId, liveMatch.currentNet.toString))
+      if (liveMatch.duration > 0) {
+        networthService.insertOrUpdate(NetWorth(liveMatch.matchId, liveMatch.currentNet.toString))
+      }
 
       liveMatch.copy(scheduledGameId = game.id)
     }

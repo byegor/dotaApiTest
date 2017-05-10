@@ -23,13 +23,17 @@ class ItemCache(val itemService: ItemService) {
   }
 
   def getItem(id: Int): Item = {
-    val option: Option[Item] = cache.get(id)
-    if (option.isDefined) {
-      option.get
+    if (id != 0) {
+      val option: Option[Item] = cache.get(id)
+      if (option.isDefined) {
+        option.get
+      } else {
+        log.error("ALARMAAAA    Couldn't find an item: " + id)
+        new Item(id, "")
+        //todo item task
+      }
     } else {
-      log.error("ALARMAAAA    Couldn't find an item: " + id)
       new Item(id, "")
-      //todo item task
     }
   }
 

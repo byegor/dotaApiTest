@@ -3,7 +3,6 @@ package com.eb.pulse.crawler.transformer
 import com.eb.pulse.crawler.Lookup
 import com.eb.pulse.crawler.cache.CacheHelper
 import com.eb.pulse.crawler.model.{FinishedMatch, Player, TeamScoreBoard}
-import com.eb.schedule.model.MatchStatus
 import com.eb.schedule.shared.bean.{HeroBean, Item, Match, TeamBean}
 
 import scala.collection.JavaConverters._
@@ -24,7 +23,7 @@ object FinishedMatchToTransformer {
     //todo do i need start time
     matchBean.setStartTime(finishedMatch.startTime)
     matchBean.setDuration(getDuration(finishedMatch.duration))
-    matchBean.setMatchStatus(MatchStatus.FINISHED.status)
+    matchBean.setMatchStatus(if (finishedMatch.radiantWin) 1 else 2)
     matchBean.setRadiantTeam(radiantTeam)
     matchBean.setDireTeam(direTeam)
     matchBean.setMatchScore(finishedMatch.radiantTeam.score + " - " + finishedMatch.direTeam.score)

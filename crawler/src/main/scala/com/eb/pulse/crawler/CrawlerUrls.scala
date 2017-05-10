@@ -1,5 +1,4 @@
-package com.eb.schedule.crawler
-
+package com.eb.pulse.crawler
 
 object CrawlerUrls {
 

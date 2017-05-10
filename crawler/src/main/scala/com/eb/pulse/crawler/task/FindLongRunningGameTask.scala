@@ -2,8 +2,8 @@ package com.eb.pulse.crawler.task
 
 import java.util.concurrent.TimeUnit
 
+import com.eb.pulse.crawler.CrawlerUrls
 import com.eb.pulse.crawler.service.{GameService, MatchService}
-import com.eb.schedule.crawler.CrawlerUrls
 import com.eb.schedule.utils.HttpUtils
 import com.google.gson.JsonObject
 import org.slf4j.LoggerFactory

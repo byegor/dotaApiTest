@@ -50,7 +50,8 @@ class SendGameDataTask(liveMatches: Seq[LiveMatch], gameService: GameService, ma
             val jsonMatch = currentMatchesJson(m.matchId.toString)
             matchesByGameNumber = matchesByGameNumber + (m.gameNumber.toString -> jsonMatch)
           }
-          matchesByGames += (game.id.toString -> mapper.writeValueAsString(matchesByGameNumber))
+          val matchesList = matchesByGameNumber.toSeq.sortBy(_._1).unzip._2
+          matchesByGames += (game.id.toString -> mapper.writeValueAsString(matchesList))
         }
 
         val data = mapper.writeValueAsString(Data(currentGamesJson, currentMatchesJson, matchesByGames))

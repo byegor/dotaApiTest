@@ -12,7 +12,7 @@ import scala.concurrent.Future
   */
 class RestartTask(val seriesRepository: SeriesRepository) {
 
-  def process(): Unit = {
+  def processRestart(): Unit = {
     val stillRunningMatches: Future[Seq[MatchSeries]] = seriesRepository.getLiveMatches()
     stillRunningMatches.map(seq => seq.foreach(liveMatch => seriesRepository.updateFinishedState(liveMatch.matchId, finished = true)))
   }
