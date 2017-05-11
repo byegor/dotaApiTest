@@ -20,7 +20,7 @@ class FindWinnerForTheMatchTask(matchService: MatchService, httpUtils: HttpUtils
       val unfinishedGames: Future[Map[ScheduledGame, Seq[MatchSeries]]] = matchService.getNotFinishedGamesWithMatches()
       unfinishedGames.map(games => games.foreach(tuple => tuple._2.foreach(updateWinners(_, tuple._1))))
     } catch {
-      case e: Throwable => log.error("some trouble with mysql logic i guess", e)
+      case e: Throwable => log.error("Issue in running task", e)
     }
   }
 

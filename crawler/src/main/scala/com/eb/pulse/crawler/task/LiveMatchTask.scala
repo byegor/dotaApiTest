@@ -34,16 +34,20 @@ class LiveMatchTask(gameService: GameService, matchService: MatchService, httpUt
 
 
   override def run(): Unit = {
-    val liveMatchesJson: List[JsonObject] = getLiveMatches()
-    val parsedLiveMatches: List[LiveMatch] = liveMatchesJson.map(liveMatchParser.parse).filter(filterOutLiveMatches).map(_.get)
-    val liveMatches = Future.sequence(parsedLiveMatches.map(processCurrentLiveGame))
-    liveMatches.onComplete {
-      case Success(liveMatchesResult) =>
-        val finishedIds = findFinishedMatches(liveMatchesResult)
-        finishedIds.foreach(processFinishedMatches)
-        sendMatches(liveMatchesResult)
-      case Failure(ex) => log.error("Couldn't process live matches", ex)
+    try {
+      val liveMatchesJson: List[JsonObject] = getLiveMatches()
+      val parsedLiveMatches: List[LiveMatch] = liveMatchesJson.map(liveMatchParser.parse).filter(filterOutLiveMatches).map(_.get)
+      val liveMatches = Future.sequence(parsedLiveMatches.map(processCurrentLiveGame))
+      liveMatches.onComplete {
+        case Success(liveMatchesResult) =>
+          val finishedIds = findFinishedMatches(liveMatchesResult)
+          finishedIds.foreach(processFinishedMatches)
+          sendMatches(liveMatchesResult)
+        case Failure(ex) => log.error("Couldn't process live matches", ex)
 
+      }
+    } catch {
+      case e: Throwable => log.error("Issue in running task", e)
     }
   }
 

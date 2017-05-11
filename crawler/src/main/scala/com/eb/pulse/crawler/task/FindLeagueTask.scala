@@ -32,7 +32,7 @@ class FindLeagueTask(leagueService: LeagueService, taskService: TaskService, htt
         }
       }
     } catch {
-      case e: Throwable => log.error("", e)
+      case e: Throwable => log.error("Issue in running task", e)
     }
   }
 

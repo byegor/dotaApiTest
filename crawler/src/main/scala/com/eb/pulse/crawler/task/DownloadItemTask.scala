@@ -22,7 +22,7 @@ class DownloadItemTask(itemService: ItemService, httpUtils: HttpUtils) extends R
       }
       itemService.insert(items)
     }catch {
-      case e: Throwable => log.error("", e)
+      case e: Throwable => log.error("Issue in running task", e)
     }
   }
 

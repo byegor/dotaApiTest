@@ -34,7 +34,7 @@ class FindFinishedGamesTask(gameService: GameService, matchService: MatchService
         }
       }
     } catch {
-      case e: Throwable => log.error("SeriesCrawler: ", e)
+      case e: Throwable => log.error("Issue in running task", e)
     }
   }
 }

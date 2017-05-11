@@ -5,7 +5,7 @@ import com.eb.pulse.crawler.cache.CacheHelper
 import com.eb.pulse.crawler.model.{FinishedMatch, Player, TeamScoreBoard}
 import com.eb.schedule.shared.bean.{HeroBean, Item, Match, TeamBean}
 
-import scala.collection.JavaConverters._
+import scala.collection.JavaConversions.seqAsJavaList
 
 
 /**
@@ -27,7 +27,9 @@ object FinishedMatchToTransformer {
     matchBean.setRadiantTeam(radiantTeam)
     matchBean.setDireTeam(direTeam)
     matchBean.setMatchScore(finishedMatch.radiantTeam.score + " - " + finishedMatch.direTeam.score)
-    matchBean.setNetworth(seqAsJavaList(finishedMatch.netWorth.netWorth.split(",").toList.map(new Integer(_))))
+    if (!finishedMatch.netWorth.netWorth.isEmpty) {
+      matchBean.setNetworth(seqAsJavaList(finishedMatch.netWorth.netWorth.split(",").toList.map(new Integer(_))))
+    }
     matchBean.setGameNumber(-1) //todo do i need gameNumber
     matchBean.setRadianPicks(seqAsJavaList(finishedMatch.radiantTeam.picks.map(cacheHelper.getHero(_)).map(hero => new HeroBean(hero.id, hero.name))))
     matchBean.setRadianBans(seqAsJavaList(finishedMatch.radiantTeam.bans.map(cacheHelper.getHero(_)).map(hero => new HeroBean(hero.id, hero.name))))
@@ -62,7 +64,7 @@ object FinishedMatchToTransformer {
     })
   }
 
-  def getDuration(duration:Int) = {
+  def getDuration(duration: Int) = {
     val minutes: Int = duration / 60
     val seconds: Int = duration - minutes * 60
     minutes + ":" + "%02d".format(seconds)
