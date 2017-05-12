@@ -67,7 +67,7 @@ class FinishedMatchParser(netWorthService: NetworthService) {
       var items:List[Int] = Nil
       for (i <- 0 until 6) {
         val itemId: Int = player.get("item_" + i).getAsInt
-        items ::= itemId
+        items :+= itemId
       }
       val p = Player(accountId, "", heroId, items, level, kills, deaths, assists, 0)
       val isRadiant = player.get("player_slot").getAsInt < 5
@@ -98,7 +98,7 @@ class FinishedMatchParser(netWorthService: NetworthService) {
         val heroId: Int = pick.get("hero_id").getAsInt
         val isRadiant: Boolean = pick.get("team").getAsInt == 0
         val isPick: Boolean = pick.get("is_pick").getAsBoolean
-        picks ::= Pick(heroId, isRadiant, isPick)
+        picks :+= Pick(heroId, isRadiant, isPick)
       }
     }
     picks
