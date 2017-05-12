@@ -105,6 +105,6 @@ class FinishedMatchParser(netWorthService: NetworthService) {
   }
 
 
+  case class Pick(heroId: Int, radiant: Boolean, pick: Boolean)
 }
 
-case class Pick(heroId: Int, radiant: Boolean, pick: Boolean)
