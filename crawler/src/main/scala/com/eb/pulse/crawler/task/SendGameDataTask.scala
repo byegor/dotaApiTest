@@ -113,7 +113,11 @@ class SendGameDataTask(liveMatches: Seq[LiveMatch], gameService: GameService, ma
 
 
   def fillWithScore(gameBean: GameBean, matches: Seq[MatchSeries]) = {
-    matches.foreach(matches =>
+    var matchesByGameNumber = HashMap[Byte, MatchSeries]()
+    for (m <- matches.sortBy(_.startDate.getTime)) {
+      matchesByGameNumber = matchesByGameNumber + (m.gameNumber -> m)
+    }
+    matchesByGameNumber.values.foreach(matches =>
       if (matches.radiantWin.get) gameBean.setRadiantWin(gameBean.radiantWin + 1) else gameBean.setDireWin(gameBean.direWin + 1))
   }
 
