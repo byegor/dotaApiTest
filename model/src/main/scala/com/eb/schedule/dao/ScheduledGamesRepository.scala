@@ -64,7 +64,7 @@ class ScheduledGameRepositoryImpl(implicit db: JdbcBackend#DatabaseDef) extends 
     val future: Future[Int] = db.run(games += game)
     future.onFailure {
       case e =>
-        log.error("couldn't insert scheduled game", e)
+        log.error("couldn't insert scheduled game " + game, e)
         throw e
     }
     future
@@ -77,7 +77,7 @@ class ScheduledGameRepositoryImpl(implicit db: JdbcBackend#DatabaseDef) extends 
     val future: Future[Int] = db.run(action)
     future.onFailure {
       case e =>
-        log.error("couldn't insertAndGet scheduled game", e)
+        log.error("couldn't insertAndGet scheduled game " + game, e)
         throw e
     }
     future

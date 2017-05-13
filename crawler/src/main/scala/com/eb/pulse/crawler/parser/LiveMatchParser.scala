@@ -54,7 +54,7 @@ class LiveMatchParser(netWorthService: NetworthService, cacheHelper: CacheHelper
 
   def parseTeam(json: JsonObject): Team = {
     if (json == null) {
-      Team(-1)
+      Team(0)
     } else {
       val teamId: Int = json.get("team_id").getAsInt
       val name = json.get("team_name").getAsString
