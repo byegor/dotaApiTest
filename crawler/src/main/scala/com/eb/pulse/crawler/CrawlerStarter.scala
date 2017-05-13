@@ -8,7 +8,6 @@ import com.eb.pulse.crawler.task._
 /**
   * Created by Егор on 08.02.2016.
   */
-//todo check rehost
 object CrawlerStarter extends App {
 
   val restartTask = new RestartTask(Lookup.seriesRepository)
