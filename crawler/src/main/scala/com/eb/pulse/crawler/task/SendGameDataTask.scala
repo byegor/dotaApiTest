@@ -72,7 +72,7 @@ class SendGameDataTask(liveMatches: Seq[LiveMatch], gameService: GameService, ma
       gameBean.setId(game.id)
       gameBean.setSeriesType(SeriesType.fromCode(game.seriesType).name())
       gameBean.setGameStatus(game.status)
-      gameBean.setNumberOfGames(matches.size)
+      gameBean.setNumberOfGames(matches.map(_.gameNumber).toSet.size)
       gameBean.setStartTime(game.startDate.getTime)
 
       currentGames = gameBean :: currentGames
