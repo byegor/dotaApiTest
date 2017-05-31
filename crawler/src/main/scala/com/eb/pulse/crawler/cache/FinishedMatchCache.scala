@@ -40,7 +40,7 @@ class FinishedMatchCache(finishedMatchParser: FinishedMatchParser, val httpUtils
     try {
       val response: JsonObject = httpUtils.getResponseAsJson(GET_MATCH_DETAILS + matchId)
       val result: JsonObject = response.getAsJsonObject("result")
-      if (result.has("error")) {
+      if (result == null || result.has("error")) {
         None
       } else {
         val finishedMatch = finishedMatchParser.parseMatch(result)
