@@ -24,7 +24,7 @@ libraryDependencies in ThisBuild ++= Seq(
 
 )
 
-lazy val root = project.in(file(".")) aggregate(model, restapi, crawler)
+lazy val root = project.in(file(".")) aggregate(model, restapi, crawler, dotabot)
 
 lazy val model = project.in(file("model"))
 
@@ -33,5 +33,7 @@ lazy val model = project.in(file("model"))
 lazy val crawler = project.in(file("crawler")) dependsOn (model % "test->test;compile->compile")
 
 lazy val restapi = project.in(file("rest-api"))
+
+lazy val dotabot = project.in(file("dota-bot"))
 
 parallelExecution in ThisBuild := false
