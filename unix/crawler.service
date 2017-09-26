@@ -1,0 +1,14 @@
+Unit]
+Description=Crawler Service
+
+[Service]
+User=egtheprog
+WorkingDirectory=/home/egtheprog
+ExecStart=/usr/bin/java -Xmx340m -Dconfig.file=application-prod.conf -jar crawler-assembly-0.3.jar
+SuccessExitStatus=143
+TimeoutStopSec=10
+Restart=on-failure
+RestartSec=5
+
+[Install]
+WantedBy=multi-user.target
