@@ -5,46 +5,41 @@ import com.eb.schedule.shared.bean.Match;
 
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 /**
  * Created by Egor on 24.09.2017.
  */
 public class Data {
 
-    List<GameBean> games;
-    Map<String, Match> matchById;
-    Map<String, List<Match>> matchesByGames;
+    Map<String, List<GameBean>> currentGames;
+    Map<String, Match> currentMatches;
+    Map<String, Match> matchesByGames;
 
     public Data() {
     }
 
-    public Data(List<GameBean> games, Map<String, Match> matchById, Map<String, List<Match>> matchesByGames) {
-        this.games = games;
-        this.matchById = matchById;
-        this.matchesByGames = matchesByGames;
+    public List<GameBean> getCurrentGames() {
+        return currentGames.entrySet().stream().map(entry -> entry.getValue()).flatMap(List::stream).collect(Collectors.toList());
     }
 
-    public List<GameBean> getGames() {
-        return games;
+    public void setCurrentGames(Map<String, List<GameBean>> currentGames) {
+        this.currentGames = currentGames;
     }
 
-    public void setGames(List<GameBean> games) {
-        this.games = games;
+    public Map<String, Match> getCurrentMatches() {
+        return currentMatches;
     }
 
-    public Map<String, Match> getMatchById() {
-        return matchById;
+    public void setCurrentMatches(Map<String, Match> currentMatches) {
+        this.currentMatches = currentMatches;
     }
 
-    public void setMatchById(Map<String, Match> matchById) {
-        this.matchById = matchById;
-    }
-
-    public Map<String, List<Match>> getMatchesByGames() {
+    public Map<String, Match> getMatchesByGames() {
         return matchesByGames;
     }
 
-    public void setMatchesByGames(Map<String, List<Match>> matchesByGames) {
+    public void setMatchesByGames(Map<String, Match> matchesByGames) {
         this.matchesByGames = matchesByGames;
     }
 }

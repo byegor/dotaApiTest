@@ -47,16 +47,14 @@ public class DotaStatisticsBot extends TelegramLongPollingBot {
         String command = split[0];
         switch (command.toLowerCase()) {
             case "/all":
-
+//todo check npe
                 return DataService.INSTANCE.getAllGames().stream().reduce((o1, o2) -> o1 + "\r\n" + o2).orElse("");
             case "/live":
-                return "get only live games";
+                return DataService.INSTANCE.getLiveGames().stream().reduce((o1, o2) -> o1 + "\r\n" + o2).orElse("");
             case "/finished":
                 return "only finished";
             default:
                 return "have no idea what you want, ltmgtfy";
-
-
         }
     }
 

@@ -22,14 +22,14 @@ public enum DataService {
 
 
     public List<String> getAllGames() {
-        return data.getGames().stream().map(TransformerUtil::transform).collect(Collectors.toList());
+        return data.getCurrentGames().stream().map(TransformerUtil::transform).collect(Collectors.toList());
     }
 
     public List<String> getLiveGames() {
-        return data.getGames().stream().filter(gameBean -> gameBean.getGameStatus() == 1).map(TransformerUtil::transform).collect(Collectors.toList());
+        return data.getCurrentGames().stream().filter(gameBean -> gameBean.getGameStatus() == 1).map(TransformerUtil::transform).collect(Collectors.toList());
     }
 
     public List<String> getFinishedGames() {
-        return data.getGames().stream().filter(gameBean -> gameBean.getGameStatus() == 0).map(TransformerUtil::transform).collect(Collectors.toList());
+        return data.getCurrentGames().stream().filter(gameBean -> gameBean.getGameStatus() == 0).map(TransformerUtil::transform).collect(Collectors.toList());
     }
 }
