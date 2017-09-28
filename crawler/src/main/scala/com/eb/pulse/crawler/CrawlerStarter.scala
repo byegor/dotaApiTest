@@ -2,7 +2,8 @@ package com.eb.pulse.crawler
 
 import java.util.concurrent.{Executors, ScheduledExecutorService, TimeUnit}
 
-import com.eb.pulse.crawler.task._
+import com.eb.pulse.crawler.data.task._
+import com.eb.pulse.crawler.httpserver.HtppServer
 
 
 /**
@@ -32,4 +33,6 @@ object CrawlerStarter extends App {
   executor.scheduleAtFixedRate(seriesCrawler, 20, 60, TimeUnit.SECONDS)
   executor.scheduleAtFixedRate(longRunningCrawler, 30, 60, TimeUnit.SECONDS)
   executor.scheduleAtFixedRate(heroTask, 40, 60, TimeUnit.SECONDS)
+
+  HtppServer.start
 }

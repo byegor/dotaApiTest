@@ -1,8 +1,8 @@
 package com.eb.pulse.crawler
 
-import com.eb.pulse.crawler.cache._
-import com.eb.pulse.crawler.parser.FinishedMatchParser
-import com.eb.pulse.crawler.service._
+import com.eb.pulse.crawler.data.cache._
+import com.eb.pulse.crawler.data.parser.FinishedMatchParser
+import com.eb.pulse.crawler.data.service._
 import com.eb.schedule.dao.{HeroRepositoryImpl, ItemRepositoryImpl, NetWorthRepositoryImpl, SeriesRepositoryImpl}
 import com.eb.schedule.model.dao.{LeagueRepositoryImpl, ScheduledGameRepositoryImpl, TeamRepositoryImpl, UpdateTaskRepositoryImpl}
 import com.eb.schedule.model.db.DB

@@ -1,45 +1,41 @@
 package com.eb.pulse.telegrambot.entity;
 
 import com.eb.schedule.shared.bean.GameBean;
-import com.eb.schedule.shared.bean.Match;
 
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
-import java.util.stream.Collectors;
 
 /**
  * Created by Egor on 24.09.2017.
  */
 public class Data {
 
-    Map<String, List<GameBean>> currentGames;
-    Map<String, Match> currentMatches;
-    Map<String, Match> matchesByGames;
+    Map<String, String> currentGames;
+    Map<String, String> currentMatches;
+    Map<String, String> matchesByGames;
 
     public Data() {
     }
 
     public List<GameBean> getCurrentGames() {
-        return currentGames.entrySet().stream().map(entry -> entry.getValue()).flatMap(List::stream).collect(Collectors.toList());
+//        return currentGames.entrySet().stream().map(entry -> entry.getValue()).flatMap(List::stream).collect(Collectors.toList());
+        return Collections.emptyList();
     }
 
-    public void setCurrentGames(Map<String, List<GameBean>> currentGames) {
-        this.currentGames = currentGames;
-    }
-
-    public Map<String, Match> getCurrentMatches() {
+    public Map<String, String> getCurrentMatches() {
         return currentMatches;
     }
 
-    public void setCurrentMatches(Map<String, Match> currentMatches) {
+    public void setCurrentMatches(Map<String, String> currentMatches) {
         this.currentMatches = currentMatches;
     }
 
-    public Map<String, Match> getMatchesByGames() {
+    public Map<String, String> getMatchesByGames() {
         return matchesByGames;
     }
 
-    public void setMatchesByGames(Map<String, Match> matchesByGames) {
+    public void setMatchesByGames(Map<String, String> matchesByGames) {
         this.matchesByGames = matchesByGames;
     }
 }
