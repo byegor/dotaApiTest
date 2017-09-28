@@ -1,0 +1,27 @@
+version: '3'
+
+volumes:
+    crawler_mysql:
+    bot_mysql:
+services:
+  crawler_mysql:
+    container_name: crawler_mysql_container
+    image: mysql:5.7
+    environment:
+      - MYSQL_ROOT_PASSWORD=root
+      - MYSQL_DATABASE=schedule
+    ports:
+      - "3307:3306"
+    volumes:
+      - crawler_mysql:/crawler_data
+
+  bot_mysql:
+      container_name: bot_mysql_container
+      image: mysql:5.7
+      environment:
+        - MYSQL_ROOT_PASSWORD=root
+        - MYSQL_DATABASE=bot
+      ports:
+        - "3307:3306"
+      volumes:
+        - bot_mysql:/bot_data
