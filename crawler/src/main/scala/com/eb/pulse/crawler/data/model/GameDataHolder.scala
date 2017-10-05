@@ -33,5 +33,5 @@ object GameDataHolder {
 
 
 }
-
+//todo matches by games should contains gameid to list of mathces id
 case class Data(currentGames: Map[String, List[GameBean]], currentMatches: Map[String, Match], matchesByGames: Map[String, Seq[Match]])
