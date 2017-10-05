@@ -1,9 +1,12 @@
 package com.eb.pulse.telegrambot.service;
 
-import com.eb.pulse.telegrambot.entity.Data;
 import com.eb.pulse.telegrambot.util.TransformerUtil;
+import com.eb.schedule.shared.bean.GameBean;
+import com.eb.schedule.shared.bean.Match;
 
+import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 /**
@@ -13,23 +16,34 @@ import java.util.stream.Collectors;
 public enum DataService {
     INSTANCE;
 
-    private Data data;
+    List<GameBean> currentGames = Collections.emptyList();
+    Map<String, Match> currentMatches = Collections.emptyMap();
+    Map<String, List<String>> matchesByGames = Collections.emptyMap();
 
 
-    public void setData(Data data) {
-        this.data = data;
+    public void setCurrentGames(List<GameBean> currentGames) {
+        this.currentGames = currentGames;
     }
 
+    public void setCurrentMatches(Map<String, Match> currentMatches) {
+        this.currentMatches = currentMatches;
+    }
 
-    public List<String> getAllGames() {
-        return data.getCurrentGames().stream().map(TransformerUtil::transform).collect(Collectors.toList());
+    public void setMatchesByGames(Map<String, List<String>> matchesByGames) {
+        this.matchesByGames = matchesByGames;
+    }
+//todo text can't be empty
+
+
+    public List<GameBean> getCurrentGames() {
+        return currentGames;
     }
 
     public List<String> getLiveGames() {
-        return data.getCurrentGames().stream().filter(gameBean -> gameBean.getGameStatus() == 1).map(TransformerUtil::transform).collect(Collectors.toList());
+        return currentGames.stream().filter(gameBean -> gameBean.getGameStatus() == 1).map(TransformerUtil::transform).collect(Collectors.toList());
     }
 
     public List<String> getFinishedGames() {
-        return data.getCurrentGames().stream().filter(gameBean -> gameBean.getGameStatus() == 0).map(TransformerUtil::transform).collect(Collectors.toList());
+        return currentGames.stream().filter(gameBean -> gameBean.getGameStatus() == 2).map(TransformerUtil::transform).collect(Collectors.toList());
     }
 }
