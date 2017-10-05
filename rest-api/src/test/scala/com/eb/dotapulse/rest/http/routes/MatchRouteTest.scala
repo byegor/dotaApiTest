@@ -2,7 +2,7 @@ package com.eb.dotapulse.rest.http.routes
 
 import akka.http.scaladsl.server.Route
 import akka.http.scaladsl.testkit.ScalatestRouteTest
-import com.eb.dotapulse.rest.data.{Data, DataStorage}
+import com.eb.dotapulse.rest.data.{Data1, DataStorage}
 import org.scalatest.{Matchers, WordSpec}
 
 /**
@@ -25,7 +25,7 @@ class MatchRouteTest extends WordSpec with Matchers with ScalatestRouteTest {
     }
 
     "find match" in{
-      val data = Data("", Map("123" -> "MATCH"), Map())
+      val data = Data1("", Map("123" -> "MATCH"), Map())
       DataStorage.setData(data)
       Get("/matches/123") ~> route ~> check {
         responseAs[String] shouldEqual "MATCH"

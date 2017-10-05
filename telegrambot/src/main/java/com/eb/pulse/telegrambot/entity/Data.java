@@ -1,5 +1,8 @@
 package com.eb.pulse.telegrambot.entity;
 
+import com.eb.schedule.shared.bean.GameBean;
+import com.eb.schedule.shared.bean.Match;
+
 import java.util.List;
 import java.util.Map;
 
@@ -8,26 +11,26 @@ import java.util.Map;
  */
 public class Data {
 
-    public Map<String, List<String>> currentGames;
-    Map<String, String> currentMatches;
+    Map<String, List<GameBean>> currentGames;
+    Map<String, Match> currentMatches;
     Map<String, List<String>> matchesByGames;
 
     public Data() {
     }
 
-    public Map<String, List<String>> getCurrentGames() {
+    public Map<String, List<GameBean>> getCurrentGames() {
         return currentGames;
     }
 
-    public void setCurrentGames(Map<String, List<String>> currentGames) {
+    public void setCurrentGames(Map<String, List<GameBean>> currentGames) {
         this.currentGames = currentGames;
     }
 
-    public Map<String, String> getCurrentMatches() {
+    public Map<String, Match> getCurrentMatches() {
         return currentMatches;
     }
 
-    public void setCurrentMatches(Map<String, String> currentMatches) {
+    public void setCurrentMatches(Map<String, Match> currentMatches) {
         this.currentMatches = currentMatches;
     }
 

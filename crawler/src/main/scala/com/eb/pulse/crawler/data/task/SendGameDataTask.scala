@@ -8,8 +8,6 @@ import com.eb.schedule.model.SeriesType
 import com.eb.schedule.model.slick.{League, MatchSeries, ScheduledGame, Team}
 import com.eb.schedule.shared.bean.{GameBean, LeagueBean, Match, TeamBean}
 import com.eb.schedule.utils.HttpUtils
-import com.fasterxml.jackson.databind.ObjectMapper
-import com.fasterxml.jackson.module.scala.DefaultScalaModule
 import org.joda.time.format.DateTimeFormat
 import org.joda.time.{DateTime, DateTimeZone}
 import org.slf4j.LoggerFactory
@@ -25,9 +23,6 @@ import scala.util.{Failure, Success}
 class SendGameDataTask(liveMatches: Seq[LiveMatch], gameService: GameService, matchService: MatchService, httpUtils: HttpUtils, cacheHelper: CacheHelper) {
   private val log = LoggerFactory.getLogger(this.getClass)
 
-  val mapper = new ObjectMapper()
-  mapper.registerModule(DefaultScalaModule)
-
   val formatter = DateTimeFormat.forPattern("EEEE, d MMM")
 
   val liveMatchesById = liveMatches.map(m => m.matchId -> m).toMap
@@ -40,13 +35,13 @@ class SendGameDataTask(liveMatches: Seq[LiveMatch], gameService: GameService, ma
         val currentGames = processGames(gamesPair)
         val currentMatches: Map[String, Match] = processMatch(gamesPair.values.flatten)
 
-        var matchesByGames = new HashMap[String, Seq[Match]]()
+        var matchesByGames = new HashMap[String, Seq[String]]()
         for ((game, mathces) <- gamesPair) {
 
-          var matchesByGameNumber = HashMap[String, Match]()
+          var matchesByGameNumber = HashMap[String, String]()
           for (m <- mathces.sortBy(_.startDate.getTime)) {
             val matchBean = currentMatches(m.matchId.toString)
-            matchesByGameNumber = matchesByGameNumber + (m.gameNumber.toString -> matchBean)
+            matchesByGameNumber = matchesByGameNumber + (m.gameNumber.toString -> matchBean.getMatchId.toString)
           }
           val matchesList = matchesByGameNumber.toSeq.sortBy(_._1).unzip._2
           matchesByGames += (game.id.toString -> matchesList)

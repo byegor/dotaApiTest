@@ -20,12 +20,16 @@ public class AllCmd extends BotCommand {
         super("/all", "get all games during last few hours");
     }
 
+    protected AllCmd(String s, String s1) {
+        super(s, s1);
+    }
+
     @Override
     public SendMessage processCommand(Message message, String... arguments) {
         InlineKeyboardMarkup keyboardMarkup = new InlineKeyboardMarkup();
         List<List<InlineKeyboardButton>> rows = new ArrayList<>();
         List<InlineKeyboardButton> inlineRow = null;
-        List<GameBean> games = DataService.INSTANCE.getCurrentGames();
+        List<GameBean> games = getGameBeanList();
         for (int i = 0; i < games.size(); i++) {
             if (i % 2 == 0) {
                 if (inlineRow != null) {
@@ -44,8 +48,16 @@ public class AllCmd extends BotCommand {
         keyboardMarkup.setKeyboard(rows);
         SendMessage sendMessage = new SendMessage();
         sendMessage.setReplyMarkup(keyboardMarkup);
-        sendMessage.setText("Here the list of games for the last few hours");
+        sendMessage.setText(getText());
         sendMessage.setChatId(message.getChatId());
         return sendMessage;
+    }
+
+    public List<GameBean> getGameBeanList(){
+        return DataService.INSTANCE.getCurrentGames();
+    }
+
+    public String getText(){
+        return "Here the list of games for the last few hours";
     }
 }

@@ -13,7 +13,7 @@ object DataStorage {
   private var currentMatches: java.util.Map[String, String] = new ConcurrentHashMap[String, String]()
   private var matchesByGames: java.util.Map[String, String] = new ConcurrentHashMap[String, String]()
 
-  def setData(data: Data): Unit = {
+  def setData(data: Data1): Unit = {
     this.currentGames = data.currentGames
     this.currentMatches = new ConcurrentHashMap[String, String](mapAsJavaMap(data.currentMatches))
     this.matchesByGames = new ConcurrentHashMap[String, String](mapAsJavaMap(data.matchesByGames))

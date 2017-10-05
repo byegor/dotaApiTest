@@ -1,12 +1,11 @@
 package com.eb.pulse.telegrambot.service;
 
-import com.eb.pulse.telegrambot.util.TransformerUtil;
+import com.eb.pulse.telegrambot.entity.Data;
 import com.eb.schedule.shared.bean.GameBean;
 import com.eb.schedule.shared.bean.Match;
 
 import java.util.Collections;
 import java.util.List;
-import java.util.Map;
 import java.util.stream.Collectors;
 
 /**
@@ -16,34 +15,40 @@ import java.util.stream.Collectors;
 public enum DataService {
     INSTANCE;
 
-    List<GameBean> currentGames = Collections.emptyList();
-    Map<String, Match> currentMatches = Collections.emptyMap();
-    Map<String, List<String>> matchesByGames = Collections.emptyMap();
+    Data data;
+    List<GameBean> currentGames;
 
-
-    public void setCurrentGames(List<GameBean> currentGames) {
-        this.currentGames = currentGames;
+    public void setData(Data data) {
+        this.data = data;
+        currentGames = data.getCurrentGames().values().stream().flatMap(List::stream).collect(Collectors.toList());
     }
-
-    public void setCurrentMatches(Map<String, Match> currentMatches) {
-        this.currentMatches = currentMatches;
-    }
-
-    public void setMatchesByGames(Map<String, List<String>> matchesByGames) {
-        this.matchesByGames = matchesByGames;
-    }
-//todo text can't be empty
 
 
     public List<GameBean> getCurrentGames() {
         return currentGames;
     }
 
-    public List<String> getLiveGames() {
-        return currentGames.stream().filter(gameBean -> gameBean.getGameStatus() == 1).map(TransformerUtil::transform).collect(Collectors.toList());
+    public List<GameBean> getLiveGames() {
+        if (data != null) {
+            return currentGames.stream().filter(gameBean -> gameBean.getGameStatus() == 1).collect(Collectors.toList());
+        } else {
+            return Collections.emptyList();
+        }
     }
 
-    public List<String> getFinishedGames() {
-        return currentGames.stream().filter(gameBean -> gameBean.getGameStatus() == 2).map(TransformerUtil::transform).collect(Collectors.toList());
+    public List<GameBean> getFinishedGames() {
+        if (data != null) {
+            return currentGames.stream().filter(gameBean -> gameBean.getGameStatus() == 2).collect(Collectors.toList());
+        } else {
+            return Collections.emptyList();
+        }
+    }
+
+    public List<String> getMatchesIdByGameId(String gameId) {
+        return data.getMatchesByGames().getOrDefault(gameId, Collections.emptyList());
+    }
+
+    public Match getMatchById(String matchId) {
+        return data.getCurrentMatches().get(matchId);
     }
 }

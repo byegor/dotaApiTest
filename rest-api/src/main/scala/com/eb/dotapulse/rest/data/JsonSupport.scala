@@ -8,6 +8,6 @@ import spray.json.DefaultJsonProtocol
   */
 trait JsonSupport extends SprayJsonSupport with DefaultJsonProtocol {
 
-  implicit val itemFormat = jsonFormat3(Data)
+  implicit val itemFormat = jsonFormat3(Data1)
 
 }

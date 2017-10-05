@@ -2,7 +2,7 @@ package com.eb.dotapulse.rest.http.routes
 
 import akka.http.scaladsl.server.Route
 import akka.http.scaladsl.testkit.ScalatestRouteTest
-import com.eb.dotapulse.rest.data.{Data, DataStorage}
+import com.eb.dotapulse.rest.data.{Data1, DataStorage}
 import org.scalatest.{Matchers, WordSpec}
 
 /**
@@ -12,7 +12,7 @@ class GamesRouteTest extends WordSpec with Matchers with ScalatestRouteTest {
   val route: Route = new GamesRoute().route
 
   "Get current games should return live games" in {
-    DataStorage.setData(Data("current", Map(), Map()))
+    DataStorage.setData(Data1("current", Map(), Map()))
     Get("/games/") ~> route ~> check {
       responseAs[String] shouldEqual "current"
     }
@@ -20,7 +20,7 @@ class GamesRouteTest extends WordSpec with Matchers with ScalatestRouteTest {
 
 
   "Get matches by gameId" in {
-    DataStorage.setData(Data("current", Map(), Map("123" -> "seq of matches")))
+    DataStorage.setData(Data1("current", Map(), Map("123" -> "seq of matches")))
     Get("/games/123") ~> route ~> check {
       responseAs[String] shouldEqual "seq of matches"
     }

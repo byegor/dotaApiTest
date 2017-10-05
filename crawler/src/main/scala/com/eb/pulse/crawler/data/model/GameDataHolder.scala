@@ -30,8 +30,7 @@ object GameDataHolder {
   def removeLiveMatch(matchId: Long): Boolean = {
     liveMatchesId.remove(matchId)
   }
-
-
 }
+
 //todo matches by games should contains gameid to list of mathces id
-case class Data(currentGames: Map[String, List[GameBean]], currentMatches: Map[String, Match], matchesByGames: Map[String, Seq[Match]])
+case class Data(currentGames: Map[String, List[GameBean]], currentMatches: Map[String, Match], matchesByGames: Map[String, Seq[String]])
