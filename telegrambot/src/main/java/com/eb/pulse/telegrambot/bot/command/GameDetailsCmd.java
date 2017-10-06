@@ -28,11 +28,11 @@ public class GameDetailsCmd extends BotCommand {
             if (first.isPresent()) {
                 StringBuilder sb = new StringBuilder();
                 GameBean gameBean = first.get();
-                sb.append("League: ").append(gameBean.getLeague().getName()).append("\r\n");
+                sb.append("League: _").append(gameBean.getLeague().getName()).append("_\r\n");
                 sb.append(gameBean.getRadiant().getName()).append("  ").append(gameBean.getRadiantWin());
                 sb.append(" : ").append(gameBean.getDireWin()).append("  ").append(gameBean.getDire().getName()).append("\r\n");
 
-                StringBuilder s = new StringBuilder("             ");
+                StringBuilder s = new StringBuilder();
                 for (int i = 0; i < gameBean.getRadiant().getName().length(); i++) {
                     s.append(" ");
                 }
