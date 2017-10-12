@@ -1,4 +1,4 @@
-package com.eb.pulse.telegrambot.bot.command;
+package com.eb.pulse.telegrambot.bot.command.user;
 
 import com.eb.pulse.telegrambot.service.DataService;
 import com.eb.schedule.shared.bean.GameBean;
@@ -8,13 +8,13 @@ import java.util.List;
 /**
  * Created by Egor on 03.10.2017.
  */
-public class LiveCmd extends AllCmd {
+public class LiveCmd extends RecentCmd {
     public LiveCmd() {
         super("/live", "get all live games");
     }
 
     @Override
-    public List<GameBean> getGameBeanList() {
+    public List<GameBean> getGameBeanList(int count) {
         return DataService.INSTANCE.getLiveGames();
     }
 

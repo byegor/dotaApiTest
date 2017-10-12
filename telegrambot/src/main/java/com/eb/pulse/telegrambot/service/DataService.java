@@ -5,7 +5,9 @@ import com.eb.schedule.shared.bean.GameBean;
 import com.eb.schedule.shared.bean.Match;
 
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 /**
@@ -17,15 +19,30 @@ public enum DataService {
 
     Data data;
     List<GameBean> currentGames;
+    Map<String, String> gamesByMatchId;
 
     public void setData(Data data) {
         this.data = data;
         currentGames = data.getCurrentGames().values().stream().flatMap(List::stream).collect(Collectors.toList());
+
+        gamesByMatchId = new HashMap<>();
+        Map<String, List<String>> matchesByGames = data.getMatchesByGames();
+        for (Map.Entry<String, List<String>> entry : matchesByGames.entrySet()) {
+            List<String> matchesIds = entry.getValue();
+            for (String id : matchesIds) {
+                gamesByMatchId.put(id, entry.getKey());
+            }
+
+        }
     }
 
 
     public List<GameBean> getCurrentGames() {
         return currentGames;
+    }
+
+    public List<GameBean> getRecentGames(int count) {
+        return currentGames.subList(0, count > currentGames.size() ? currentGames.size() : count);
     }
 
     public List<GameBean> getLiveGames() {
@@ -36,9 +53,9 @@ public enum DataService {
         }
     }
 
-    public List<GameBean> getFinishedGames() {
+    public List<GameBean> getFinishedGames(int maxCount) {
         if (data != null) {
-            return currentGames.stream().filter(gameBean -> gameBean.getGameStatus() == 2).collect(Collectors.toList());
+            return currentGames.stream().filter(gameBean -> gameBean.getGameStatus() == 2).limit(maxCount).collect(Collectors.toList());
         } else {
             return Collections.emptyList();
         }
@@ -50,5 +67,9 @@ public enum DataService {
 
     public Match getMatchById(String matchId) {
         return data.getCurrentMatches().get(matchId);
+    }
+
+    public String getGamesByMatchId(String matchId) {
+        return gamesByMatchId.get(matchId);
     }
 }
