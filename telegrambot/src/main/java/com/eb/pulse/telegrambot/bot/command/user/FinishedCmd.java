@@ -10,16 +10,21 @@ import java.util.List;
  */
 public class FinishedCmd extends RecentCmd {
     public FinishedCmd() {
-        super("/done", " get last 5 finished games, want more: type /done 10");
+        super("/done", "get last 5 finished games, also available /done N");
     }
 
     @Override
     public List<GameBean> getGameBeanList(int count) {
-        return DataService.INSTANCE.getFinishedGames(count );
+        return DataService.INSTANCE.getFinishedGames(count);
     }
 
     @Override
     public String getText() {
         return getDescription();
+    }
+
+    @Override
+    public String getTextForNoGames() {
+        return "Couldn't find any finished game for the past few hours";
     }
 }

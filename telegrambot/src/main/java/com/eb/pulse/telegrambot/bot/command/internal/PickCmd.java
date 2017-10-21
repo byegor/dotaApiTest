@@ -11,7 +11,6 @@ import org.telegram.telegrambots.api.objects.replykeyboard.InlineKeyboardMarkup;
 import org.telegram.telegrambots.api.objects.replykeyboard.buttons.InlineKeyboardButton;
 
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
 
 /**
@@ -22,22 +21,19 @@ public class PickCmd extends BotCommand {
         super("/mp", "");
     }
 
+    public PickCmd(String s, String s1) {
+        super(s,s1);
+    }
+
+
     @Override
     public BotApiMethod executeCmd(Message message, String... arguments) {
         String matchId = arguments[1];
 
         Match match = DataService.INSTANCE.getMatchById(matchId);
-        List<HeroBean> radianPicks = match.getRadianPicks();
-        List<HeroBean> direPicks = match.getDirePicks();
-        Iterator<HeroBean> direIterator = direPicks.iterator();
-        StringBuilder sb = new StringBuilder();
-        for (HeroBean radianPick : radianPicks) {
-            HeroBean direPick = direIterator.next();
-            sb.append(String.format("%-15s", radianPick.getName())).append(direPick.getName()).append("\r\n");
-        }
 
         EditMessageText editMessage = new EditMessageText();
-        editMessage.setText(sb.toString());
+        editMessage.setText(generateMessage(match));
         editMessage.enableMarkdown(true);
         editMessage.setChatId(message.getChatId());
         editMessage.setMessageId(message.getMessageId());
@@ -45,12 +41,20 @@ public class PickCmd extends BotCommand {
         return editMessage;
     }
 
+    protected void addPickInfo(StringBuilder sb, String teamName, List<HeroBean> heroes) {
+        sb.append("_").append(teamName).append("_").append("\r\n");
+
+        for (HeroBean hero : heroes) {
+            sb.append("    ").append(hero.getName()).append("\r\n");
+        }
+    }
+
     @Override
     protected boolean validateCmdRequest(String[] arguments) {
         return arguments.length == 2;
     }
 
-    private InlineKeyboardMarkup createInlineKeyboard(Match match) {
+    protected InlineKeyboardMarkup createInlineKeyboard(Match match) {
         List<List<InlineKeyboardButton>> rows = new ArrayList<>();
         List<InlineKeyboardButton> inlineRow = new ArrayList<>();
 
@@ -61,5 +65,13 @@ public class PickCmd extends BotCommand {
         InlineKeyboardMarkup keyboardMarkup = new InlineKeyboardMarkup();
         keyboardMarkup.setKeyboard(rows);
         return keyboardMarkup;
+    }
+
+    protected String generateMessage(Match match){
+        StringBuilder sb = new StringBuilder();
+
+        addPickInfo(sb, match.getRadiantTeam().getName(), match.getRadianPicks());
+        addPickInfo(sb, match.getDireTeam().getName(), match.getDirePicks());
+        return sb.toString();
     }
 }

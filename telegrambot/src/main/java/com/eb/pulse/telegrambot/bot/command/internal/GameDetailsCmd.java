@@ -39,7 +39,7 @@ public class GameDetailsCmd extends BotCommand {
             for (String mId : mathesId) {
                 Match match = DataService.INSTANCE.getMatchById(mId);
                 sb.append("*Game ").append(++index).append("*").append("\r\n");
-                sb.append(TransformerUtil.transformMatchFoGeneralInf(match));
+                sb.append(TransformerUtil.transformMatchFoGeneralInfo(match));
             }
             SendMessage sendMessage = new SendMessage();
             sendMessage.setText(sb.toString());

@@ -18,7 +18,7 @@ import java.util.List;
  */
 public class RecentCmd extends BotCommand implements UserCommand {
     public RecentCmd() {
-        super("/recent", "get recent 5 games, want more: type /recent 10");
+        super("/recent", "get recent 5 games, want more: type /recent N");
     }
 
     protected RecentCmd(String s, String s1) {
@@ -51,8 +51,12 @@ public class RecentCmd extends BotCommand implements UserCommand {
 
         keyboardMarkup.setKeyboard(rows);
         SendMessage sendMessage = new SendMessage();
+        if (games.isEmpty()) {
+            sendMessage.setText(getTextForNoGames());
+        } else {
+            sendMessage.setText(getText());
+        }
         sendMessage.setReplyMarkup(keyboardMarkup);
-        sendMessage.setText(getText());
         sendMessage.setChatId(message.getChatId());
         return sendMessage;
     }
@@ -73,5 +77,9 @@ public class RecentCmd extends BotCommand implements UserCommand {
     @Override
     public String getHelpDescription() {
         return getCommand() + " - " + getDescription();
+    }
+
+    public String getTextForNoGames() {
+        return "there are no games for pats few hours";
     }
 }

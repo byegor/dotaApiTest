@@ -29,6 +29,7 @@ public class HelpCmd extends BotCommand implements UserCommand {
             if (botCommand instanceof UserCommand) {
                 sb.append(((UserCommand) botCommand).getHelpDescription()).append("\r\n");
             }
+            sb.append(getHelpDescription()).append("\r\n");
         }
         return sb.toString();
     }

@@ -92,7 +92,7 @@ public class DotaStatisticsBot extends TelegramLongPollingBot {
 
     private SendMessage getErrorMessage(Long chatId) {
         errorMessage = new SendMessage();
-        errorMessage.setText("Opps! We can't handle your request now :( ");
+        errorMessage.setText("Opps and sorry! We can't handle your request now :( ");
         errorMessage.setChatId(chatId);
         return errorMessage;
     }

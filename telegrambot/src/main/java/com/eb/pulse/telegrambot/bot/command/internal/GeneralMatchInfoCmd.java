@@ -25,8 +25,8 @@ public class GeneralMatchInfoCmd extends BotCommand {
     public EditMessageText executeCmd(Message message, String... arguments) {
         String matchId = arguments[1];
         Match match = DataService.INSTANCE.getMatchById(matchId);
-        String matchString = TransformerUtil.transformMatchFoGeneralInf(match);
-        matchString += EmojiParser.parseToUnicode("      :clock4: ") + match.getDuration();
+        String matchString = TransformerUtil.transformMatchInfo(match);
+        matchString += EmojiParser.parseToUnicode("     :clock4:  ") + match.getDuration();
 
         EditMessageText editMessage = new EditMessageText();
         editMessage.setText(matchString);

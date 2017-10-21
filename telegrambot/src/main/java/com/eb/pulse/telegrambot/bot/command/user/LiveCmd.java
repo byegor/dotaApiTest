@@ -22,4 +22,9 @@ public class LiveCmd extends RecentCmd {
     public String getText() {
         return getDescription();
     }
+
+    @Override
+    public String getTextForNoGames() {
+        return "there are no live games currently running";
+    }
 }
